@@ -1,0 +1,14 @@
+/.gradle/
+/build/
+/deploy/
+/.shelf/
+/test-home/
+out
+*.iml
+*.ipr
+*.iws
+*.ids
+
+modules/*/test-home/
+modules/*/build/
+modules/core/test-ormcache-run/

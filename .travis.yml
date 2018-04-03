@@ -1,0 +1,18 @@
+language: java
+jdk: oraclejdk9
+
+install:
+  - ./gradlew --no-daemon assemble
+
+script:
+  - ./gradlew --no-daemon test javadoc
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+addons:
+  apt:
+    packages:
+      - oracle-java9-installer
