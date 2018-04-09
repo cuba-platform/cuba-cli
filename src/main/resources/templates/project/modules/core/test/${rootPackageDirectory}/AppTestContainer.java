@@ -1,4 +1,4 @@
-package $rootPackage;
+package ${project.RootPackage};
 
 import com.haulmont.bali.util.Dom4j;
 import com.haulmont.cuba.testsupport.TestContainer;
@@ -25,7 +25,7 @@ public class AppTestContainer extends TestContainer {
         appPropertiesFiles = Arrays.asList(
                 // List the files defined in your web.xml
                 // in appPropertiesConfig context parameter of the core module
-                "$packageDirectoryName/app.properties",
+                "${project.RootPackageDirectory}/app.properties",
                 // Add this file which is located in CUBA and defines some properties
                 // specifically for test environment. You can replace it with your own
                 // or add another one in the end.

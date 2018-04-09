@@ -15,7 +15,7 @@ const val RESET = "\u001B[0m"
 
 class TemplateProcessor(templateFolderPath: String) {
 
-    private val pathVariablePattern: Regex = Regex("\\$\\{[a-zA-Z_][a-zA-Z_0-9]*}")
+    private val pathVariablePattern: Regex = Regex("\\$\\{[a-zA-Z][0-9a-zA-Z]+(\\.[a-zA-Z][0-9a-zA-Z]*)*}")
 
     private val templatePath: Path
 
@@ -31,7 +31,7 @@ class TemplateProcessor(templateFolderPath: String) {
         }
     }
 
-    fun copyTo(path: Path, bindings: Map<String, String>) {
+    fun copyTo(path: Path, bindings: Map<String, Any>) {
         Velocity.init()
         val vc = VelocityContext()
         bindings.forEach({ k, v -> vc.put(k, v) })
@@ -72,10 +72,10 @@ class TemplateProcessor(templateFolderPath: String) {
         outputFile.createNewFile()
     }
 
-    private fun applyPathTransform(path: String, bindings: Map<String, String>): String {
+    private fun applyPathTransform(path: String, bindings: Map<String, Any>): String {
         return pathVariablePattern.replace(path) {
             val paramName = it.value.substring(2, it.value.length - 1)
-            bindings[paramName]!!
+            bindings[paramName] as String
         }
     }
 }

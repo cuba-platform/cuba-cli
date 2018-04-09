@@ -1,7 +1,7 @@
 package com.haulmont.cuba.cli
 
 interface CliCommand {
-    fun run()
 
-    fun name(): String
+    @Throws(CommandExecutionException::class)
+    fun execute(context: CliContext)
 }

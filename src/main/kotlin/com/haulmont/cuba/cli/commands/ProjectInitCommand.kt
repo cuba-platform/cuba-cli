@@ -1,68 +1,69 @@
 package com.haulmont.cuba.cli.commands
 
-import com.beust.jcommander.Parameter
-import com.haulmont.cuba.cli.*
+import com.haulmont.cuba.cli.CliContext
+import com.haulmont.cuba.cli.GeneratorCommand
+import com.haulmont.cuba.cli.TemplateProcessor
+import com.haulmont.cuba.cli.model.ProjectModel
+import com.haulmont.cuba.cli.prompting.Answers
+import com.haulmont.cuba.cli.prompting.QuestionsList
 import java.io.File
 import java.nio.file.Paths
 
-class ProjectInitCommand : CliCommand {
+class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
+    override fun getModelName(): String = "project"
 
-    @Parameter(names = ["--help"], help = true)
-    var help: Boolean = false
 
-    override fun name(): String = "init"
+    override fun checkPreconditions(context: CliContext) {
+        super.checkPreconditions(context)
+        val projectModel = context.getModel<ProjectModel>("project")
+        check(projectModel == null) { "There are existing project found" }
+    }
 
-    override fun run() {
-
-        if (help) {
-            printHelp()
-            return
+    override fun QuestionsList.prompting(context: CliContext) {
+        question("projectName", "Project Name") {
+            default { System.getProperty("user.dir").split(File.separatorChar).last() }
         }
 
-        generateProject()
+        question("namespace", "Project Namespace") {
+            default { answers ->
+                val notAlphaNumeric = Regex("[^a-zA-Z0-9]")
+
+                notAlphaNumeric.replace(answers["projectName"] as String, "")
+            }
+
+            validate {
+                checkRegex("[a-zA-Z][a-zA-Z0-9]*", "Project namespace can contain only alphanumeric characters and start with a letter.")
+            }
+        }
+
+        question("rootPackage", "Root package") {
+            default { answers -> "com.company.${answers["namespace"]}" }
+        }
+
+        options("platformVersion", "Platform version", availablePlatformVersions)
     }
 
-    private fun printHelp() {
-        println("New CUBA platform project generation")
+    override fun createModel(context: CliContext, answers: Answers): ProjectInitModel {
+        val rootPackage = answers["rootPackage"] as String
+        return ProjectInitModel(
+                answers["projectName"] as String,
+                answers["namespace"] as String,
+                rootPackage,
+                answers["platformVersion"] as String,
+                rootPackage.replace('.', File.separatorChar)
+        )
     }
 
-    private fun generateProject() {
-        val notAlphaNumeric = Regex("[^a-zA-Z0-9]")
-        val namespaceRegex = Regex("[a-zA-Z][a-zA-Z0-9]*")
+    override fun beforeGeneration(context: CliContext, bindings: MutableMap<String, Any>) {
+        bindings["rootPackageDirectory"] = context.getModel<ProjectInitModel>(getModelName())!!.rootPackageDirectory
+    }
 
-        val answers = PromptsBuilder(System.`in`, System.out)
-                .addQuestion(
-                        name = "projectName",
-                        caption = "Project Name",
-                        defaultValue = PlainValue(getDefaultProjectName()))
-                .addQuestion(
-                        name = "namespace",
-                        caption = "Project Namespace",
-                        defaultValue = CalculatedValue { answers -> notAlphaNumeric.replace(answers["projectName"]!!, "") },
-                        validation = {
-                            it.takeIf { it.matches(namespaceRegex) }
-                                    ?: throw ValidationException("Project namespace can contain only alphanumeric characters and start with a letter.")
-
-                        })
-                .addQuestion(
-                        name = "rootPackage",
-                        caption = "Root package",
-                        defaultValue = CalculatedValue { answers -> "com.company.${answers["namespace"]}" })
-                .addListQuestion(
-                        name = "platformVersion",
-                        caption = "Platform Version",
-                        options = listOf("6.8.5", "6.9-SNAPSHOT"))
-                .addSilentQuestion(
-                        name = "packageDirectoryName",
-                        defaultValue = CalculatedValue { answers ->
-                            answers["rootPackage"]!!.replace('.', File.separatorChar)
-                        }
-                ).build()
-                .ask()
-
+    override fun generate(context: CliContext, bindings: Map<String, Any>) {
         TemplateProcessor("templates/project")
-                .copyTo(Paths.get(""), answers)
+                .copyTo(Paths.get(""), bindings)
     }
 }
 
-fun getDefaultProjectName(): String = System.getProperty("user.dir").split(File.separatorChar).last()
+data class ProjectInitModel(val name: String, val namespace: String, val rootPackage: String, val platformVersion: String, val rootPackageDirectory: String)
+
+private val availablePlatformVersions = listOf("6.8.5", "6.9-SNAPSHOT")
