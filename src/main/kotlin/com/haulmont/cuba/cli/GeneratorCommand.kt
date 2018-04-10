@@ -1,6 +1,5 @@
 package com.haulmont.cuba.cli
 
-import com.haulmont.cuba.cli.event.BeforeGenerationEvent
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.Prompts
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -14,9 +13,9 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
         context.addModel(getModelName(), model)
 
         val bindings: MutableMap<String, Any> = mutableMapOf()
-        context.postEvent(BeforeGenerationEvent(context, bindings))
-
+        context.getModels().toMap(bindings)
         beforeGeneration(context, bindings)
+
         generate(context, bindings.toMap())
     }
 

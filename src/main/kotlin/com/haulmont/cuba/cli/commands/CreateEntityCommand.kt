@@ -1,12 +1,13 @@
 package com.haulmont.cuba.cli.commands
 
+import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.GeneratorCommand
 import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
-
+@Parameters(commandDescription = "Create new entity")
 class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     override fun QuestionsList.prompting(context: CliContext) {
 

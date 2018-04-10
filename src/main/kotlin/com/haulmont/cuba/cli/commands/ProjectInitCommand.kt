@@ -1,5 +1,6 @@
 package com.haulmont.cuba.cli.commands
 
+import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.GeneratorCommand
 import com.haulmont.cuba.cli.TemplateProcessor
@@ -8,6 +9,7 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
 import java.io.File
 import java.nio.file.Paths
 
+@Parameters(commandDescription = "Create new project")
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     override fun getModelName(): String = "project"
 

@@ -5,7 +5,7 @@ install:
   - ./gradlew --no-daemon assemble
 
 script:
-  - ./gradlew --no-daemon test javadoc
+  - ./gradlew --no-daemon test
 
 cache:
   directories:

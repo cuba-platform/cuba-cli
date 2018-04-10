@@ -1,14 +1,19 @@
 package com.haulmont.cuba.cli.event
 
+import com.haulmont.cuba.cli.CliCommand
 import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.CommandsRegistry
 
-abstract class CliEvent(val cliContext: CliContext)
+interface CliEvent
 
-class LoadingEndEvent(cliContext: CliContext) : CliEvent(cliContext)
+class InitPluginEvent(val cliContext: CliContext, val commandsRegistry: CommandsRegistry) : CliEvent
 
-class ModelRegisteredEvent(cliContext: CliContext, val modelName: String) : CliEvent(cliContext)
+class BeforeCommandExecutionEvent(val command: CliCommand) : CliEvent
 
-class CommandRegisterEvent(cliContext: CliContext, val commandsRegistry: CommandsRegistry) : CliEvent(cliContext)
+class ModelRegisteredEvent(val modelName: String) : CliEvent
 
-class BeforeGenerationEvent(cliContext: CliContext, val bindings: MutableMap<String, Any>) : CliEvent(cliContext)
+class AfterCommandExecutionEvent(val command: CliCommand) : CliEvent
+
+class DestroyPluginEvent : CliEvent
+
+class FailEvent(val cause: Throwable? = null) : CliEvent

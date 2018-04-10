@@ -2,6 +2,7 @@ package com.haulmont.cuba.cli
 
 import com.google.common.eventbus.EventBus
 import com.haulmont.cuba.cli.event.CliEvent
+import com.haulmont.cuba.cli.event.FailEvent
 import com.haulmont.cuba.cli.event.ModelRegisteredEvent
 import java.io.File
 
@@ -22,8 +23,10 @@ class CliContext {
 
     fun <T : Any> addModel(key: String, model: T) {
         models[key] = model
-        postEvent(ModelRegisteredEvent(this, key))
+        postEvent(ModelRegisteredEvent(key))
     }
+
+    internal fun clearModels() = models.clear()
 
     fun registerListener(listener: Any) = eventBus.register(listener)
     fun unregisterListener(listener: Any) = eventBus.unregister(listener)
@@ -33,11 +36,13 @@ class CliContext {
     fun postEvent(event: CliEvent) = eventBus.post(event)
 
     fun fail(cause: String?) {
+        postEvent(FailEvent())
         println(cause)
         System.exit(1)
     }
 
     fun fail(cause: Throwable) {
+        postEvent(FailEvent(cause))
         cause.printStackTrace(System.err)
         System.exit(1)
     }

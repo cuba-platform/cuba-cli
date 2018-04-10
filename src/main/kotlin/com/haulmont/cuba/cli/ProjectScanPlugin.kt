@@ -3,14 +3,25 @@ package com.haulmont.cuba.cli
 import com.google.common.eventbus.Subscribe
 import com.haulmont.cuba.cli.commands.CreateEntityCommand
 import com.haulmont.cuba.cli.commands.ProjectInitCommand
-import com.haulmont.cuba.cli.event.BeforeGenerationEvent
-import com.haulmont.cuba.cli.event.CommandRegisterEvent
-import com.haulmont.cuba.cli.event.LoadingEndEvent
+import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
+import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
+import com.haulmont.cuba.cli.event.InitPluginEvent
 
 class ProjectScanPlugin : CliPlugin {
+    private lateinit var context: CliContext
+
     @Subscribe
-    fun onStart(event: LoadingEndEvent) {
-        val context = event.cliContext
+    fun onInit(event: InitPluginEvent) {
+        context = event.cliContext
+
+        event.commandsRegistry.setup {
+            command("init", ProjectInitCommand())
+            command("entity", CreateEntityCommand())
+        }
+    }
+
+    @Subscribe
+    fun beforeCommand(event: BeforeCommandExecutionEvent) {
         val currentDir = context.currentDir
         val buildGradle = currentDir.list { _, name -> name == "build.gradle" }.firstOrNull()
 
@@ -25,15 +36,7 @@ class ProjectScanPlugin : CliPlugin {
     }
 
     @Subscribe
-    fun onRegisterCommands(event: CommandRegisterEvent) {
-        event.commandsRegistry.setup {
-            command("init", ProjectInitCommand())
-            command("entity", CreateEntityCommand())
-        }
-    }
-
-    @Subscribe
-    fun onBeforeGeneration(event: BeforeGenerationEvent) {
-        event.cliContext.getModels().toMap(event.bindings)
+    fun afterCommand(event: AfterCommandExecutionEvent) {
+        context.clearModels()
     }
 }

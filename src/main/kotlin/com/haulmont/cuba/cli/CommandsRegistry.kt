@@ -1,27 +1,30 @@
 package com.haulmont.cuba.cli
 
-import com.beust.jcommander.JCommander
-
 class CommandsRegistry(rootCommand: RootCommand) {
 
-    val root: CommandsSpace = CommandsSpace(rootCommand)
+    private val root: CommandsSpace = CommandsSpace(rootCommand)
 
     fun setup(setup: CommandsSpace.() -> Unit) {
         root.setup()
     }
 
-    fun apply(jCommander: JCommander) {
-        jCommander.addObject(root.command)
-        apply(jCommander, root)
+    fun traverse(visitor: CommandVisitor) {
+        traverse(root, visitor)
     }
 
-    private fun apply(jCommander: JCommander, currentCommandSpace: CommandsSpace) {
-        currentCommandSpace.commands
-                .forEach { name, commandsSpace ->
-                    jCommander.addCommand(name, commandsSpace.command)
-                    apply(jCommander.commands[name]!!, commandsSpace)
-                }
+    private fun traverse(commandsSpace: CommandsSpace, visitor: CommandVisitor) {
+        commandsSpace.commands.forEach { name, commandsSpace ->
+            visitor.enterCommand(name, commandsSpace.command)
+            traverse(commandsSpace, visitor)
+            visitor.exitCommand()
+        }
     }
+}
+
+interface CommandVisitor {
+    fun enterCommand(name: String, command: CliCommand)
+
+    fun exitCommand()
 }
 
 class CommandsSpace internal constructor(val command: CliCommand) {
@@ -37,5 +40,3 @@ class CommandsSpace internal constructor(val command: CliCommand) {
         commands[name] = commandsSpace
     }
 }
-
-
