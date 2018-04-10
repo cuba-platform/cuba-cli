@@ -3,7 +3,6 @@ package com.haulmont.cuba.cli.commands
 import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.GeneratorCommand
 import com.haulmont.cuba.cli.TemplateProcessor
-import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import java.io.File
@@ -15,8 +14,8 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
     override fun checkPreconditions(context: CliContext) {
         super.checkPreconditions(context)
-        val projectModel = context.getModel<ProjectModel>("project")
-        check(projectModel == null) { "There are existing project found" }
+
+        check(!context.hasModel("project")) { "There are existing project found" }
     }
 
     override fun QuestionsList.prompting(context: CliContext) {
@@ -55,7 +54,8 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     }
 
     override fun beforeGeneration(context: CliContext, bindings: MutableMap<String, Any>) {
-        bindings["rootPackageDirectory"] = context.getModel<ProjectInitModel>(getModelName())!!.rootPackageDirectory
+        val model = context.getModel<ProjectInitModel>(getModelName())!!
+        bindings["rootPackageDirectory"] = model.rootPackageDirectory
     }
 
     override fun generate(context: CliContext, bindings: Map<String, Any>) {

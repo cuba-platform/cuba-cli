@@ -16,7 +16,9 @@ class CliContext {
 
     val tempDir: File by lazy(::createTempDir)
 
-    fun <T : Any> getModel(key: String): T? = (models[key] as T)
+    fun <T : Any> getModel(key: String): T = (models[key] as T)
+
+    fun hasModel(key: String): Boolean = models.containsKey(key)
 
     fun <T : Any> addModel(key: String, model: T) {
         models[key] = model

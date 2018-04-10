@@ -13,7 +13,7 @@ import java.nio.file.Paths
 const val GREEN = "\u001B[32m"
 const val RESET = "\u001B[0m"
 
-class TemplateProcessor(templateFolderPath: String) {
+class TemplateProcessor(templateBasePath: String) {
 
     private val pathVariablePattern: Regex = Regex("\\$\\{[a-zA-Z][0-9a-zA-Z]+(\\.[a-zA-Z][0-9a-zA-Z]*)*}")
 
@@ -21,11 +21,11 @@ class TemplateProcessor(templateFolderPath: String) {
 
     init {
         val classLoader = javaClass.classLoader
-        val templateUri = classLoader.getResource(templateFolderPath).toURI()
+        val templateUri = classLoader.getResource(templateBasePath).toURI()
 
         templatePath = if (templateUri.scheme == "jar") {
             val fileSystem = FileSystems.newFileSystem(templateUri, mutableMapOf<String, Any>(), classLoader)
-            fileSystem.getPath(templateFolderPath)
+            fileSystem.getPath(templateBasePath)
         } else {
             Paths.get(templateUri)
         }

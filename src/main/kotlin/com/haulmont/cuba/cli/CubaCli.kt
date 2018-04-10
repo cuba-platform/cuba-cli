@@ -3,7 +3,7 @@ package com.haulmont.cuba.cli
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.MissingCommandException
 import com.haulmont.cuba.cli.event.CommandRegisterEvent
-import com.haulmont.cuba.cli.event.LoadEndEvent
+import com.haulmont.cuba.cli.event.LoadingEndEvent
 import org.fusesource.jansi.Ansi.ansi
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
         context.registerListener(it)
     }
 
-    context.postEvent(LoadEndEvent(context))
+    context.postEvent(LoadingEndEvent(context))
 
     context.postEvent(CommandRegisterEvent(context, commandsRegistry))
 

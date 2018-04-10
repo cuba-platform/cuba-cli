@@ -2,13 +2,16 @@ package com.haulmont.cuba.cli.commands
 
 import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.GeneratorCommand
+import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import java.io.File
 
 
 class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     override fun QuestionsList.prompting(context: CliContext) {
+
+        val projectModel = context.getModel<ProjectModel>("project")
+
         question("entityName", "Entity Name") {
             validate {
                 checkRegex("\\b[A-Z]+[\\w\\d_$]*", "Invalid entity getName")
@@ -16,7 +19,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
         }
 
         question("packageName", "Package Name") {
-            default { getDefaultPackageName() }
+            default { "${projectModel.rootPackage}.entity" }
         }
 
         options("entityType", "Entity type", entityTypes)
@@ -48,19 +51,3 @@ data class EntityModel(val name: String, val packageName: String, val type: Stri
 
 private val entityTypes = listOf("Persistent", "Persistent embedded", "Not persistent")
 private val idTypes = listOf("UUID", "String", "Integer", "Long", "Long Identity", "Integer Identity")
-private val globalModuleDir = File("modules/global/src")
-
-private fun getDefaultPackageName(): String {
-//    assumption that persistence.xml would lay in root package
-    val maybeRootPackageDirectory = globalModuleDir.walkTopDown()
-            .filter { it.name == "persistence.xml" }
-            .firstOrNull()
-            ?.parentFile
-
-    val maybeRootPackage = maybeRootPackageDirectory
-            ?.relativeTo(globalModuleDir)
-            ?.toString()
-
-    return maybeRootPackage?.replace(File.separatorChar, '.')?.let { "$it.entity" }
-            ?: "com.company.entity"
-}

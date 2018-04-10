@@ -5,7 +5,7 @@ import com.haulmont.cuba.cli.CommandsRegistry
 
 abstract class CliEvent(val cliContext: CliContext)
 
-class LoadEndEvent(cliContext: CliContext) : CliEvent(cliContext)
+class LoadingEndEvent(cliContext: CliContext) : CliEvent(cliContext)
 
 class ModelRegisteredEvent(cliContext: CliContext, val modelName: String) : CliEvent(cliContext)
 
