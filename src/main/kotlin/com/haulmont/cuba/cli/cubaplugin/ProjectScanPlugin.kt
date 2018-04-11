@@ -1,8 +1,8 @@
-package com.haulmont.cuba.cli
+package com.haulmont.cuba.cli.cubaplugin
 
 import com.google.common.eventbus.Subscribe
-import com.haulmont.cuba.cli.commands.CreateEntityCommand
-import com.haulmont.cuba.cli.commands.ProjectInitCommand
+import com.haulmont.cuba.cli.CliContext
+import com.haulmont.cuba.cli.CliPlugin
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent

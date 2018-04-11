@@ -1,5 +1,6 @@
-package com.haulmont.cuba.cli
+package com.haulmont.cuba.cli.commands
 
+import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.Prompts
 import com.haulmont.cuba.cli.prompting.QuestionsList

@@ -1,4 +1,4 @@
-package com.haulmont.cuba.cli
+package com.haulmont.cuba.cli.cubaplugin
 
 import com.haulmont.cuba.cli.model.ProjectModel
 import java.io.File

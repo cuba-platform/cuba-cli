@@ -1,18 +1,17 @@
-package com.haulmont.cuba.cli.commands
+package com.haulmont.cuba.cli.cubaplugin
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.CliContext
-import com.haulmont.cuba.cli.GeneratorCommand
-import com.haulmont.cuba.cli.TemplateProcessor
+import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.template.TemplateProcessor
 import java.io.File
 import java.nio.file.Paths
 
 @Parameters(commandDescription = "Create new project")
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     override fun getModelName(): String = "project"
-
 
     override fun checkPreconditions(context: CliContext) {
         super.checkPreconditions(context)
@@ -56,7 +55,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     }
 
     override fun beforeGeneration(context: CliContext, bindings: MutableMap<String, Any>) {
-        val model = context.getModel<ProjectInitModel>(getModelName())!!
+        val model = context.getModel<ProjectInitModel>(getModelName())
         bindings["rootPackageDirectory"] = model.rootPackageDirectory
     }
 

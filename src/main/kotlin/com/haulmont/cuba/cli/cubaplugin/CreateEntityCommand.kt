@@ -1,8 +1,8 @@
-package com.haulmont.cuba.cli.commands
+package com.haulmont.cuba.cli.cubaplugin
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.CliContext
-import com.haulmont.cuba.cli.GeneratorCommand
+import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -15,7 +15,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
 
         question("entityName", "Entity Name") {
             validate {
-                checkRegex("\\b[A-Z]+[\\w\\d_$]*", "Invalid entity getName")
+                checkRegex("\\b[A-Z]+[\\w\\d_$]*", "Invalid entity name")
             }
         }
 

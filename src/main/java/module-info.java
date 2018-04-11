@@ -1,14 +1,19 @@
 import com.haulmont.cuba.cli.CliPlugin;
-import com.haulmont.cuba.cli.ProjectScanPlugin;
+import com.haulmont.cuba.cli.cubaplugin.ProjectScanPlugin;
 
 module cuba.cli.main {
-    requires kotlin.stdlib;
-    requires jcommander;
-    requires velocity;
     requires java.base;
-    requires jdk.zipfs;
+    requires kotlin.stdlib;
+    requires kotlin.reflect;
+
+    requires jcommander;
     requires jansi;
+    requires jline;
+
+    requires velocity;
+
     requires guava;
+
     requires slf4j.simple;
     requires slf4j.api;
 
@@ -17,6 +22,6 @@ module cuba.cli.main {
 
     uses com.haulmont.cuba.cli.CliPlugin;
 
-    opens com.haulmont.cuba.cli;
+    opens com.haulmont.cuba.cli.cubaplugin;
     opens com.haulmont.cuba.cli.commands;
 }

@@ -1,6 +1,7 @@
-package com.haulmont.cuba.cli
+package com.haulmont.cuba.cli.commands
 
 import com.beust.jcommander.Parameter
+import com.haulmont.cuba.cli.CliContext
 
 class RootCommand : CliCommand {
     @Parameter(names = ["--help", "-h"], help = true, description = "Show help message")

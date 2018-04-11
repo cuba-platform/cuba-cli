@@ -1,4 +1,4 @@
-package com.haulmont.cuba.cli
+package com.haulmont.cuba.cli.template
 
 import org.apache.velocity.Template
 import org.apache.velocity.VelocityContext
@@ -60,7 +60,7 @@ class TemplateProcessor(templateBasePath: String) {
         template.data = runtimeServices.parse(Files.newInputStream(inputPath).bufferedReader(), inputPath.fileName.toString())
         template.initDocument()
 
-        println("${GREEN}created$RESET ${outputFile.absoluteFile}")
+        println("${GREEN}created${RESET} ${outputFile.absoluteFile}")
 
         val writer = outputFile.bufferedWriter()
         template.merge(vc, writer)

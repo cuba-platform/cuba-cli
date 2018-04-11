@@ -1,10 +1,12 @@
 package com.haulmont.cuba.cli
 
-class CommandsRegistry(rootCommand: RootCommand) {
+import com.haulmont.cuba.cli.commands.CliCommand
 
-    private val root: CommandsSpace = CommandsSpace(rootCommand)
+class CommandsRegistry {
 
-    fun setup(setup: CommandsSpace.() -> Unit) {
+    private val root: HasSubCommand = HasSubCommand()
+
+    fun setup(setup: HasSubCommand.() -> Unit) {
         root.setup()
     }
 
@@ -12,10 +14,10 @@ class CommandsRegistry(rootCommand: RootCommand) {
         traverse(root, visitor)
     }
 
-    private fun traverse(commandsSpace: CommandsSpace, visitor: CommandVisitor) {
-        commandsSpace.commands.forEach { name, commandsSpace ->
-            visitor.enterCommand(name, commandsSpace.command)
-            traverse(commandsSpace, visitor)
+    private fun traverse(hasSubCommand: HasSubCommand, visitor: CommandVisitor) {
+        hasSubCommand.commands.forEach { name, subCommand ->
+            visitor.enterCommand(name, subCommand.cliCommand)
+            traverse(subCommand, visitor)
             visitor.exitCommand()
         }
     }
@@ -27,16 +29,22 @@ interface CommandVisitor {
     fun exitCommand()
 }
 
-class CommandsSpace internal constructor(val command: CliCommand) {
+open class HasSubCommand internal constructor() {
 
-    internal val commands: MutableMap<String, CommandsSpace> = mutableMapOf()
+    internal val commands: MutableMap<String, Command> = mutableMapOf()
 
-    fun command(name: String, command: CliCommand, setup: (CommandsSpace.() -> Unit)? = null) {
-        check(commands[name] == null) { TODO("Write error message") }
-        check(name.isNotBlank()) { TODO("Write error message") }
+    fun command(name: String, cliCommand: CliCommand, setup: (HasSubCommand.() -> Unit)? = null) {
+        check(name.isNotBlank()) {
+            "Empty names for commands are not allowed"
+        }
+        check(commands[name] == null) {
+            "Command with such name is already presented by ${commands[name]!!.cliCommand::class}"
+        }
 
-        val commandsSpace = CommandsSpace(command)
-        setup?.let { commandsSpace.it() }
-        commands[name] = commandsSpace
+        commands[name] = Command(cliCommand).apply {
+            setup?.let { it() }
+        }
     }
 }
+
+internal class Command(val cliCommand: CliCommand) : HasSubCommand()
