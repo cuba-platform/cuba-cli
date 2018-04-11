@@ -1,15 +1,15 @@
 package com.haulmont.cuba.cli.prompting
 
-import org.fusesource.jansi.Ansi.ansi
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.Writer
+import com.haulmont.cuba.cli.kodein
+import org.jline.reader.LineReader
+import org.jline.reader.impl.completer.NullCompleter
+import org.kodein.di.generic.instance
+import java.io.PrintWriter
 
-class Prompts internal constructor(inputStream: InputStream, outputStream: OutputStream, private val questionsList: QuestionsList) {
+class Prompts internal constructor(private val questionsList: QuestionsList) {
 
-    private val reader: BufferedReader = inputStream.bufferedReader()
-    private val writer: Writer = outputStream.writer()
+    private val reader: LineReader by kodein.instance(arg = NullCompleter())
+    private val writer: PrintWriter by kodein.instance()
 
     fun ask(): Answers {
         val answers: MutableMap<String, Answer> = mutableMapOf()
@@ -21,7 +21,6 @@ class Prompts internal constructor(inputStream: InputStream, outputStream: Outpu
 
         return answers
     }
-
 
     private fun ask(question: Question, answers: Map<String, Any>): String = when (question) {
         is OptionsQuestion -> {
@@ -40,7 +39,7 @@ class Prompts internal constructor(inputStream: InputStream, outputStream: Outpu
     private fun ask(validation: (String) -> Unit, prompt: String, defaultValue: String): String {
         var result: String
         do {
-            print(prompt)
+            writer.print(prompt)
             result = read().takeIf { it.isNotEmpty() } ?: defaultValue
         } while (!validate(result, validation))
         return result
@@ -50,7 +49,7 @@ class Prompts internal constructor(inputStream: InputStream, outputStream: Outpu
         val answer = "> ${question.caption} "
         val defaultValuePostfix = when {
             defaultValue.isEmpty() -> ""
-            else -> ansi().render("@|red ($defaultValue) |@").toString()
+            else -> "@|red ($defaultValue) |@"
         }
         val options = when (question) {
             is OptionsQuestion -> printOptionsIndexed(question.options)
@@ -61,27 +60,19 @@ class Prompts internal constructor(inputStream: InputStream, outputStream: Outpu
     }
 
 
-    private fun printOptionsIndexed(options: List<String>): String = options.foldIndexed("") { index, acc, s ->
-        "$acc\n${index + 1}. $s "
-    }
+    private fun printOptionsIndexed(options: List<String>): String = options
+            .foldIndexed("") { index, acc, s ->
+                "$acc\n${index + 1}. $s "
+            }
 
     private fun validate(result: String, validateFn: (String) -> Unit): Boolean =
             try {
                 validateFn(result)
                 true
             } catch (e: ValidationException) {
-                println(ansi().render("@|red ${e.message}|@").toString())
+                writer.println("@|red ${e.message}|@")
                 false
             }
-
-    private fun print(prompt: String) {
-        writer.write(ansi().render(prompt).toString())
-        writer.flush()
-    }
-
-    private fun println(prompt: String) {
-        print(ansi().render(prompt + "\n").toString())
-    }
 
     private fun read(): String = reader.readLine().trim()
 }

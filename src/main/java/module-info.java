@@ -17,6 +17,10 @@ module cuba.cli.main {
     requires slf4j.simple;
     requires slf4j.api;
 
+    requires jdk.zipfs;
+    requires kodein.di.core.jvm;
+    requires kodein.di.generic.jvm;
+
 
     provides CliPlugin with ProjectScanPlugin;
 

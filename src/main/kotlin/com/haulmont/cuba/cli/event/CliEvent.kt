@@ -1,7 +1,7 @@
 package com.haulmont.cuba.cli.event
 
 import com.haulmont.cuba.cli.CliContext
-import com.haulmont.cuba.cli.CommandsRegistry
+import com.haulmont.cuba.cli.commands.CommandsRegistry
 import com.haulmont.cuba.cli.commands.CliCommand
 
 interface CliEvent

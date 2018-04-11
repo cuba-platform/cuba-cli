@@ -1,17 +1,32 @@
 package com.haulmont.cuba.cli
 
+import com.haulmont.cuba.cli.commands.CommandsRegistry
+import com.haulmont.cuba.cli.di.terminalModule
 import com.haulmont.cuba.cli.event.DestroyPluginEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
+import org.kodein.di.Kodein
+import org.kodein.di.generic.bind
+import org.kodein.di.generic.instance
 import java.util.*
+
+
+val kodein by lazy {
+    Kodein {
+        import(terminalModule)
+
+        bind<CliContext>() with instance(context)
+    }
+}
+
+private val context: CliContext = CliContext()
 
 fun main(args: Array<String>) {
 
-    val context = CliContext()
     val commandsRegistry = CommandsRegistry()
 
     loadPlugins(context, commandsRegistry)
 
-    val cli = createCli(args, context, commandsRegistry)
+    val cli = createCli(args, commandsRegistry)
 
     cli.run()
 
@@ -26,12 +41,12 @@ private fun loadPlugins(context: CliContext, commandsRegistry: CommandsRegistry)
     context.postEvent(InitPluginEvent(context, commandsRegistry))
 }
 
-private fun createCli(args: Array<String>, context: CliContext, commandsRegistry: CommandsRegistry): Cli {
+private fun createCli(args: Array<String>, commandsRegistry: CommandsRegistry): Cli {
     if (args.isNotEmpty()) {
         if (args.first() == "shell") {
-            return ShellCli(context, commandsRegistry)
+            return ShellCli(commandsRegistry)
         }
     }
 
-    return SingleCommandCli(args, context, commandsRegistry)
+    return SingleCommandCli(args, commandsRegistry)
 }

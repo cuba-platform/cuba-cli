@@ -2,8 +2,13 @@ package com.haulmont.cuba.cli.commands
 
 import com.beust.jcommander.Parameter
 import com.haulmont.cuba.cli.CliContext
+import com.haulmont.cuba.cli.kodein
+import org.kodein.di.generic.instance
+import java.io.PrintWriter
 
 class RootCommand : CliCommand {
+    private val writer: PrintWriter by kodein.instance()
+
     @Parameter(names = ["--help", "-h"], help = true, description = "Show help message")
     var help: Boolean = false
         private set
@@ -14,12 +19,10 @@ class RootCommand : CliCommand {
 
     override fun execute(context: CliContext) {
         if (version) {
-            printVersion()
+            writer.println(CLI_VERSION)
             return
         }
     }
 }
 
-private fun printVersion() {
-    println("CUBA CLI 1.0-SNAPSHOT")
-}
+const val CLI_VERSION = "CUBA CLI 1.0-SNAPSHOT"

@@ -6,17 +6,19 @@ import com.haulmont.cuba.cli.CliPlugin
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
+import com.haulmont.cuba.cli.kodein
+import org.kodein.di.generic.instance
 
 class ProjectScanPlugin : CliPlugin {
-    private lateinit var context: CliContext
+    private val context: CliContext by kodein.instance()
 
     @Subscribe
     fun onInit(event: InitPluginEvent) {
-        context = event.cliContext
-
         event.commandsRegistry.setup {
             command("init", ProjectInitCommand())
-            command("entity", CreateEntityCommand())
+            command("entity", CreateEntityCommand()) {
+                command("create", CreateEntityCommand())
+            }
         }
     }
 

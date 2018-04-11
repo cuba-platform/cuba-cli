@@ -1,6 +1,4 @@
-package com.haulmont.cuba.cli
-
-import com.haulmont.cuba.cli.commands.CliCommand
+package com.haulmont.cuba.cli.commands
 
 class CommandsRegistry {
 

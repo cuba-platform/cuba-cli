@@ -1,35 +1,50 @@
 package com.haulmont.cuba.cli
 
-import com.haulmont.cuba.cli.commands.CliCommand
-import com.haulmont.cuba.cli.commands.CommandParser
+import com.haulmont.cuba.cli.commands.*
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import org.jline.builtins.Completers
 import org.jline.builtins.Completers.TreeCompleter.Node
 import org.jline.builtins.Completers.TreeCompleter.node
 import org.jline.reader.*
-import org.jline.terminal.Terminal
-import org.jline.terminal.TerminalBuilder
+import org.kodein.di.generic.instance
+import java.io.PrintWriter
 
-class ShellCli(val context: CliContext, commandsRegistry: CommandsRegistry) : Cli {
+class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
 
-    private val commandParser: CommandParser = CommandParser(commandsRegistry)
-    private val completer: Completer = createCompleter(commandsRegistry)
+    private val commandParser: CommandParser
 
-    private val terminal: Terminal = TerminalBuilder.builder().build()
+    private val context: CliContext by kodein.instance()
 
-    private val reader: LineReader = LineReaderBuilder.builder()
-            .terminal(terminal)
-            .completer(completer)
-            .build()
+    private val writer: PrintWriter by kodein.instance()
+
+    private val completer: Completer
+
+    private val lineParser: Parser by lazy { reader.parser }
+
+    init {
+        commandsRegistry.setup {
+            command("help", HelpCommand)
+            command("version", VersionCommand)
+            command("exit", ExitCommand)
+        }
+
+        commandParser = CommandParser(commandsRegistry)
+        completer = createCommandsCompleter(commandsRegistry)
+    }
+
+    private val reader: LineReader by kodein.instance(arg = completer)
 
     override fun run() {
         printWelcome()
 
         while (true) {
             val command = try {
-                val line = reader.readLine("cuba>")
-                val parsedLine = reader.parser.parse(line, 0)
+                val line = reader.readLine(PROMPT).takeIf {
+                    it.isNotBlank()
+                } ?: continue
+
+                val parsedLine = lineParser.parse(line, 0)
                 val args = parsedLine.words().toTypedArray()
                 commandParser.parseCommand(args)
             } catch (e: UserInterruptException) {
@@ -38,14 +53,37 @@ class ShellCli(val context: CliContext, commandsRegistry: CommandsRegistry) : Cl
                 return
             }
 
-            context.postEvent(BeforeCommandExecutionEvent(command))
-            command.execute(context)
-            context.postEvent(AfterCommandExecutionEvent(command))
+            when (command) {
+                is HelpCommand -> commandParser.printHelp()
+                is ExitCommand -> return
+                else -> {
+                    context.postEvent(BeforeCommandExecutionEvent(command))
+                    command.execute(context)
+                    context.postEvent(AfterCommandExecutionEvent(command))
+                }
+            }
         }
+    }
+
+    private fun printWelcome() {
+        writer.println("""
+              |
+              |@|blue  ██████╗██╗   ██╗██████╗  █████╗      ██████╗██╗     ██╗
+              |██╔════╝██║   ██║██╔══██╗██╔══██╗    ██╔════╝██║     ██║
+              |██║     ██║   ██║██████╔╝███████║    ██║     ██║     ██║
+              |██║     ██║   ██║██╔══██╗██╔══██║    ██║     ██║     ██║
+              |╚██████╗╚██████╔╝██████╔╝██║  ██║    ╚██████╗███████╗██║
+              | ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝     ╚═════╝╚══════╝╚═╝
+              |
+              ||@""".trimMargin())
+    }
+
+    companion object {
+        private const val PROMPT: String = "cuba>"
     }
 }
 
-private fun createCompleter(commandsRegistry: CommandsRegistry): Completers.TreeCompleter {
+private fun createCommandsCompleter(commandsRegistry: CommandsRegistry): Completers.TreeCompleter {
     val rootBuilders = mutableListOf<NodeBuilder>()
     val stack = mutableListOf<NodeBuilder>()
 
@@ -61,31 +99,20 @@ private fun createCompleter(commandsRegistry: CommandsRegistry): Completers.Tree
         }
 
         override fun exitCommand() {
-            stack.removeAt(stack.size - 1)
+            stack.removeAt(stack.lastIndex)
         }
     })
 
-    return Completers.TreeCompleter(rootBuilders.map { it.build() })
+    return Completers.TreeCompleter(*rootBuilders.buildNodes())
 }
 
-class NodeBuilder(val name: String, val command: CliCommand) {
+private class NodeBuilder(val name: String, val command: CliCommand) {
     val builders: MutableList<NodeBuilder> = mutableListOf()
 
     fun build(): Node = when {
         builders.isEmpty() -> node(name)
-        else -> node(name, builders.map { it.build() })
+        else -> node(name, *builders.buildNodes())
     }
 }
 
-private fun printWelcome() {
-    println("""
-              |
-              | ██████╗██╗   ██╗██████╗  █████╗      ██████╗██╗     ██╗
-              |██╔════╝██║   ██║██╔══██╗██╔══██╗    ██╔════╝██║     ██║
-              |██║     ██║   ██║██████╔╝███████║    ██║     ██║     ██║
-              |██║     ██║   ██║██╔══██╗██╔══██║    ██║     ██║     ██║
-              |╚██████╗╚██████╔╝██████╔╝██║  ██║    ╚██████╗███████╗██║
-              | ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝     ╚═════╝╚══════╝╚═╝
-              |
-                                                        """.trimMargin())
-}
+private fun MutableList<NodeBuilder>.buildNodes() = map { it.build() }.toTypedArray()

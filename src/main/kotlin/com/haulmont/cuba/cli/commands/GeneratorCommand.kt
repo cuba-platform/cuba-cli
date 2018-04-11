@@ -9,7 +9,7 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
     override fun execute(context: CliContext) {
         super.execute(context)
         val questions = QuestionsList { prompting(context) }
-        val answers = Prompts(System.`in`, System.out, questions).ask()
+        val answers = Prompts(questions).ask()
         val model = createModel(context, answers)
         context.addModel(getModelName(), model)
 

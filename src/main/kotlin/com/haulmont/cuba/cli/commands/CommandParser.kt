@@ -1,13 +1,16 @@
 package com.haulmont.cuba.cli.commands
 
 import com.beust.jcommander.JCommander
-import com.haulmont.cuba.cli.CommandVisitor
-import com.haulmont.cuba.cli.CommandsRegistry
+import com.haulmont.cuba.cli.kodein
+import org.kodein.di.generic.instance
+import java.io.PrintWriter
 
 class CommandParser(commandsRegistry: CommandsRegistry, withRootCommand: Boolean = false) {
 
+    private val writer: PrintWriter by kodein.instance()
+
     private val commander = JCommander().apply {
-        programName = "cuba"
+        programName = if (withRootCommand) "cuba" else ""
         if (withRootCommand) {
             addObject(RootCommand())
         }
@@ -22,7 +25,7 @@ class CommandParser(commandsRegistry: CommandsRegistry, withRootCommand: Boolean
         return getParsedCommand(commander)
     }
 
-    fun usage() = commander.usage()
+    fun printHelp() = buildString { commander.usage(this) }.let { writer.println(it) }
 }
 
 private tailrec fun getParsedCommand(command: JCommander): CliCommand {
