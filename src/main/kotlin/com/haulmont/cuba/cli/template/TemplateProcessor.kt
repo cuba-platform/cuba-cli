@@ -1,19 +1,19 @@
 package com.haulmont.cuba.cli.template
 
+import com.haulmont.cuba.cli.kodein
 import org.apache.velocity.Template
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
 import org.apache.velocity.runtime.RuntimeSingleton
+import org.kodein.di.generic.instance
 import java.io.File
-import java.nio.file.FileSystems
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-
-const val GREEN = "\u001B[32m"
-const val RESET = "\u001B[0m"
+import java.io.PrintWriter
+import java.net.URI
+import java.nio.file.*
 
 class TemplateProcessor(templateBasePath: String) {
+
+    private val writer: PrintWriter by kodein.instance()
 
     private val pathVariablePattern: Regex = Regex("\\$\\{[a-zA-Z][0-9a-zA-Z]+(\\.[a-zA-Z][0-9a-zA-Z]*)*}")
 
@@ -24,11 +24,17 @@ class TemplateProcessor(templateBasePath: String) {
         val templateUri = classLoader.getResource(templateBasePath).toURI()
 
         templatePath = if (templateUri.scheme == "jar") {
-            val fileSystem = FileSystems.newFileSystem(templateUri, mutableMapOf<String, Any>(), classLoader)
+            val fileSystem = getFileSystem(templateUri, classLoader)
             fileSystem.getPath(templateBasePath)
         } else {
             Paths.get(templateUri)
         }
+    }
+
+    private fun getFileSystem(templateUri: URI?, classLoader: ClassLoader?) = try {
+        FileSystems.getFileSystem(templateUri)
+    } catch (e: FileSystemNotFoundException) {
+        FileSystems.newFileSystem(templateUri, mutableMapOf<String, Any>(), classLoader)
     }
 
     fun copyTo(path: Path, bindings: Map<String, Any>) {
@@ -60,7 +66,7 @@ class TemplateProcessor(templateBasePath: String) {
         template.data = runtimeServices.parse(Files.newInputStream(inputPath).bufferedReader(), inputPath.fileName.toString())
         template.initDocument()
 
-        println("${GREEN}created${RESET} ${outputFile.absoluteFile}")
+        writer.println("\t@|green created|@\t${outputFile.absoluteFile}")
 
         val writer = outputFile.bufferedWriter()
         template.merge(vc, writer)

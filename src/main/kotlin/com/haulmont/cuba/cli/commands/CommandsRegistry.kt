@@ -4,7 +4,7 @@ class CommandsRegistry {
 
     private val root: HasSubCommand = HasSubCommand()
 
-    fun setup(setup: HasSubCommand.() -> Unit) {
+    operator fun invoke(setup: HasSubCommand.() -> Unit) {
         root.setup()
     }
 

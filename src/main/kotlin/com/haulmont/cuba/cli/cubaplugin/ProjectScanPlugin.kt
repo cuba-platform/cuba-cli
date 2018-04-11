@@ -7,6 +7,7 @@ import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
 import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.model.ProjectModel
 import org.kodein.di.generic.instance
 
 class ProjectScanPlugin : CliPlugin {
@@ -14,11 +15,9 @@ class ProjectScanPlugin : CliPlugin {
 
     @Subscribe
     fun onInit(event: InitPluginEvent) {
-        event.commandsRegistry.setup {
+        event.commandsRegistry {
             command("init", ProjectInitCommand())
-            command("entity", CreateEntityCommand()) {
-                command("create", CreateEntityCommand())
-            }
+            command("entity", CreateEntityCommand())
         }
     }
 
@@ -29,8 +28,7 @@ class ProjectScanPlugin : CliPlugin {
 
         if (buildGradle != null) {
             try {
-                val projectModel = scanProject()
-                context.addModel("project", projectModel)
+                context.addModel(ProjectModel.MODEL_NAME, scanProject())
             } catch (e: ProjectScanException) {
                 println(e.message)
             }

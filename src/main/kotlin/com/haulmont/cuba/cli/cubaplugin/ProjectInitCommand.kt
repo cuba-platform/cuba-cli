@@ -1,7 +1,6 @@
 package com.haulmont.cuba.cli.cubaplugin
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -13,13 +12,13 @@ import java.nio.file.Paths
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     override fun getModelName(): String = "project"
 
-    override fun checkPreconditions(context: CliContext) {
-        super.checkPreconditions(context)
+    override fun checkPreconditions() {
+        super.checkPreconditions()
 
         check(!context.hasModel("project")) { "There are existing project found" }
     }
 
-    override fun QuestionsList.prompting(context: CliContext) {
+    override fun QuestionsList.prompting() {
         question("projectName", "Project Name") {
             default { System.getProperty("user.dir").split(File.separatorChar).last() }
         }
@@ -43,7 +42,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
         options("platformVersion", "Platform version", availablePlatformVersions)
     }
 
-    override fun createModel(context: CliContext, answers: Answers): ProjectInitModel {
+    override fun createModel(answers: Answers): ProjectInitModel {
         val rootPackage = answers["rootPackage"] as String
         return ProjectInitModel(
                 answers["projectName"] as String,
@@ -54,12 +53,12 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
         )
     }
 
-    override fun beforeGeneration(context: CliContext, bindings: MutableMap<String, Any>) {
+    override fun beforeGeneration(bindings: MutableMap<String, Any>) {
         val model = context.getModel<ProjectInitModel>(getModelName())
         bindings["rootPackageDirectory"] = model.rootPackageDirectory
     }
 
-    override fun generate(context: CliContext, bindings: Map<String, Any>) {
+    override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor("templates/project")
                 .copyTo(Paths.get(""), bindings)
     }

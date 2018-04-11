@@ -9,7 +9,6 @@ import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
 import java.util.*
 
-
 val kodein by lazy {
     Kodein {
         import(terminalModule)
@@ -38,7 +37,7 @@ private fun loadPlugins(context: CliContext, commandsRegistry: CommandsRegistry)
         context.registerListener(it)
     }
 
-    context.postEvent(InitPluginEvent(context, commandsRegistry))
+    context.postEvent(InitPluginEvent(commandsRegistry))
 }
 
 private fun createCli(args: Array<String>, commandsRegistry: CommandsRegistry): Cli {
@@ -50,3 +49,5 @@ private fun createCli(args: Array<String>, commandsRegistry: CommandsRegistry): 
 
     return SingleCommandCli(args, commandsRegistry)
 }
+
+const val CLI_VERSION = "CUBA CLI 1.0-SNAPSHOT"

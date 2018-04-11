@@ -1,5 +1,6 @@
 package com.haulmont.cuba.cli
 
+import com.beust.jcommander.MissingCommandException
 import com.haulmont.cuba.cli.commands.*
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
@@ -23,7 +24,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
     private val lineParser: Parser by lazy { reader.parser }
 
     init {
-        commandsRegistry.setup {
+        commandsRegistry {
             command("help", HelpCommand)
             command("version", VersionCommand)
             command("exit", ExitCommand)
@@ -51,6 +52,9 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
                 continue
             } catch (e: EndOfFileException) {
                 return
+            } catch (e: MissingCommandException) {
+                writer.println("@|red Unrecognized command|@")
+                continue
             }
 
             when (command) {
@@ -58,7 +62,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
                 is ExitCommand -> return
                 else -> {
                     context.postEvent(BeforeCommandExecutionEvent(command))
-                    command.execute(context)
+                    command.execute()
                     context.postEvent(AfterCommandExecutionEvent(command))
                 }
             }

@@ -1,7 +1,7 @@
 package com.haulmont.cuba.cli.commands
 
 import com.beust.jcommander.Parameter
-import com.haulmont.cuba.cli.CliContext
+import com.haulmont.cuba.cli.CLI_VERSION
 import com.haulmont.cuba.cli.kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
@@ -17,12 +17,10 @@ class RootCommand : CliCommand {
     var version: Boolean = false
         private set
 
-    override fun execute(context: CliContext) {
+    override fun execute() {
         if (version) {
             writer.println(CLI_VERSION)
             return
         }
     }
 }
-
-const val CLI_VERSION = "CUBA CLI 1.0-SNAPSHOT"

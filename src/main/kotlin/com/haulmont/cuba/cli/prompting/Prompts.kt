@@ -1,6 +1,7 @@
 package com.haulmont.cuba.cli.prompting
 
 import com.haulmont.cuba.cli.kodein
+import org.fusesource.jansi.Ansi
 import org.jline.reader.LineReader
 import org.jline.reader.impl.completer.NullCompleter
 import org.kodein.di.generic.instance
@@ -39,8 +40,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
     private fun ask(validation: (String) -> Unit, prompt: String, defaultValue: String): String {
         var result: String
         do {
-            writer.print(prompt)
-            result = read().takeIf { it.isNotEmpty() } ?: defaultValue
+            result = read(prompt).takeIf { it.isNotEmpty() } ?: defaultValue
         } while (!validate(result, validation))
         return result
     }
@@ -74,7 +74,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
                 false
             }
 
-    private fun read(): String = reader.readLine().trim()
+    private fun read(prompt: String): String = reader.readLine(Ansi.ansi().render(prompt).toString()).trim()
 }
 
 private fun DefaultValue.get(answers: Answers): String = when (this) {

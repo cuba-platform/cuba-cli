@@ -6,7 +6,7 @@ import com.haulmont.cuba.cli.commands.CliCommand
 
 interface CliEvent
 
-class InitPluginEvent(val cliContext: CliContext, val commandsRegistry: CommandsRegistry) : CliEvent
+class InitPluginEvent(val commandsRegistry: CommandsRegistry) : CliEvent
 
 class BeforeCommandExecutionEvent(val command: CliCommand) : CliEvent
 

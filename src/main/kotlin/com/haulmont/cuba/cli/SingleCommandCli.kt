@@ -31,7 +31,7 @@ class SingleCommandCli(private val args: Array<String>, commandsRegistry: Comman
         }
 
         context.postEvent(BeforeCommandExecutionEvent(command))
-        command.execute(context)
+        command.execute()
         context.postEvent(AfterCommandExecutionEvent(command))
     }
 }

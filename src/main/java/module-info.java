@@ -28,4 +28,6 @@ module cuba.cli.main {
 
     opens com.haulmont.cuba.cli.cubaplugin;
     opens com.haulmont.cuba.cli.commands;
+
+    exports com.haulmont.cuba.cli.model;
 }

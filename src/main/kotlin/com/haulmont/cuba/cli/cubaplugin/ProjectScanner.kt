@@ -2,55 +2,47 @@ package com.haulmont.cuba.cli.cubaplugin
 
 import com.haulmont.cuba.cli.model.ProjectModel
 import java.io.File
-import java.util.stream.Collectors
 
 @Throws(ProjectScanException::class)
-fun scanProject(): ProjectModel {
-    val model = ProjectModel()
-
+fun scanProject(): ProjectModel = ProjectModel().apply {
     val persistenceXml = findPersistenceXml()
 
-    model.rootPackage = getRootPackage(persistenceXml)
-    model.name = File("").name
+    rootPackage = getRootPackage(persistenceXml)
+    rootPackageDirectory = rootPackage.replace('.', File.separatorChar)
+    name = File("").name
 
-    parseBuildGradle(model)
-    parseAppComponents(model)
-    parseDatabaseInfo(model)
-
-    return model
+    parsePersistenceXml(this, persistenceXml)
+    parseBuildGradle(this)
+    parseAppComponents(this)
+    parseDatabaseInfo(this)
 }
 
 class ProjectScanException(message: String) : Exception(message)
 
+
+fun parsePersistenceXml(model: ProjectModel, persistenceXml: File) {
+    model.namespace = Regex("<persistence-unit +name *= *\"([a-zA-Z0-9]+)\"")
+            .findAll(persistenceXml.readText()) groupNOrNull 1
+            ?: throw ProjectScanException("Unable to scan persistence xml")
+}
+
 private fun parseBuildGradle(model: ProjectModel) {
     val artifactParseError: () -> Nothing = { throw ProjectScanException("Can not parse artifact info") }
 
-    val buildGradle = File("build.gradle")
-            .bufferedReader()
-            .lines()
-            .collect(Collectors.joining("\n"))
+    val buildGradle = File("build.gradle").readText()
 
     val groupRegex = Regex("group *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]")
-    model.group = groupRegex.findAll(buildGradle)
-            .firstOrNull()?.let { matchResult -> matchResult.groupValues[1] }
-            ?: artifactParseError()
-
+    model.group = groupRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
 
     val versionRegex = Regex("version *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]")
-    model.version = versionRegex.findAll(buildGradle)
-            .firstOrNull()?.let { matchResult -> matchResult.groupValues[1] }
-            ?: artifactParseError()
+    model.version = versionRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
 
 
     val copyrightRegex = Regex("copyright *= *'''(.*)'''")
-    model.copyright = copyrightRegex.findAll(buildGradle)
-            .firstOrNull()?.let { matchResult -> matchResult.groupValues[1] }
-
+    model.copyright = copyrightRegex.findAll(buildGradle) groupNOrNull 1
 
     val cubaVersionRegex = Regex("ext\\.cubaVersion *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]")
-    model.cubaVersion = cubaVersionRegex.findAll(buildGradle)
-            .firstOrNull()?.let { matchResult -> matchResult.groupValues[1] }
-            ?: artifactParseError()
+    model.cubaVersion = cubaVersionRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
 }
 
 private fun parseAppComponents(model: ProjectModel) {
@@ -75,3 +67,7 @@ private fun findPersistenceXml(): File {
             .firstOrNull()
             ?: throw ProjectScanException("Unable to find persistence.xml")
 }
+
+
+private infix fun Sequence<MatchResult>.groupNOrNull(groupIndex: Int): String? =
+        firstOrNull()?.groupValues?.get(groupIndex)
