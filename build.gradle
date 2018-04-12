@@ -30,6 +30,7 @@ def guavaVersion = "21.0"
 def slf4jVersion = "1.7.25"
 def jlineVersion = "3.6.2"
 def kodeinVersion = "5.0.0"
+def coroutinesVersion = "0.22.5"
 
 apply plugin: 'kotlin'
 apply plugin: 'java-library'
@@ -59,6 +60,8 @@ dependencies {
 
     implementation "org.kodein.di:kodein-di-generic-jvm:$kodeinVersion"
 
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
@@ -84,5 +87,11 @@ compileJava {
 jar {
     manifest {
         attributes 'Main-Class': 'com.haulmont.cuba.cli.EntryPointKt'
+    }
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
     }
 }

@@ -25,9 +25,14 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
 
         question("packageName", "Package Name") {
             default { "${projectModel.rootPackage}.entity" }
+            validate {
+                checkIsPackage()
+            }
         }
 
-        options("entityType", "Entity type", entityTypes)
+        options("entityType", "Entity type", entityTypes) {
+            default(2)
+        }
     }
 
     override fun createModel(answers: Answers): EntityModel {

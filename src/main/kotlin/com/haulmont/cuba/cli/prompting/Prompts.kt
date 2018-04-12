@@ -12,37 +12,35 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
     private val reader: LineReader by kodein.instance(arg = NullCompleter())
     private val writer: PrintWriter by kodein.instance()
 
-    fun ask(): Answers {
-        val answers: MutableMap<String, Answer> = mutableMapOf()
+    fun ask(): Answers = questionsList.getQuestions()
+            .fold(mapOf()) { answers, question ->
+                answers.toMutableMap()
+                        .apply {
+                            put(question.name, ask(question, answers))
+                        }
+            }
 
-        questionsList.getQuestions()
-                .forEach {
-                    answers[it.name] = ask(it, answers)
-                }
 
-        return answers
-    }
-
-    private fun ask(question: Question, answers: Map<String, Any>): String = when (question) {
+    private fun ask(question: Question, answers: Answers): Answer = when (question) {
         is OptionsQuestion -> {
-            val defaultValue = question.default.get(answers)
+            val defaultValue = question.defaultValue.get(answers)
             val prompt = createPrompt(question, defaultValue)
             val index = ask(question.validation, prompt, defaultValue).toInt() - 1
             question.options[index]
         }
         is PlainQuestion -> {
-            val defaultValue = question.default.get(answers)
+            val defaultValue = question.defaultValue.get(answers)
             val prompt = createPrompt(question, defaultValue)
             ask(question.validation, prompt, defaultValue)
         }
     }
 
     private fun ask(validation: (String) -> Unit, prompt: String, defaultValue: String): String {
-        var result: String
-        do {
-            result = read(prompt).takeIf { it.isNotEmpty() } ?: defaultValue
-        } while (!validate(result, validation))
-        return result
+        return generateSequence {
+            read(prompt).takeIf { it.isNotEmpty() } ?: defaultValue
+        }.filter {
+            it satisfies validation
+        }.first()
     }
 
     private fun createPrompt(question: Question, defaultValue: String): String {
@@ -65,16 +63,16 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
                 "$acc\n${index + 1}. $s "
             }
 
-    private fun validate(result: String, validateFn: (String) -> Unit): Boolean =
+    private fun read(prompt: String): String = reader.readLine(Ansi.ansi().render(prompt).toString()).trim()
+
+    private infix fun String.satisfies(validateFn: (String) -> Unit): Boolean =
             try {
-                validateFn(result)
+                validateFn(this)
                 true
             } catch (e: ValidationException) {
                 writer.println("@|red ${e.message}|@")
                 false
             }
-
-    private fun read(prompt: String): String = reader.readLine(Ansi.ansi().render(prompt).toString()).trim()
 }
 
 private fun DefaultValue.get(answers: Answers): String = when (this) {

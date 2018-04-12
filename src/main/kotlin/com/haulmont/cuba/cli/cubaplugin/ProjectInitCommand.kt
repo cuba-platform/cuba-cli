@@ -37,9 +37,14 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
         question("rootPackage", "Root package") {
             default { answers -> "com.company.${answers["namespace"]}" }
+            validate {
+                checkIsPackage()
+            }
         }
 
-        options("platformVersion", "Platform version", availablePlatformVersions)
+        options("platformVersion", "Platform version", availablePlatformVersions) {
+            default(1)
+        }
     }
 
     override fun createModel(answers: Answers): ProjectInitModel {
