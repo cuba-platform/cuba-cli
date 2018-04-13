@@ -6,7 +6,6 @@ import com.haulmont.cuba.cli.event.FailEvent
 import com.haulmont.cuba.cli.event.ModelRegisteredEvent
 import org.kodein.di.direct
 import org.kodein.di.generic.instance
-import java.io.File
 import java.io.PrintWriter
 
 class CliContext {
@@ -17,10 +16,6 @@ class CliContext {
     private val eventBus: EventBus = EventBus { throwable: Throwable, _ ->
         fail(throwable)
     }
-
-    val currentDir: File = File("").absoluteFile
-
-    val tempDir: File by lazy(::createTempDir)
 
     fun <T : Any> getModel(key: String): T = (models[key] as T)
 
@@ -52,5 +47,3 @@ class CliContext {
         System.exit(1)
     }
 }
-
-private fun createTempDir(): File = TODO()

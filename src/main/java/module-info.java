@@ -1,5 +1,5 @@
 import com.haulmont.cuba.cli.CliPlugin;
-import com.haulmont.cuba.cli.cubaplugin.ProjectScanPlugin;
+import com.haulmont.cuba.cli.cubaplugin.CubaPlugin;
 
 module cuba.cli.main {
     requires java.base;
@@ -21,8 +21,12 @@ module cuba.cli.main {
     requires kodein.di.core.jvm;
     requires kodein.di.generic.jvm;
 
+    requires practicalxml;
+    requires java.xml;
+    requires kotlinx.coroutines.core;
 
-    provides CliPlugin with ProjectScanPlugin;
+
+    provides CliPlugin with CubaPlugin;
 
     uses com.haulmont.cuba.cli.CliPlugin;
 

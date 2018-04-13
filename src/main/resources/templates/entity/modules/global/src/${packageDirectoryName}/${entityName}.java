@@ -1,4 +1,4 @@
-package $packageName;
+package ${entity.PackageName};
 
 #if( ${entity.Type} == "Persistent" )
 import com.haulmont.cuba.core.entity.StandardEntity;

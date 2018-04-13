@@ -4,7 +4,7 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import com.haulmont.cuba.cli.template.TemplateProcessor
+import com.haulmont.cuba.cli.generation.TemplateProcessor
 import java.io.File
 import java.nio.file.Paths
 

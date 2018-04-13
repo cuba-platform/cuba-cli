@@ -3,14 +3,16 @@ package com.haulmont.cuba.cli.cubaplugin
 import com.google.common.eventbus.Subscribe
 import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.CliPlugin
+import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.model.ProjectModel
+import com.haulmont.cuba.cli.model.ProjectScanException
 import org.kodein.di.generic.instance
 
-class ProjectScanPlugin : CliPlugin {
+class CubaPlugin : CliPlugin {
     private val context: CliContext by kodein.instance()
 
     @Subscribe
@@ -23,15 +25,16 @@ class ProjectScanPlugin : CliPlugin {
 
     @Subscribe
     fun beforeCommand(event: BeforeCommandExecutionEvent) {
-        val currentDir = context.currentDir
-        val buildGradle = currentDir.list { _, name -> name == "build.gradle" }.firstOrNull()
+        val projectFiles = try {
+            ProjectFiles()
+        } catch (e: Exception) {
+            return
+        }
 
-        if (buildGradle != null) {
-            try {
-                context.addModel(ProjectModel.MODEL_NAME, scanProject())
-            } catch (e: ProjectScanException) {
-                println(e.message)
-            }
+        try {
+            context.addModel(ProjectModel.MODEL_NAME, ProjectModel(projectFiles))
+        } catch (e: ProjectScanException) {
+            println(e.message)
         }
     }
 
