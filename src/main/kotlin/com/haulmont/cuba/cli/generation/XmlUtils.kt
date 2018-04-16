@@ -27,6 +27,6 @@ fun parse(path: Path): Document =
         Files.newInputStream(path).let(::InputSource).let(ParseUtil::parse)
 
 
-fun save(document: Document, path: Path) = DOMSerializer().run {
+fun save(document: Document, path: Path) = DOMSerializer(numIndentSpaces = 4).run {
     serialize(document, Files.newOutputStream(path))
 }
