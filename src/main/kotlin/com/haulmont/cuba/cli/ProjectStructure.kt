@@ -75,6 +75,10 @@ class ModuleFiles(val name: String, val rootPackage: String) {
                 rootPackageDirectory.resolve(fileName) orFail
                 "Module $name screens.xml not found"
     }
+    val springXml: Path by lazy {
+        val fileName = if (name == "core") "spring.xml" else "web-spring.xml"
+        src.findFile(fileName) orFail "Module $name spring.xml not found"
+    }
 }
 
 class ProjectFileNotFoundException(message: String) : RuntimeException(message)

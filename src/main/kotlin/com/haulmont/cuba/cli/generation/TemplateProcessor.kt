@@ -94,7 +94,7 @@ class TemplateProcessor(templateBasePath: String) {
     }
 
     private fun ensureFile(outputFile: Path) {
-        outputFile.parent.takeIf { !Files.exists(it) }?.let { Files.createDirectories(it) }
+        (outputFile.parent ?: outputFile.toAbsolutePath().parent).takeIf { !Files.exists(it) }?.let { Files.createDirectories(it) }
         Files.createFile(outputFile)
     }
 

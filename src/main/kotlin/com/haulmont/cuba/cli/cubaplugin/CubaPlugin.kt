@@ -37,6 +37,7 @@ class CubaPlugin : CliPlugin {
             command("init", ProjectInitCommand())
             command("entity", CreateEntityCommand())
             command("screen", CreateScreenCommand())
+            command("service", CreateServiceCommand())
         }
     }
 

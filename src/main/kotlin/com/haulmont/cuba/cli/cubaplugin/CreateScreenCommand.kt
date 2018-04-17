@@ -22,12 +22,10 @@ import com.haulmont.cuba.cli.ModuleType
 import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.generation.parse
-import com.haulmont.cuba.cli.generation.save
+import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import net.sf.practicalxml.DomUtil
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -99,14 +97,12 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
     }
 
     private fun addToScreensXml(screensXml: Path, screenModel: ScreenModel) {
-        val document = parse(screensXml)
-
-        DomUtil.appendChild(document.documentElement, "screen").apply {
-            setAttribute("id", screenModel.screenName)
-            setAttribute("template", screenModel.packageDirectory + File.separatorChar + screenModel.screenName + ".xml")
+        updateXml(screensXml) {
+            add("screen") {
+                "id" mustBe screenModel.screenName
+                "template" mustBe (screenModel.packageDirectory + File.separatorChar + screenModel.screenName + ".xml")
+            }
         }
-
-        save(document, screensXml)
     }
 
     override fun checkPreconditions() = onlyInProject()

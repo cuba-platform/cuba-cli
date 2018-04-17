@@ -22,13 +22,11 @@ import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.entityNameToTableName
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.generation.parse
-import com.haulmont.cuba.cli.generation.save
+import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import net.sf.practicalxml.DomUtil
 import org.kodein.di.generic.instance
 import java.io.File
 import java.io.PrintWriter
@@ -112,17 +110,13 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     }
 
     private fun addEntityToConfig(configPath: Path, elementName: String, entityModel: EntityModel) {
-        val document = parse(configPath)
-
-        val targetNode = DomUtil.getChild(document.documentElement, elementName)
-
-        DomUtil.appendChild(targetNode, "class").apply {
-            textContent = entityModel.packageName + "." + entityModel.name
+        updateXml(configPath) {
+            elementName {
+                add("class") {
+                    +(entityModel.packageName + "." + entityModel.name)
+                }
+            }
         }
-
-        save(document, configPath)
-
-        writer.println("\t@|green altered|@\t$configPath")
     }
 }
 
