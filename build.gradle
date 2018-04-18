@@ -14,7 +14,6 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
     }
 }
 
@@ -34,7 +33,7 @@ def coroutinesVersion = "0.22.5"
 
 apply plugin: 'kotlin'
 apply plugin: 'java-library'
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'application'
 
 sourceCompatibility = 9
 targetCompatibility = 9
@@ -89,6 +88,23 @@ compileJava {
 jar {
     manifest {
         attributes 'Main-Class': 'com.haulmont.cuba.cli.EntryPointKt'
+    }
+}
+
+mainClassName = "com.haulmont.cuba.cli.EntryPointKt"
+
+startScripts {
+    doLast {
+        unixScript.text = unixScript.text
+                .replace(
+                "eval set -- \$DEFAULT_JVM_OPTS \$JAVA_OPTS \$CUBA_CLI_OPTS -classpath \"\\\"\$CLASSPATH\\\"\" $mainClassName \"\$APP_ARGS\"",
+                "eval set -- \$DEFAULT_JVM_OPTS \$JAVA_OPTS \$CUBA_CLI_OPTS -p \"\\\"\$CLASSPATH\\\"\" -m $moduleName/$mainClassName \"\$APP_ARGS\"")
+
+        windowsScript.text = windowsScript.text
+                .replace(
+                "\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %CUBA_CLI_OPTS%  -classpath \"%CLASSPATH%\" $mainClassName %CMD_LINE_ARGS%",
+                "\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %CUBA_CLI_OPTS%  -p \"%CLASSPATH%\" -m $moduleName/$mainClassName %CMD_LINE_ARGS%")
+
     }
 }
 
