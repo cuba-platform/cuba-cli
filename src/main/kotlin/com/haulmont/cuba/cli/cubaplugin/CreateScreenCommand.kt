@@ -43,11 +43,8 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
                 checkRegex("([a-zA-Z]*[a-zA-Z0-9]+)(-[a-zA-Z]*[a-zA-Z0-9]+)*", "Invalid screen name")
             }
         }
-        options("module", "Choose module", listOf("web", "gui")) {
-            default(1)
-        }
         question("package", "Package name") {
-            default { "${projectModel.rootPackage}.${it["module"]}.screens" }
+            default { "${projectModel.rootPackage}.web.screens" }
             validate {
                 checkIsPackage()
             }
@@ -64,7 +61,6 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         return ScreenModel(
                 screenName,
                 controllerName,
-                answers["module"] as String,
                 packageName,
                 packageDirectory
         )
@@ -74,7 +70,6 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         val screenModel = context.getModel<ScreenModel>(ScreenModel.MODEL_NAME)
 
         bindings["packageDirectory"] = screenModel.packageDirectory
-        bindings["module"] = screenModel.module
         bindings["screenName"] = screenModel.screenName
         bindings["controllerName"] = screenModel.controllerName
 
@@ -87,11 +82,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         TemplateProcessor("templates/screen")
                 .copyTo(Paths.get(""), bindings)
 
-        val screensXml = when (screenModel.module) {
-            "web" -> ProjectFiles().getModule(ModuleType.WEB)
-            "gui" -> ProjectFiles().getModule(ModuleType.GUI)
-            else -> return
-        }.screensXml
+        val screensXml = ProjectFiles().getModule(ModuleType.WEB).screensXml
 
         addToScreensXml(screensXml, screenModel)
     }
@@ -111,7 +102,6 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
 data class ScreenModel(
         val screenName: String,
         val controllerName: String,
-        val module: String,
         val packageName: String,
         val packageDirectory: String) {
     companion object {

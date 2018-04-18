@@ -7,7 +7,7 @@
     <context-param>
         <description>Web resources version for correct caching in browser</description>
         <param-name>webResourcesTs</param-name>
-        <param-value>\${webResourcesTs}</param-value>
+        <param-value>${webResourcesTs}</param-value>
     </context-param>
     <!-- Application properties config files -->
     <context-param>
@@ -16,7 +16,7 @@
             
             classpath:${project.RootPackageDirectory}/web-app.properties
             /WEB-INF/local.app.properties
-            "file:\${catalina.base}/conf/app/local.app.properties"
+            "file:${catalina.base}/conf/app/local.app.properties"
         </param-value>
     </context-param>
     <!--Application components-->

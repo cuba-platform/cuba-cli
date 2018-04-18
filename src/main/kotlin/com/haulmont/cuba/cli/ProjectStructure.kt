@@ -43,7 +43,6 @@ class ProjectFiles {
         ModuleType.GLOBAL -> "global"
         ModuleType.CORE -> "core"
         ModuleType.WEB -> "web"
-        ModuleType.GUI -> "gui"
     }.let { ModuleFiles(it, rootPackage) }
 }
 
@@ -70,7 +69,7 @@ class ModuleFiles(val name: String, val rootPackage: String) {
     }
 
     val screensXml: Path by lazy {
-        val fileName = if (name == "gui") "screens.xml" else "web-screens.xml"
+        val fileName = "web-screens.xml"
         src.resolve(fileName) orTry
                 rootPackageDirectory.resolve(fileName) orFail
                 "Module $name screens.xml not found"
@@ -84,7 +83,7 @@ class ModuleFiles(val name: String, val rootPackage: String) {
 class ProjectFileNotFoundException(message: String) : RuntimeException(message)
 
 enum class ModuleType {
-    GLOBAL, CORE, WEB, GUI
+    GLOBAL, CORE, WEB
 }
 
 private infix fun Path?.orTry(another: Path?): Path? =
