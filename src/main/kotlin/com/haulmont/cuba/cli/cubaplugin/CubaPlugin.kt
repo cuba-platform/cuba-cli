@@ -34,7 +34,7 @@ class CubaPlugin : CliPlugin {
     @Subscribe
     fun onInit(event: InitPluginEvent) {
         event.commandsRegistry {
-            command("init", ProjectInitCommand())
+            command("create-app", ProjectInitCommand())
             command("entity", CreateEntityCommand())
             command("screen", CreateScreenCommand())
             command("service", CreateServiceCommand())

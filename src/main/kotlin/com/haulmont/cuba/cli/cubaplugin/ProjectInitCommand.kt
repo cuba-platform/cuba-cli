@@ -18,20 +18,26 @@ package com.haulmont.cuba.cli.cubaplugin
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.generation.TemplateProcessor
+import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import com.haulmont.cuba.cli.generation.TemplateProcessor
+import org.kodein.di.generic.instance
 import java.io.File
+import java.io.PrintWriter
 import java.nio.file.Paths
 
 @Parameters(commandDescription = "Create new project")
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
+
+    private val writer: PrintWriter by kodein.instance()
+
     override fun getModelName(): String = "project"
 
     override fun checkPreconditions() {
         super.checkPreconditions()
 
-        check(!context.hasModel("project")) { "There are existing project found" }
+        check(!context.hasModel("project")) { "There is an existing project found in current directory." }
     }
 
     override fun QuestionsList.prompting() {
@@ -80,8 +86,17 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     }
 
     override fun generate(bindings: Map<String, Any>) {
+        val cwd = Paths.get("")
         TemplateProcessor("templates/project")
-                .copyTo(Paths.get(""), bindings)
+                .copyTo(cwd, bindings)
+
+        writer.println("""
+
+            @|white Project generated at ${cwd.toAbsolutePath()} directory
+            To build project execute `gradlew assemble`
+            To import project into IDE execute `gradlew ide` and open generated *.iml file|@
+
+        """.trimIndent())
     }
 }
 

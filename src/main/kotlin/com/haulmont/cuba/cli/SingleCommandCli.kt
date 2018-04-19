@@ -17,37 +17,49 @@
 package com.haulmont.cuba.cli
 
 import com.beust.jcommander.MissingCommandException
+import com.beust.jcommander.ParameterException
+import com.haulmont.cuba.cli.commands.CliCommand
 import com.haulmont.cuba.cli.commands.CommandParser
 import com.haulmont.cuba.cli.commands.CommandsRegistry
-import com.haulmont.cuba.cli.commands.RootCommand
+import com.haulmont.cuba.cli.commands.CommonParameters
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import org.kodein.di.generic.instance
-import java.io.PrintWriter
 
 class SingleCommandCli(private val args: Array<String>, commandsRegistry: CommandsRegistry) : Cli {
 
     private val context: CliContext by kodein.instance()
 
-    private val writer: PrintWriter by kodein.instance()
+    private val errorsManager: ErrorsManager by kodein.instance()
 
-    private val commandParser: CommandParser = CommandParser(commandsRegistry, true)
+    private val commandParser: CommandParser = CommandParser(commandsRegistry, false)
 
     override fun run() {
         val command = try {
             commandParser.parseCommand(args)
         } catch (e: MissingCommandException) {
-            writer.println("@|red Unrecognized command|@")
+            errorsManager.unrecognizedCommand()
+            return
+        } catch (e: ParameterException) {
+            errorsManager.unrecognizedParameters()
             return
         }
 
-        if (command is RootCommand && command.help) {
-            commandParser.printHelp()
+        evalCommand(command)
+    }
+
+    private fun evalCommand(command: CliCommand) {
+        if (CommonParameters.help) {
+            commandParser.printHelp(command)
             return
         }
 
         context.postEvent(BeforeCommandExecutionEvent(command))
-        command.execute()
+        try {
+            command.execute()
+        } catch (e: Exception) {
+            errorsManager.handleCommandException(e)
+        }
         context.postEvent(AfterCommandExecutionEvent(command))
     }
 }

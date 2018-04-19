@@ -17,6 +17,7 @@
 package com.haulmont.cuba.cli
 
 import com.beust.jcommander.MissingCommandException
+import com.beust.jcommander.ParameterException
 import com.haulmont.cuba.cli.commands.*
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
@@ -35,6 +36,8 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
 
     private val writer: PrintWriter by kodein.instance()
 
+    private val errorsManager: ErrorsManager by kodein.instance()
+
     private val completer: Completer
 
     private val lineParser: Parser by lazy { reader.parser }
@@ -42,11 +45,12 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
     init {
         commandsRegistry {
             command("help", HelpCommand)
+            command("stacktrace", Stacktrace)
             command("version", VersionCommand)
             command("exit", ExitCommand)
         }
 
-        commandParser = CommandParser(commandsRegistry)
+        commandParser = CommandParser(commandsRegistry, shellMode = true)
         completer = createCommandsCompleter(commandsRegistry)
     }
 
@@ -56,6 +60,9 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
         printWelcome()
 
         while (true) {
+            CommonParameters.reset()
+            commandParser.reset()
+
             val command = try {
                 val line = reader.readLine(PROMPT).takeIf {
                     it.isNotBlank()
@@ -66,29 +73,46 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
                 commandParser.parseCommand(args)
             } catch (e: UserInterruptException) {
                 continue
+            } catch (e: MissingCommandException) {
+                errorsManager.unrecognizedCommand()
+                continue
+            } catch (e: ParameterException) {
+                errorsManager.unrecognizedParameters()
+                continue
             } catch (e: EndOfFileException) {
                 return
-            } catch (e: MissingCommandException) {
-                writer.println("@|red Unrecognized command|@")
+            }
+
+            if (CommonParameters.help) {
+                commandParser.printHelp(command)
                 continue
             }
 
             when (command) {
                 is HelpCommand -> commandParser.printHelp()
+                is Stacktrace -> errorsManager.printLastStacktrace()
                 is ExitCommand -> return
-                else -> {
-                    context.postEvent(BeforeCommandExecutionEvent(command))
-                    command.execute()
-                    context.postEvent(AfterCommandExecutionEvent(command))
-                }
+                else -> evalCommand(command)
             }
         }
+    }
+
+    private fun evalCommand(command: CliCommand) {
+        context.postEvent(BeforeCommandExecutionEvent(command))
+        try {
+            command.execute()
+        } catch (e: EndOfFileException) {
+        } catch (e: UserInterruptException) {
+        } catch (e: Exception) {
+            errorsManager.handleCommandException(e)
+        }
+        context.postEvent(AfterCommandExecutionEvent(command))
     }
 
     private fun printWelcome() {
         writer.println("""
               |
-              |@|blue  ██████╗██╗   ██╗██████╗  █████╗      ██████╗██╗     ██╗
+       |@|blue  ██████╗██╗   ██╗██████╗  █████╗      ██████╗██╗     ██╗
               |██╔════╝██║   ██║██╔══██╗██╔══██╗    ██╔════╝██║     ██║
               |██║     ██║   ██║██████╔╝███████║    ██║     ██║     ██║
               |██║     ██║   ██║██╔══██╗██╔══██║    ██║     ██║     ██║

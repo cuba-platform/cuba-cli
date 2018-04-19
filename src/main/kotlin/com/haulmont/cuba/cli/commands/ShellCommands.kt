@@ -36,6 +36,13 @@ object HelpCommand : CliCommand {
     }
 }
 
+@Parameters(commandDescription = "Prints last stacktrace")
+object Stacktrace : CliCommand {
+    override fun execute() {
+//        Command handled in ShellCli
+    }
+}
+
 @Parameters(commandDescription = "Print version")
 object VersionCommand : CliCommand {
     private val writer: PrintWriter by kodein.instance()
