@@ -2,6 +2,7 @@
 /build/
 /deploy/
 /.shelf/
+/.idea/
 /test-home/
 out
 *.iml
