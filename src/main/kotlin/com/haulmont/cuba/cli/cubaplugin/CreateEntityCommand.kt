@@ -21,6 +21,7 @@ import com.haulmont.cuba.cli.ModuleType
 import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.entityNameToTableName
+import com.haulmont.cuba.cli.generation.PropertiesAppender
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.kodein
@@ -107,6 +108,8 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
             val persistenceXml = projectFiles.getModule(ModuleType.GLOBAL).persistenceXml
             addEntityToConfig(persistenceXml, "persistence-unit", entityModel)
         }
+
+        addToMessages(projectFiles, entityModel)
     }
 
     private fun addEntityToConfig(configPath: Path, elementName: String, entityModel: EntityModel) {
@@ -116,6 +119,24 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
                     +(entityModel.packageName + "." + entityModel.name)
                 }
             }
+        }
+    }
+
+    private fun addToMessages(projectFiles: ProjectFiles, entityModel: EntityModel) {
+        val packageDirectory = projectFiles.getModule(ModuleType.GLOBAL)
+                .src
+                .resolve(entityModel.packageName.replace('.', File.separatorChar))
+
+        val entityPrintableName = Regex("([A-Z][a-z0-9]*)")
+                .findAll(entityModel.name)
+                .map { it.value }
+                .joinToString(" ")
+
+
+        val messages = packageDirectory.resolve("messages.properties")
+
+        PropertiesAppender(messages, writer) {
+            append(entityModel.name, entityPrintableName)
         }
     }
 }
