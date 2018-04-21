@@ -39,8 +39,6 @@ module cuba.cli.main {
 
     requires practicalxml;
     requires java.xml;
-    requires kotlinx.coroutines.core;
-
 
     provides CliPlugin with CubaPlugin;
 
