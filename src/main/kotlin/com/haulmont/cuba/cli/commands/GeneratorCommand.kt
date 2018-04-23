@@ -24,7 +24,11 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
     override fun execute() {
         super.execute()
         val questions = QuestionsList { prompting() }
-        val answers = Prompts(questions).ask()
+        val answers = if (CommonParameters.nonInteractive.isEmpty()) {
+            Prompts(questions).ask()
+        } else {
+            Prompts(questions).askNonInteractive()
+        }
         val model = createModel(answers)
         context.addModel(getModelName(), model)
 

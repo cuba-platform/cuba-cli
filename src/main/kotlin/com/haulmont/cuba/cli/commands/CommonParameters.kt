@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.commands
 
+import com.beust.jcommander.DynamicParameter
 import com.beust.jcommander.Parameter
 
 object CommonParameters {
@@ -27,8 +28,12 @@ object CommonParameters {
     var help: Boolean = false
         private set
 
+    @DynamicParameter(names = ["-P"], description = "Non interactive mode parameters", hidden = true)
+    var nonInteractive: Map<String, String> = mutableMapOf()
+
     fun reset() {
         stacktrace = false
         help = false
+        (nonInteractive as MutableMap).clear()
     }
 }

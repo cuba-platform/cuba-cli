@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.prompting
 
+import com.haulmont.cuba.cli.commands.CommonParameters
 import com.haulmont.cuba.cli.kodein
 import org.fusesource.jansi.Ansi
 import org.jline.reader.LineReader
@@ -35,6 +36,26 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
                             put(question.name, ask(question, answers))
                         }
             }
+
+    fun askNonInteractive(): Answers {
+        val answers = CommonParameters.nonInteractive
+
+        questionsList.getQuestions().forEach {
+            if (it.name !in answers) {
+                throw ValidationException("Parameter ${it.name} not passed")
+            }
+            val value = answers[it.name] as String
+
+            when (it) {
+                is OptionsQuestion -> if (value !in it.options) {
+                    throw ValidationException("Invalid value $value for parameter ${it.name}.")
+                }
+                is WithValidation -> it.validation(value)
+            }
+        }
+
+        return answers
+    }
 
 
     private fun ask(question: Question, answers: Answers): Answer = when (question) {
