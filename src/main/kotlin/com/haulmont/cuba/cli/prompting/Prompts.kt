@@ -48,7 +48,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
 
             when (it) {
                 is OptionsQuestion -> if (value !in it.options) {
-                    throw ValidationException("Invalid value $value for parameter ${it.name}.")
+                    throw ValidationException("Invalid value $value for parameter ${it.name}. Available values are ${it.options}.")
                 }
                 is WithValidation -> it.validation(value)
             }
