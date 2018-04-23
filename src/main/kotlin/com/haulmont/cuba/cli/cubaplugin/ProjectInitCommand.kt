@@ -43,6 +43,18 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     override fun QuestionsList.prompting() {
         question("projectName", "Project Name") {
             default { System.getProperty("user.dir").split(File.separatorChar).last() }
+
+            validate {
+                val invalidNameRegex = Regex("[^\\w\\-]")
+
+                if (invalidNameRegex.find(it) != null) {
+                    fail("Project name should contain only Latin letters, digits, dashes and underscores.")
+                }
+
+                if (it.isBlank()) {
+                    fail("Empty names not allowed")
+                }
+            }
         }
 
         question("namespace", "Project Namespace") {
@@ -80,15 +92,18 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
         )
     }
 
-    override fun beforeGeneration(bindings: MutableMap<String, Any>) {
-        val model = context.getModel<ProjectInitModel>(getModelName())
-        bindings["rootPackageDirectory"] = model.rootPackageDirectory
-    }
-
     override fun generate(bindings: Map<String, Any>) {
         val cwd = Paths.get("")
-        TemplateProcessor("templates/project")
-                .copyTo(cwd, bindings)
+
+        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "project", bindings) {
+            listOf("modules", "build.gradle", "settings.gradle").forEach {
+                transform(it)
+            }
+            copy("gitignore", Paths.get(".gitignore"))
+            listOf("gradle", "gradlew", "gradlew.bat").forEach {
+                copy(it)
+            }
+        }
 
         writer.println("""
 

@@ -51,12 +51,12 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
         }
     }
 
-    private fun ask(validation: (String) -> Unit, prompt: String, defaultValue: String): String {
-        return generateSequence {
-            read(prompt).takeIf { it.isNotEmpty() } ?: defaultValue
-        }.filter {
-            it satisfies validation
-        }.first()
+    private tailrec fun ask(validation: (String) -> Unit, prompt: String, defaultValue: String): String {
+        val answer = read(prompt).takeIf { it.isNotEmpty() } ?: defaultValue
+        return if (answer satisfies validation)
+            answer
+        else
+            ask(validation, prompt, defaultValue)
     }
 
     private fun createPrompt(question: Question, defaultValue: String): String {

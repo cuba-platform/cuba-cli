@@ -29,14 +29,13 @@ def guavaVersion = "21.0"
 def slf4jVersion = "1.7.25"
 def jlineVersion = "3.6.2"
 def kodeinVersion = "5.0.0"
-def coroutinesVersion = "0.22.5"
 
 apply plugin: 'kotlin'
 apply plugin: 'java-library'
 apply plugin: 'application'
 
-sourceCompatibility = 9
-targetCompatibility = 9
+sourceCompatibility = 10
+targetCompatibility = 10
 
 repositories {
     mavenCentral()

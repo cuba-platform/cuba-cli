@@ -26,7 +26,6 @@ import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import java.io.File
-import java.nio.file.Paths
 
 @Parameters(commandDescription = "Create new CUBA service")
 class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
@@ -66,16 +65,10 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
 
     override fun createModel(answers: Answers): ServiceModel = ServiceModel(answers)
 
-    override fun beforeGeneration(bindings: MutableMap<String, Any>) {
-        val serviceModel = context.getModel<ServiceModel>(ServiceModel.MODEL_NAME)
-        bindings["packageDirectory"] = serviceModel.packageName.replace('.', File.separatorChar)
-        bindings["beanName"] = serviceModel.beanName
-        bindings["interfaceName"] = serviceModel.interfaceName
-    }
-
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor("templates/service")
-                .copyTo(Paths.get(""), bindings)
+        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "service", bindings) {
+            copy("")
+        }
 
         val springXml = ProjectFiles().getModule(ModuleType.WEB).springXml
 
@@ -101,15 +94,22 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
     }
 }
 
-class ServiceModel(val interfaceName: String, val beanName: String, val packageName: String, val serviceName: String) {
+class ServiceModel(val interfaceName: String,
+                   val beanName: String,
+                   val packageName: String,
+                   val packageDirectoryName: String,
+                   val serviceName: String) {
     companion object {
         const val MODEL_NAME = "service"
 
         operator fun invoke(answers: Answers): ServiceModel {
+            val packageName = answers["packageName"] as String
+
             return ServiceModel(
                     answers["interfaceName"] as String,
                     answers["beanName"] as String,
-                    answers["packageName"] as String,
+                    packageName,
+                    packageName.replace('.', File.separatorChar),
                     answers["serviceName"] as String
             )
         }

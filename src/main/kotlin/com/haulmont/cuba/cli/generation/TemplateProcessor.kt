@@ -25,44 +25,45 @@ import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.net.URI
 import java.nio.file.*
+import kotlin.reflect.full.memberProperties
 
-class TemplateProcessor(templateBasePath: String) {
+class TemplateProcessor private constructor(templateBasePath: String, private val bindings: Map<String, Any>) {
 
     private val writer: PrintWriter by kodein.instance()
 
-    private val pathVariablePattern: Regex = Regex("\\$\\{[a-zA-Z][0-9a-zA-Z]+(\\.[a-zA-Z][0-9a-zA-Z]*)*}")
+    private val pathExpressionPattern = Regex("\\$\\{[a-zA-Z][0-9a-zA-Z]*(\\.[a-zA-Z][0-9a-zA-Z]*)*}")
+    private val variablePartPattern = Regex("[a-zA-Z][0-9a-zA-Z]*")
+
+    private val velocityContext: VelocityContext = VelocityContext().apply {
+        bindings.forEach { k, v -> put(k, v) }
+    }
 
     private val templatePath: Path
 
     init {
-        val classLoader = javaClass.classLoader
-        val templateUri = classLoader.getResource(templateBasePath).toURI()
+        val templateUri = javaClass.getResource(templateBasePath).toURI()
 
         templatePath = if (templateUri.scheme == "jar") {
-            val fileSystem = getFileSystem(templateUri, classLoader)
+            val fileSystem = getFileSystem(templateUri)
             fileSystem.getPath(templateBasePath)
         } else {
             Paths.get(templateUri)
         }
     }
 
-    private fun getFileSystem(templateUri: URI?, classLoader: ClassLoader?) = try {
+    private fun getFileSystem(templateUri: URI?) = try {
         FileSystems.getFileSystem(templateUri)
     } catch (e: FileSystemNotFoundException) {
-        FileSystems.newFileSystem(templateUri, mutableMapOf<String, Any>(), classLoader)
+        FileSystems.newFileSystem(templateUri, mutableMapOf<String, Any>())
     }
 
-    fun copyTo(path: Path, bindings: Map<String, Any>) {
-        val targetAbsolutePath = path.toAbsolutePath()
-
-        Velocity.init()
-        val vc = VelocityContext()
-        bindings.forEach { k, v -> vc.put(k, v) }
+    private fun process(from: Path, to: Path, withTransform: Boolean) {
+        val targetAbsolutePath = to.toAbsolutePath()
 
         val baseTemplatePath = templatePath.toAbsolutePath().toString()
         val targetDirectoryPath = targetAbsolutePath.toString()
 
-        Files.walk(templatePath, Int.MAX_VALUE)
+        Files.walk(from)
                 .filter { Files.isRegularFile(it) }
                 .forEach { inputPath ->
                     val outputFile = inputPath.toAbsolutePath().toString()
@@ -71,13 +72,18 @@ class TemplateProcessor(templateBasePath: String) {
                             .let { Paths.get(it) }
                             .let { targetAbsolutePath.relativize(it) }
 
-                    ensureFile(outputFile)
+                    ensureFolders(outputFile)
 
-                    copy(inputPath, outputFile, vc)
+                    if (withTransform) {
+                        transformInternal(inputPath, outputFile, velocityContext)
+                    } else {
+                        copyInternal(inputPath, outputFile)
+                    }
+
                 }
     }
 
-    private fun copy(inputPath: Path, outputFile: Path, vc: VelocityContext) {
+    private fun transformInternal(inputPath: Path, outputFile: Path, vc: VelocityContext) {
         val template = Template()
         val runtimeServices = RuntimeSingleton.getRuntimeServices()
         template.setRuntimeServices(runtimeServices)
@@ -93,15 +99,67 @@ class TemplateProcessor(templateBasePath: String) {
         writer.println("\t@|green created|@\t$outputFile")
     }
 
-    private fun ensureFile(outputFile: Path) {
-        (outputFile.parent ?: outputFile.toAbsolutePath().parent).takeIf { !Files.exists(it) }?.let { Files.createDirectories(it) }
-        Files.createFile(outputFile)
+    private fun copyInternal(inputPath: Path, outputFile: Path) {
+        Files.copy(inputPath, outputFile)
+
+        writer.println("\t@|green created|@\t$outputFile")
+    }
+
+    private fun ensureFolders(outputFile: Path) {
+        val parent = outputFile.toAbsolutePath().parent
+        if (!Files.exists(parent)) {
+            Files.createDirectories(parent)
+        }
     }
 
     private fun applyPathTransform(path: String, bindings: Map<String, Any>): String {
-        return pathVariablePattern.replace(path) {
-            val paramName = it.value.substring(2, it.value.length - 1)
-            bindings[paramName] as String
+        return pathExpressionPattern.replace(path) {
+            val expression = it.value.substring(2, it.value.lastIndex)
+            variablePartPattern.findAll(expression)
+                    .map {
+                        it.value
+                    }.fold(bindings as Any) { obj, name ->
+                        getChild(obj, name)
+                    }.toString()
+        }
+    }
+
+    private fun getChild(obj: Any, name: String): Any = when (obj) {
+        is Map<*, *> -> obj[name]!!
+        else -> getField(obj, name)
+    }
+
+    private fun getField(obj: Any, name: String): Any {
+        val kClass = obj::class
+
+        return kClass.memberProperties.first { it.name == name }.getter.call(obj)!!
+    }
+
+    fun copy(subPath: Path, to: Path = Paths.get("")) {
+        process(templatePath.resolve(subPath), to, false)
+    }
+
+    fun copy(subPath: String, to: Path = Paths.get("")) {
+        process(templatePath.resolve(subPath), to, false)
+    }
+
+    fun transform(subPath: Path, to: Path = Paths.get("")) {
+        process(templatePath.resolve(subPath), to, true)
+    }
+
+    fun transform(subPath: String, to: Path = Paths.get("")) {
+        process(templatePath.resolve(subPath), to, true)
+    }
+
+    companion object {
+
+        init {
+            Velocity.init()
+        }
+
+        operator fun invoke(templateBasePath: String, bindings: Map<String, Any>, block: TemplateProcessor.() -> Unit) {
+            TemplateProcessor(templateBasePath, bindings).block()
         }
     }
 }
+

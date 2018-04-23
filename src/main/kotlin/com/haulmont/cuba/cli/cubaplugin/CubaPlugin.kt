@@ -60,4 +60,8 @@ class CubaPlugin : CliPlugin {
     fun afterCommand(event: AfterCommandExecutionEvent) {
         context.clearModels()
     }
+
+    companion object {
+        const val TEMPLATES_BASE_PATH = "/com/haulmont/cuba/cli/templates/"
+    }
 }

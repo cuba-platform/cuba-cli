@@ -32,7 +32,6 @@ import org.kodein.di.generic.instance
 import java.io.File
 import java.io.PrintWriter
 import java.nio.file.Path
-import java.nio.file.Paths
 
 @Parameters(commandDescription = "Create new entity")
 class CreateEntityCommand : GeneratorCommand<EntityModel>() {
@@ -72,9 +71,12 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
             append(entityNameToTableName(entityName))
         }
 
+        val packageName = answers["packageName"] as String
+
         return EntityModel(
                 entityName,
-                answers["packageName"] as String,
+                packageName,
+                packageName.replace('.', File.separatorChar),
                 answers["entityType"] as String,
                 tableName
         )
@@ -84,22 +86,14 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
         onlyInProject()
     }
 
-    override fun beforeGeneration(bindings: MutableMap<String, Any>) {
-        val entityModel = context.getModel<EntityModel>(EntityModel.MODEL_NAME)
-
-        bindings["packageDirectoryName"] = entityModel.packageName.replace('.', File.separatorChar)
-        bindings["entityName"] = entityModel.name
-
-        super.beforeGeneration(bindings)
-    }
-
     override fun generate(bindings: Map<String, Any>) {
         val entityModel = context.getModel<EntityModel>(EntityModel.MODEL_NAME)
 
         val projectFiles = ProjectFiles()
 
-        TemplateProcessor("templates/entity")
-                .copyTo(Paths.get(""), bindings)
+        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "entity", bindings) {
+            copy("")
+        }
 
         if (entityModel.type == "Not persistent") {
             val metadataXml = projectFiles.getModule(ModuleType.GLOBAL).metadataXml
@@ -141,7 +135,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     }
 }
 
-data class EntityModel(val name: String, val packageName: String, val type: String, val tableName: String) {
+data class EntityModel(val name: String, val packageName: String, val packageDirectoryName: String, val type: String, val tableName: String) {
     companion object {
         const val MODEL_NAME = "entity"
     }

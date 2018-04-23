@@ -28,7 +28,6 @@ import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import java.io.File
 import java.nio.file.Path
-import java.nio.file.Paths
 
 @Parameters
 class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
@@ -66,21 +65,12 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         )
     }
 
-    override fun beforeGeneration(bindings: MutableMap<String, Any>) {
-        val screenModel = context.getModel<ScreenModel>(ScreenModel.MODEL_NAME)
-
-        bindings["packageDirectory"] = screenModel.packageDirectory
-        bindings["screenName"] = screenModel.screenName
-        bindings["controllerName"] = screenModel.controllerName
-
-        super.beforeGeneration(bindings)
-    }
-
     override fun generate(bindings: Map<String, Any>) {
         val screenModel = context.getModel<ScreenModel>(ScreenModel.MODEL_NAME)
 
-        TemplateProcessor("templates/screen")
-                .copyTo(Paths.get(""), bindings)
+        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "screen", bindings) {
+            copy("")
+        }
 
         val screensXml = ProjectFiles().getModule(ModuleType.WEB).screensXml
 
