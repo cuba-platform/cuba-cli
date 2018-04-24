@@ -21,6 +21,7 @@ import com.google.common.base.CaseFormat
 import com.haulmont.cuba.cli.ModuleType
 import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.generation.PropertiesAppender
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.kodein
@@ -29,11 +30,14 @@ import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
 import java.io.File
+import java.io.PrintWriter
 import java.nio.file.Path
 
 @Parameters
 class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
     private val namesUtils: NamesUtils by kodein.instance()
+
+    private val writer: PrintWriter by kodein.instance()
 
     override fun getModelName(): String = ScreenModel.MODEL_NAME
 
@@ -72,9 +76,16 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
             transform("")
         }
 
-        val screensXml = ProjectFiles().getModule(ModuleType.WEB).screensXml
+        val webModule = ProjectFiles().getModule(ModuleType.WEB)
+        val screensXml = webModule.screensXml
 
         addToScreensXml(screensXml, screenModel)
+
+        val messages = webModule.src.resolve(namesUtils.packageToDirectory(screenModel.packageName)).resolve("messages.properties")
+
+        PropertiesAppender(messages, writer) {
+            append("caption", screenModel.screenName)
+        }
     }
 
     private fun addToScreensXml(screensXml: Path, screenModel: ScreenModel) {
