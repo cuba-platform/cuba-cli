@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<template xmlns="http://schemas.haulmont.com/cuba/cli/template.xsd"
+          modelName="project">
+    <quesitons>
+        <plain name="projectName" caption="Project name"/>
+        <plain name="namespace" caption="Project namespace"/>
+        <plain name="rootPackage" caption="Root package"/>
+        <options name="platformVersion" caption="Choose Platform version">
+            <option>6.8.5</option>
+            <option>6.9-SNAPSHOT</option>
+        </options>
+    </quesitons>
+    <operations>
+        <transform src="modules"/>
+        <transform src="build.gradle"/>
+        <transform src="settings.gradle"/>
+        <copy src="gitignore" dst=".gitignore"/>
+        <copy src="gradle"/>
+        <copy src="gradlew"/>
+        <copy src="gradlew.bat"/>
+    </operations>
+</template>

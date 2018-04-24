@@ -23,14 +23,18 @@ import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
+import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import org.kodein.di.generic.instance
 import java.io.File
 import java.nio.file.Path
 
 @Parameters
 class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
+    private val namesUtils: NamesUtils by kodein.instance()
+
     override fun getModelName(): String = ScreenModel.MODEL_NAME
 
     override fun QuestionsList.prompting() {
@@ -54,14 +58,10 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         val screenName = answers["screenName"] as String
         val controllerName = CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, screenName)
 
-        val packageName = answers["package"] as String
-        val packageDirectory = (packageName).replace('.', '/')
-
         return ScreenModel(
                 screenName,
                 controllerName,
-                packageName,
-                packageDirectory
+                answers["package"] as String
         )
     }
 
@@ -69,7 +69,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         val screenModel = context.getModel<ScreenModel>(ScreenModel.MODEL_NAME)
 
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "screen", bindings) {
-            copy("")
+            transform("")
         }
 
         val screensXml = ProjectFiles().getModule(ModuleType.WEB).screensXml
@@ -81,7 +81,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         updateXml(screensXml) {
             add("screen") {
                 "id" mustBe screenModel.screenName
-                "template" mustBe (screenModel.packageDirectory + File.separatorChar + screenModel.screenName + ".xml")
+                "template" mustBe (namesUtils.packageToDirectory(screenModel.packageName) + File.separatorChar + screenModel.screenName + ".xml")
             }
         }
     }
@@ -92,8 +92,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
 data class ScreenModel(
         val screenName: String,
         val controllerName: String,
-        val packageName: String,
-        val packageDirectory: String) {
+        val packageName: String) {
     companion object {
         const val MODEL_NAME = "screen"
     }

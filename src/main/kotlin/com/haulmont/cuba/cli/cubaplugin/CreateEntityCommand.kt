@@ -20,7 +20,6 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleType
 import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.entityNameToTableName
 import com.haulmont.cuba.cli.generation.PropertiesAppender
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
@@ -35,7 +34,9 @@ import java.nio.file.Path
 
 @Parameters(commandDescription = "Create new entity")
 class CreateEntityCommand : GeneratorCommand<EntityModel>() {
-    val writer: PrintWriter by kodein.instance()
+    private val writer: PrintWriter by kodein.instance()
+
+    private val namesUtils: NamesUtils by kodein.instance()
 
     override fun getModelName(): String = EntityModel.MODEL_NAME
 
@@ -68,15 +69,12 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
         val tableName = buildString {
             append(projectModel.namespace.toUpperCase())
             append("_")
-            append(entityNameToTableName(entityName))
+            append(namesUtils.entityNameToTableName(entityName))
         }
-
-        val packageName = answers["packageName"] as String
 
         return EntityModel(
                 entityName,
-                packageName,
-                packageName.replace('.', File.separatorChar),
+                answers["packageName"] as String,
                 answers["entityType"] as String,
                 tableName
         )
@@ -92,7 +90,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
         val projectFiles = ProjectFiles()
 
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "entity", bindings) {
-            copy("")
+            transform("")
         }
 
         if (entityModel.type == "Not persistent") {
@@ -135,7 +133,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     }
 }
 
-data class EntityModel(val name: String, val packageName: String, val packageDirectoryName: String, val type: String, val tableName: String) {
+data class EntityModel(val name: String, val packageName: String, val type: String, val tableName: String) {
     companion object {
         const val MODEL_NAME = "entity"
     }

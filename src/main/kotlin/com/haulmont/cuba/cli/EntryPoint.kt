@@ -17,6 +17,7 @@
 package com.haulmont.cuba.cli
 
 import com.haulmont.cuba.cli.commands.CommandsRegistry
+import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.di.terminalModule
 import com.haulmont.cuba.cli.event.DestroyPluginEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
@@ -30,6 +31,8 @@ val kodein by lazy {
         import(terminalModule)
 
         bind<CliContext>() with instance(context)
+
+        bind<NamesUtils>() with instance(NamesUtils())
     }
 }
 

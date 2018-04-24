@@ -6,6 +6,6 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 
     <!-- Annotation-based beans -->
-    <context:component-scan base-package="${project.RootPackage}"/>
+    <context:component-scan base-package="${project.rootPackage}"/>
 
 </beans>

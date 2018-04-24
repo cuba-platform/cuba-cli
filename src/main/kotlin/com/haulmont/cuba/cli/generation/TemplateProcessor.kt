@@ -16,46 +16,43 @@
 
 package com.haulmont.cuba.cli.generation
 
+import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.kodein
 import org.apache.velocity.Template
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
 import org.apache.velocity.runtime.RuntimeSingleton
 import org.kodein.di.generic.instance
+import java.io.File
 import java.io.PrintWriter
 import java.net.URI
 import java.nio.file.*
 import kotlin.reflect.full.memberProperties
 
-class TemplateProcessor private constructor(templateBasePath: String, private val bindings: Map<String, Any>) {
+class TemplateProcessor {
+
+    private val bindings: Map<String, Any>
 
     private val writer: PrintWriter by kodein.instance()
 
-    private val pathExpressionPattern = Regex("\\$\\{[a-zA-Z][0-9a-zA-Z]*(\\.[a-zA-Z][0-9a-zA-Z]*)*}")
-    private val variablePartPattern = Regex("[a-zA-Z][0-9a-zA-Z]*")
+    private val pathExpressionPattern: Regex = Regex("\\$\\{[a-zA-Z][0-9a-zA-Z]*(\\.[a-zA-Z][0-9a-zA-Z]*)*}")
+    private val packageExpressionPattern: Regex = Regex("\\$\\[[a-zA-Z][0-9a-zA-Z]*(\\.[a-zA-Z][0-9a-zA-Z]*)*]")
 
-    private val velocityContext: VelocityContext = VelocityContext().apply {
-        bindings.forEach { k, v -> put(k, v) }
-    }
+    private val variablePartPattern: Regex = Regex("[a-zA-Z][0-9a-zA-Z]*")
+    private val velocityContext: VelocityContext
 
     private val templatePath: Path
 
-    init {
-        val templateUri = javaClass.getResource(templateBasePath).toURI()
-
-        templatePath = if (templateUri.scheme == "jar") {
-            val fileSystem = getFileSystem(templateUri)
-            fileSystem.getPath(templateBasePath)
-        } else {
-            Paths.get(templateUri)
+    private constructor(templateBasePath: Path, bindings: Map<String, Any>) {
+        templatePath = templateBasePath
+        this.bindings = bindings
+        this.velocityContext = VelocityContext().apply {
+            bindings.forEach { k, v -> put(k, v) }
         }
     }
 
-    private fun getFileSystem(templateUri: URI?) = try {
-        FileSystems.getFileSystem(templateUri)
-    } catch (e: FileSystemNotFoundException) {
-        FileSystems.newFileSystem(templateUri, mutableMapOf<String, Any>())
-    }
+    private constructor(templateBasePath: String, bindings: Map<String, Any>) : this(findTemplate(templateBasePath), bindings)
+
 
     private fun process(from: Path, to: Path, withTransform: Boolean) {
         val targetAbsolutePath = to.toAbsolutePath()
@@ -115,17 +112,30 @@ class TemplateProcessor private constructor(templateBasePath: String, private va
     private fun applyPathTransform(path: String, bindings: Map<String, Any>): String {
         return pathExpressionPattern.replace(path) {
             val expression = it.value.substring(2, it.value.lastIndex)
+            parsePathExpression(expression, bindings)
+        }.let {
+            packageExpressionPattern.replace(it) {
+                val expression = it.value.substring(2, it.value.lastIndex)
+                parsePathExpression(expression, bindings).replace('.', File.separatorChar)
+            }
+        }
+    }
+
+    private fun parsePathExpression(expression: String, bindings: Map<String, Any>): String =
             variablePartPattern.findAll(expression)
                     .map {
                         it.value
                     }.fold(bindings as Any) { obj, name ->
                         getChild(obj, name)
                     }.toString()
-        }
-    }
+
 
     private fun getChild(obj: Any, name: String): Any = when (obj) {
-        is Map<*, *> -> obj[name]!!
+        is Map<*, *> -> {
+            if (name in obj) {
+                obj[name]!!
+            } else throw CommandExecutionException("Path variable $name doesn't exists")
+        }
         else -> getField(obj, name)
     }
 
@@ -152,13 +162,44 @@ class TemplateProcessor private constructor(templateBasePath: String, private va
     }
 
     companion object {
+        private val CUSTOM_TEMPLATES_PATH = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "templates")
+                .also {
+                    if (!Files.exists(it)) {
+                        Files.createDirectories(it)
+                    }
+                }
 
         init {
             Velocity.init()
         }
 
-        operator fun invoke(templateBasePath: String, bindings: Map<String, Any>, block: TemplateProcessor.() -> Unit) {
+        operator fun invoke(templateName: String, bindings: Map<String, Any>, block: TemplateProcessor.() -> Unit) {
+            TemplateProcessor(templateName, bindings).block()
+        }
+
+        operator fun invoke(templateBasePath: Path, bindings: Map<String, Any>, block: TemplateProcessor.() -> Unit) {
             TemplateProcessor(templateBasePath, bindings).block()
+        }
+
+        fun findTemplate(templateBasePath: String): Path {
+            val templateUri = TemplateProcessor::class.java.getResource(templateBasePath)?.toURI()
+
+            if (templateUri != null) {
+                return if (templateUri.scheme == "jar") {
+                    val fileSystem = getFileSystem(templateUri)
+                    fileSystem.getPath(templateBasePath)
+                } else {
+                    Paths.get(templateUri)
+                }
+            }
+
+            return CUSTOM_TEMPLATES_PATH.resolve(templateBasePath)
+        }
+
+        private fun getFileSystem(templateUri: URI?) = try {
+            FileSystems.getFileSystem(templateUri)
+        } catch (e: FileSystemNotFoundException) {
+            FileSystems.newFileSystem(templateUri, mutableMapOf<String, Any>())
         }
     }
 }

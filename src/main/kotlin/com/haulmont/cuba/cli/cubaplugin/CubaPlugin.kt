@@ -31,6 +31,8 @@ import org.kodein.di.generic.instance
 class CubaPlugin : CliPlugin {
     private val context: CliContext by kodein.instance()
 
+    private val namesUtils: NamesUtils by kodein.instance()
+
     @Subscribe
     fun onInit(event: InitPluginEvent) {
         event.commandsRegistry {
@@ -38,11 +40,14 @@ class CubaPlugin : CliPlugin {
             command("entity", CreateEntityCommand())
             command("screen", CreateScreenCommand())
             command("service", CreateServiceCommand())
+            command("template", StaticTemplateCommand())
         }
     }
 
     @Subscribe
     fun beforeCommand(event: BeforeCommandExecutionEvent) {
+        context.addModel("names", namesUtils)
+
         val projectFiles = try {
             ProjectFiles()
         } catch (e: Exception) {

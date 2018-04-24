@@ -1,6 +1,6 @@
-package ${project.RootPackage}.core;
+package ${project.rootPackage}.core;
 
-import ${project.RootPackage}.AppTestContainer;
+import ${project.rootPackage}.AppTestContainer;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;

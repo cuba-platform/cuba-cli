@@ -1,4 +1,4 @@
-rootProject.name = '${project.Namespace}'
+rootProject.name = '${project.namespace}'
 include(":app-global", ":app-core", ":app-web")
 project(":app-global").projectDir = new File(settingsDir, 'modules/global')
 project(":app-core").projectDir = new File(settingsDir, 'modules/core')

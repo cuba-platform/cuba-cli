@@ -115,6 +115,11 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     }
 }
 
-data class ProjectInitModel(val name: String, val namespace: String, val rootPackage: String, val platformVersion: String, val rootPackageDirectory: String)
+data class ProjectInitModel(
+        val name: String,
+        val namespace: String,
+        val rootPackage: String,
+        val platformVersion: String,
+        val rootPackageDirectory: String)
 
 private val availablePlatformVersions = listOf("6.8.5", "6.9-SNAPSHOT")

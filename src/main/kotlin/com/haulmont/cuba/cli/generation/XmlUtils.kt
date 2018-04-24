@@ -45,6 +45,10 @@ fun updateXml(path: Path, definition: XmlDefinition.() -> Unit) {
     writer.println("\t@|green altered|@\t$path")
 }
 
+fun Element.getChildElements() = (0..this.childNodes.length)
+        .map(this.childNodes::item)
+        .filterIsInstance(Element::class.java)
+
 fun Element.findChild(predicate: (Element) -> Boolean): Element? =
         DomUtil.getChildren(this).firstOrNull(predicate)
 
