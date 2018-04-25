@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.prompting
 
+import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.commands.CommonParameters
 import com.haulmont.cuba.cli.kodein
 import org.fusesource.jansi.Ansi
@@ -29,93 +30,85 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
     private val reader: LineReader by kodein.instance(arg = NullCompleter())
     private val writer: PrintWriter by kodein.instance()
 
-    fun ask(): Answers = questionsList.getQuestions()
-            .fold(mapOf()) { answers, question ->
-                answers.toMutableMap()
-                        .apply {
-                            put(question.name, ask(question, answers))
-                        }
+    fun ask(): Answers = questionsList.ask()
+
+    private fun ask(question: Question, answers: Answers): Answer {
+        return when (question) {
+            is SimpleQuestion<*> -> {
+                val value = question.ask(answers)
+                if (question is OptionsQuestion) {
+                    question.options[value as Int]
+                } else value
             }
+            is CompositeQuestion -> question.ask()
+        }
+    }
+
+    private fun CompositeQuestion.ask(): Answers {
+        return this.fold(mapOf()) { answers, question ->
+            answers.toMutableMap()
+                    .apply {
+                        put(question.name, ask(question, answers))
+                    }
+        }
+    }
+
+    private tailrec fun <T : Any> SimpleQuestion<T>.ask(answers: Answers, maybePrompts: String? = null): T {
+        val prompts = maybePrompts ?: printPrompts(answers)
+        try {
+            return read(prompts).let {
+                if (it.isNotEmpty()) return@let it.read()
+                val defaultValue = defaultValue
+                when (defaultValue) {
+                    is PlainValue -> defaultValue.value
+                    is CalculatedValue -> defaultValue.function(answers)
+                    else -> it.read()
+                }
+            }.also {
+                validation(it)
+            }
+        } catch (e: Exception) {
+            when (e) {
+                is ValidationException, is ReadException -> writer.println("@|red ${e.message}|@")
+                else -> throw e
+            }
+
+        }
+
+        return ask(answers, prompts)
+    }
+
+    private fun read(prompt: String): String = reader.readLine(Ansi.ansi().render(prompt).toString()).trim()
 
     fun askNonInteractive(): Answers {
         val answers = CommonParameters.nonInteractive
 
-        questionsList.getQuestions().forEach {
-            if (it.name !in answers) {
-                throw ValidationException("Parameter ${it.name} not passed")
-            }
-            val value = answers[it.name] as String
+        if (!questionsList.all { it is SimpleQuestion<*> }) {
+            throw CommandExecutionException("Non interactive mode unavailable for complex questions")
+        }
 
-            when (it) {
-                is OptionsQuestion -> if (value !in it.options) {
-                    throw ValidationException("Invalid value $value for parameter ${it.name}. Available values are ${it.options}.")
-                }
-                is WithValidation -> it.validation(value)
-            }
+        questionsList.filterIsInstance(SimpleQuestion::class.java).forEach {
+            checkQuestion(it, answers)
         }
 
         return answers
     }
 
-
-    private fun ask(question: Question, answers: Answers): Answer = when (question) {
-        is OptionsQuestion -> {
-            val defaultValue = question.defaultValue.get(answers)
-            val prompt = createPrompt(question, defaultValue)
-            val index = ask(question.validation, prompt, defaultValue).toInt() - 1
-            question.options[index]
+    private fun <T : Any> checkQuestion(it: SimpleQuestion<T>, answers: Map<String, String>) {
+        if (it.name !in answers) {
+            throw ValidationException("Parameter ${it.name} not passed")
         }
-        is PlainQuestion -> {
-            val defaultValue = question.defaultValue.get(answers)
-            val prompt = createPrompt(question, defaultValue)
-            ask(question.validation, prompt, defaultValue)
-        }
-    }
+        val value = answers[it.name] as String
 
-    private tailrec fun ask(validation: (String) -> Unit, prompt: String, defaultValue: String): String {
-        val answer = read(prompt).takeIf { it.isNotEmpty() } ?: defaultValue
-        return if (answer satisfies validation)
-            answer
-        else
-            ask(validation, prompt, defaultValue)
-    }
-
-    private fun createPrompt(question: Question, defaultValue: String): String {
-        val answer = "> ${question.caption} "
-        val defaultValuePostfix = when {
-            defaultValue.isEmpty() -> ""
-            else -> "@|red ($defaultValue) |@"
-        }
-        val options = when (question) {
-            is OptionsQuestion -> printOptionsIndexed(question.options)
-            is PlainQuestion -> ""
-            else -> throw IllegalArgumentException()
-        }
-        return answer + defaultValuePostfix + options
-    }
-
-
-    private fun printOptionsIndexed(options: List<String>): String = options
-            .foldIndexed("") { index, acc, s ->
-                "$acc\n${index + 1}. $s "
+        when (it) {
+            is OptionsQuestion -> if (value !in it.options) {
+                throw ValidationException("Invalid value $value for parameter ${it.name}. Available values are ${it.options}.")
             }
-
-    private fun read(prompt: String): String = reader.readLine(Ansi.ansi().render(prompt).toString()).trim()
-
-    private infix fun String.satisfies(validateFn: (String) -> Unit): Boolean =
-            try {
-                validateFn(this)
-                true
-            } catch (e: ValidationException) {
-                writer.println("@|red ${e.message}|@")
-                false
+            else -> it.run {
+                validation(value.read())
             }
-}
-
-private fun DefaultValue.get(answers: Answers): String = when (this) {
-    is None -> ""
-    is PlainValue -> this.value
-    is CalculatedValue -> this.function(answers)
+        }
+    }
 }
 
 data class ValidationException(override val message: String) : RuntimeException(message)

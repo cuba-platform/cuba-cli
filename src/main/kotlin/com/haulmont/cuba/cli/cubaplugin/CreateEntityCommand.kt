@@ -58,7 +58,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
         }
 
         options("entityType", "Entity type", entityTypes) {
-            default(1)
+            default(0)
         }
     }
 

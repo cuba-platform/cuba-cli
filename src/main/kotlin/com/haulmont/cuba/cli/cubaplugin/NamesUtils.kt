@@ -23,4 +23,10 @@ class NamesUtils {
     fun packageToDirectory(packageName: String) = packageName.replace('.', File.separatorChar)
 
     fun entityNameToTableName(entityName: String): String = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, entityName)
+
+    fun join(one: String, another: String, on: String): String =
+            if (one.isEmpty())
+                another
+            else
+                "$one$on$another"
 }
