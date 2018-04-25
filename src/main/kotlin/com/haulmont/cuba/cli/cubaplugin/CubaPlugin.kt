@@ -41,6 +41,7 @@ class CubaPlugin : CliPlugin {
             command("screen", CreateScreenCommand())
             command("service", CreateServiceCommand())
             command("template", StaticTemplateCommand())
+            command("bean", CreateComponentBeanCommand())
         }
     }
 

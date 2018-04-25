@@ -5,5 +5,7 @@
         messagesPack="${screen.packageName}">
     <dialogMode height="600"
                 width="800"/>
-    <layout/>
+    <layout>
+        <!--Add you UI components here-->
+    </layout>
 </window>
