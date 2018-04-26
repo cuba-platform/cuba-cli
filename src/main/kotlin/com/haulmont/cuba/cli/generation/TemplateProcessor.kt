@@ -161,6 +161,14 @@ class TemplateProcessor {
         process(templatePath.resolve(subPath), to, true)
     }
 
+    fun transformWhole(to: Path = Paths.get("")) {
+        transform("", to)
+    }
+
+    fun copyWhole(to: Path = Paths.get("")) {
+        copy("", to)
+    }
+
     companion object {
         private val CUSTOM_TEMPLATES_PATH = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "templates")
                 .also {

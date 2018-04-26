@@ -66,7 +66,7 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
 
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "service", bindings) {
-            copy("")
+            transformWhole()
         }
 
         val springXml = ProjectFiles().getModule(ModuleType.WEB).springXml
