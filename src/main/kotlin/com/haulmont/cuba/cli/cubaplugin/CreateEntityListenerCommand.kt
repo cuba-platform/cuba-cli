@@ -65,14 +65,23 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
             default { projectModel.namespace + "_" + it["name"] }
         }
 
-        listOf("beforeInsert", "beforeUpdate", "beforeDelete",
-                "afterInsert", "afterUpdate", "afterDelete",
-                "beforeAttach", "beforeDetach")
-                .forEach {
-                    confirmation(it, "Implement ${it.capitalize()}EntityListener?") {
-                        default(true)
-                    }
+        questionList("interfaces") {
+            val interfaces = listOf("beforeInsert", "beforeUpdate", "beforeDelete",
+                    "afterInsert", "afterUpdate", "afterDelete",
+                    "beforeAttach", "beforeDetach")
+
+            interfaces.forEach {
+                confirmation(it, "Implement ${it.capitalize()}EntityListener?") {
+                    default(true)
                 }
+            }
+
+            validate { answers ->
+                if (interfaces.none { answers[it] as Boolean }) {
+                    fail("Listener must implement at least one of the interfaces")
+                }
+            }
+        }
     }
 
     override fun createModel(answers: Answers): EntityListenerModel = EntityListenerModel(answers)
@@ -169,26 +178,33 @@ data class EntityListenerModel(
         const val MODEL_NAME = "listener"
 
         operator fun invoke(answers: Answers): EntityListenerModel {
-            val entity = answers["entityType"] as String
+            val entity: String = answers("entityType")
             val lastDotIndex = entity.lastIndexOf('.')
             val entityName = if (lastDotIndex == -1) entity else entity.substring(lastDotIndex + 1)
             val entityPackageName = entity.removeSuffix(".$entityName")
 
+            val interfaces: Answers = answers("interfaces")
+
             return EntityListenerModel(
-                    answers["name"] as String,
-                    answers["packageName"] as String,
-                    answers["beanName"] as String,
+                    answers("name"),
+                    answers("packageName"),
+                    answers("beanName"),
                     entityName,
                     entityPackageName,
-                    answers["beforeInsert"] as Boolean,
-                    answers["beforeUpdate"] as Boolean,
-                    answers["beforeDelete"] as Boolean,
-                    answers["afterInsert"] as Boolean,
-                    answers["afterUpdate"] as Boolean,
-                    answers["afterDelete"] as Boolean,
-                    answers["beforeAttach"] as Boolean,
-                    answers["beforeDetach"] as Boolean
+                    interfaces("beforeInsert"),
+                    interfaces("beforeUpdate"),
+                    interfaces("beforeDelete"),
+                    interfaces("afterInsert"),
+                    interfaces("afterUpdate"),
+                    interfaces("afterDelete"),
+                    interfaces("beforeAttach"),
+                    interfaces("beforeDetach")
             )
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        infix operator fun <V> Map<String, *>.invoke(key: String): V {
+            return this[key] as V
         }
     }
 }

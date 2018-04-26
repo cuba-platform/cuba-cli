@@ -18,7 +18,7 @@ package com.haulmont.cuba.cli.prompting
 
 sealed class Question(val name: String)
 
-abstract class SimpleQuestion<T : Any>(name: String, val caption: String) : Question(name), Print<T>, Read<T>, WithValidation<T>, HasDefault<T> {
+abstract class PlainQuestion<T : Any>(name: String, val caption: String) : Question(name), Print<T>, Read<T>, WithValidation<T>, HasDefault<T> {
     open fun printPrompts(answers: Answers): String =
             """> $caption ${printDefaultValue(answers)}"""
 
@@ -36,11 +36,16 @@ abstract class SimpleQuestion<T : Any>(name: String, val caption: String) : Ques
     }
 }
 
-abstract class CompositeQuestion(name: String) : Iterable<Question>, Question(name) {
+abstract class CompositeQuestion(name: String) : Iterable<Question>, Question(name), WithValidation<Answers> {
+    override var validation: (Answers) -> Unit = acceptAll
+
     protected val questions: MutableList<Question> = mutableListOf()
 
+    val isFlat: Boolean
+        get() = name.isEmpty()
+
     fun question(name: String, caption: String, configuration: (PlainQuestionConfigurationScope.() -> Unit)? = null) {
-        PlainQuestion(name, caption).apply {
+        StringQuestion(name, caption).apply {
             configuration?.let { this.it() }
             questions.add(this)
         }
@@ -60,6 +65,10 @@ abstract class CompositeQuestion(name: String) : Iterable<Question>, Question(na
         }
     }
 
+    fun questionList(name: String = "", configure: QuestionsList.() -> Unit) {
+        questions.add(QuestionsList(name, configure))
+    }
+
     override fun iterator(): Iterator<Question> = questions.iterator()
 }
 
@@ -77,8 +86,8 @@ class QuestionsList(name: String = "", setup: (QuestionsList.() -> Unit)) : Comp
     }
 }
 
-class PlainQuestion(name: String, caption: String) :
-        SimpleQuestion<String>(name, caption),
+class StringQuestion(name: String, caption: String) :
+        PlainQuestion<String>(name, caption),
         HasDefault<String>,
         WithValidation<String>,
         PlainQuestionConfigurationScope {
@@ -95,7 +104,7 @@ class PlainQuestion(name: String, caption: String) :
 interface PlainQuestionConfigurationScope : DefaultValueConfigurable<String>, ValidationConfigurable<String>
 
 class OptionsQuestion(name: String, caption: String, val options: List<String>) :
-        SimpleQuestion<Int>(name, caption),
+        PlainQuestion<Int>(name, caption),
         HasDefault<Int>,
         WithValidation<Int> {
 
@@ -140,7 +149,7 @@ class OptionsQuestion(name: String, caption: String, val options: List<String>) 
 interface ConfirmationQuestionConfigurationScope : DefaultValueConfigurable<Boolean>
 
 class ConfirmationQuestion(name: String, caption: String) :
-        SimpleQuestion<Boolean>(name, caption),
+        PlainQuestion<Boolean>(name, caption),
         ConfirmationQuestionConfigurationScope {
 
     override var defaultValue: DefaultValue<Boolean> = None

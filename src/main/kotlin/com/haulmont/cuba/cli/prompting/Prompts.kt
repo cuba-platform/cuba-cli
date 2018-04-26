@@ -32,28 +32,38 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
 
     fun ask(): Answers = questionsList.ask()
 
-    private fun ask(question: Question, answers: Answers): Answer {
-        return when (question) {
-            is SimpleQuestion<*> -> {
-                val value = question.ask(answers)
-                if (question is OptionsQuestion) {
-                    question.options[value as Int]
-                } else value
-            }
-            is CompositeQuestion -> question.ask()
-        }
+    private fun <T : Any> askSimple(question: PlainQuestion<T>, answers: Answers): Answer {
+        val value = question.ask(answers)
+        return if (question is OptionsQuestion) {
+            question.options[value as Int]
+        } else value
     }
 
-    private fun CompositeQuestion.ask(): Answers {
-        return this.fold(mapOf()) { answers, question ->
-            answers.toMutableMap()
-                    .apply {
-                        put(question.name, ask(question, answers))
+    private tailrec fun CompositeQuestion.ask(): Answers {
+        try {
+            return this.fold<Question, Map<String, Answer>>(mapOf()) { doneAnswers, question ->
+                when (question) {
+                    is PlainQuestion<*> -> {
+                        val answer = askSimple(question, doneAnswers)
+                        doneAnswers + (question.name to answer)
                     }
+                    is CompositeQuestion -> {
+                        val answer = question.ask()
+                        if (question.isFlat) {
+                            doneAnswers + answer
+                        } else {
+                            doneAnswers + (question.name to answer)
+                        }
+                    }
+                }
+            }.also(validation)
+        } catch (e: ValidationException) {
+            writer.println("@|red ${e.message}|@")
         }
+        return this.ask()
     }
 
-    private tailrec fun <T : Any> SimpleQuestion<T>.ask(answers: Answers, maybePrompts: String? = null): T {
+    private tailrec fun <T : Any> PlainQuestion<T>.ask(answers: Answers, maybePrompts: String? = null): T {
         val prompts = maybePrompts ?: printPrompts(answers)
         try {
             return read(prompts).let {
@@ -83,18 +93,18 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
     fun askNonInteractive(): Answers {
         val answers = CommonParameters.nonInteractive
 
-        if (!questionsList.all { it is SimpleQuestion<*> }) {
+        if (!questionsList.all { it is PlainQuestion<*> }) {
             throw CommandExecutionException("Non interactive mode unavailable for complex questions")
         }
 
-        questionsList.filterIsInstance(SimpleQuestion::class.java).forEach {
+        questionsList.filterIsInstance(PlainQuestion::class.java).forEach {
             checkQuestion(it, answers)
         }
 
         return answers
     }
 
-    private fun <T : Any> checkQuestion(it: SimpleQuestion<T>, answers: Map<String, String>) {
+    private fun <T : Any> checkQuestion(it: PlainQuestion<T>, answers: Map<String, String>) {
         if (it.name !in answers) {
             throw ValidationException("Parameter ${it.name} not passed")
         }
