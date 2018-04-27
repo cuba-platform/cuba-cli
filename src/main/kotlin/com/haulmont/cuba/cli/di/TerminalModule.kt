@@ -17,7 +17,7 @@
 package com.haulmont.cuba.cli.di
 
 import com.haulmont.cuba.cli.ColoredWriter
-import com.haulmont.cuba.cli.ErrorsManager
+import com.haulmont.cuba.cli.PrintHelper
 import org.jline.reader.Completer
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
@@ -44,5 +44,5 @@ val terminalModule = Kodein.Module {
         ColoredWriter(instance<Terminal>().writer())
     }
 
-    bind<ErrorsManager>() with singleton { ErrorsManager() }
+    bind<PrintHelper>() with singleton { PrintHelper() }
 }

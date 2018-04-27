@@ -16,7 +16,9 @@
 
 package com.haulmont.cuba.cli.prompting
 
-sealed class Question(val name: String)
+sealed class Question(val name: String) : Conditional {
+    override var askCondition: (Answers) -> Boolean = { true }
+}
 
 abstract class PlainQuestion<T : Any>(name: String, val caption: String) : Question(name), Print<T>, Read<T>, WithValidation<T>, HasDefault<T> {
     open fun printPrompts(answers: Answers): String =
@@ -44,7 +46,7 @@ abstract class CompositeQuestion(name: String) : Iterable<Question>, Question(na
     val isFlat: Boolean
         get() = name.isEmpty()
 
-    fun question(name: String, caption: String, configuration: (PlainQuestionConfigurationScope.() -> Unit)? = null) {
+    fun question(name: String, caption: String, configuration: (StringQuestionConfigurationScope.() -> Unit)? = null) {
         StringQuestion(name, caption).apply {
             configuration?.let { this.it() }
             questions.add(this)
@@ -76,8 +78,6 @@ class QuestionsList(name: String = "", setup: (QuestionsList.() -> Unit)) : Comp
     init {
         setup()
 
-        check(questions.isNotEmpty())
-
         questions.groupingBy { it.name }
                 .eachCount()
                 .entries
@@ -90,7 +90,7 @@ class StringQuestion(name: String, caption: String) :
         PlainQuestion<String>(name, caption),
         HasDefault<String>,
         WithValidation<String>,
-        PlainQuestionConfigurationScope {
+        StringQuestionConfigurationScope {
 
     override var validation: (String) -> Unit = acceptAll
 
@@ -101,12 +101,13 @@ class StringQuestion(name: String, caption: String) :
     override fun String.print() = this
 }
 
-interface PlainQuestionConfigurationScope : DefaultValueConfigurable<String>, ValidationConfigurable<String>
+interface StringQuestionConfigurationScope : DefaultValueConfigurable<String>, ValidationConfigurable<String>, Conditional
 
 class OptionsQuestion(name: String, caption: String, val options: List<String>) :
         PlainQuestion<Int>(name, caption),
         HasDefault<Int>,
-        WithValidation<Int> {
+        WithValidation<Int>,
+        OptionsQuestionConfigurationScope {
 
     override var defaultValue: DefaultValue<Int> = None
 
@@ -146,7 +147,9 @@ class OptionsQuestion(name: String, caption: String, val options: List<String>) 
     }
 }
 
-interface ConfirmationQuestionConfigurationScope : DefaultValueConfigurable<Boolean>
+interface OptionsQuestionConfigurationScope : DefaultValueConfigurable<Int>, Conditional
+
+interface ConfirmationQuestionConfigurationScope : DefaultValueConfigurable<Boolean>, Conditional
 
 class ConfirmationQuestion(name: String, caption: String) :
         PlainQuestion<Boolean>(name, caption),
@@ -245,3 +248,17 @@ interface Read<out T : Any> {
 }
 
 class ReadException(message: String = "Invalid value") : Exception(message)
+
+interface Conditional {
+    var askCondition: (Answers) -> Boolean
+
+    fun askIf(askCondition: (Answers) -> Boolean) {
+        this.askCondition = askCondition
+    }
+
+    fun askIf(confirmationQuestionName: String) {
+        askIf {
+            it[confirmationQuestionName] as Boolean
+        }
+    }
+}

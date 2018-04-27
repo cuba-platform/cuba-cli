@@ -20,8 +20,9 @@ import com.haulmont.cuba.cli.commands.CommonParameters
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.nio.file.Path
 
-class ErrorsManager {
+class PrintHelper {
     val writer: PrintWriter by kodein.instance()
 
     private var lastStacktrace: String = ""
@@ -46,6 +47,14 @@ class ErrorsManager {
 
     fun printLastStacktrace() {
         writer.println("@|red $lastStacktrace|@")
+    }
+
+    fun fileCreated(path: Path) {
+        writer.println("\t@|green created|@\t$path")
+    }
+
+    fun fileAltered(path: Path) {
+        writer.println("\t@|green altered|@\t$path")
     }
 
     private fun printFailMessage(e: Exception) {

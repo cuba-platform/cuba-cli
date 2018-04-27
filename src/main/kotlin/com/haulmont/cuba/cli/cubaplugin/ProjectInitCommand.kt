@@ -77,7 +77,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
         }
 
         options("platformVersion", "Platform version", availablePlatformVersions) {
-            default(1)
+            default(0)
         }
     }
 

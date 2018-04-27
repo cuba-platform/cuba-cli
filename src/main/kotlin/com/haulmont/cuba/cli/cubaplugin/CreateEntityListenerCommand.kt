@@ -18,8 +18,11 @@ package com.haulmont.cuba.cli.cubaplugin
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleType
+import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.commands.from
+import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.getChildElements
 import com.haulmont.cuba.cli.generation.parse
@@ -33,6 +36,7 @@ import org.kodein.di.generic.instance
 @Parameters(commandDescription = "Creates new entity listener")
 class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
     private val namesUtils: NamesUtils by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance()
 
     override fun getModelName(): String = EntityListenerModel.MODEL_NAME
 
@@ -65,7 +69,7 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
             default { projectModel.namespace + "_" + it["name"] }
         }
 
-        questionList("interfaces") {
+        questionList {
             val interfaces = listOf("beforeInsert", "beforeUpdate", "beforeDelete",
                     "afterInsert", "afterUpdate", "afterDelete",
                     "beforeAttach", "beforeDetach")
@@ -88,7 +92,7 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
 
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "entityListener", bindings) {
-            transform("")
+            transformWhole()
         }
 
         registerListener()
@@ -152,6 +156,8 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
                 it.write("\n")
             }
         }
+
+        printHelper.fileAltered(entityPath)
     }
 
     override fun checkPreconditions() {
@@ -159,52 +165,31 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
     }
 }
 
-data class EntityListenerModel(
-        val className: String,
-        val packageName: String,
-        val beanName: String,
-        val entityName: String,
-        val entityPackageName: String,
-        val beforeInsert: Boolean,
-        val beforeUpdate: Boolean,
-        val beforeDelete: Boolean,
-        val afterInsert: Boolean,
-        val afterUpdate: Boolean,
-        val afterDelete: Boolean,
-        val beforeAttach: Boolean,
-        val beforeDetach: Boolean) {
+class EntityListenerModel(answers: Answers) {
+    val className: String = "name" from answers
+    val packageName: String by nameFrom(answers)
+    val beanName: String by nameFrom(answers)
+
+    val beforeInsert: Boolean by nameFrom(answers)
+    val beforeUpdate: Boolean by nameFrom(answers)
+    val beforeDelete: Boolean by nameFrom(answers)
+    val afterInsert: Boolean by nameFrom(answers)
+    val afterUpdate: Boolean by nameFrom(answers)
+    val afterDelete: Boolean by nameFrom(answers)
+    val beforeAttach: Boolean by nameFrom(answers)
+    val beforeDetach: Boolean by nameFrom(answers)
+
+    val entityName: String
+    val entityPackageName: String
+
+    init {
+        val entity: String = "entityType" from answers
+        val lastDotIndex = entity.lastIndexOf('.')
+        entityName = if (lastDotIndex == -1) entity else entity.substring(lastDotIndex + 1)
+        entityPackageName = entity.removeSuffix(".$entityName")
+    }
 
     companion object {
         const val MODEL_NAME = "listener"
-
-        operator fun invoke(answers: Answers): EntityListenerModel {
-            val entity: String = answers("entityType")
-            val lastDotIndex = entity.lastIndexOf('.')
-            val entityName = if (lastDotIndex == -1) entity else entity.substring(lastDotIndex + 1)
-            val entityPackageName = entity.removeSuffix(".$entityName")
-
-            val interfaces: Answers = answers("interfaces")
-
-            return EntityListenerModel(
-                    answers("name"),
-                    answers("packageName"),
-                    answers("beanName"),
-                    entityName,
-                    entityPackageName,
-                    interfaces("beforeInsert"),
-                    interfaces("beforeUpdate"),
-                    interfaces("beforeDelete"),
-                    interfaces("afterInsert"),
-                    interfaces("afterUpdate"),
-                    interfaces("afterDelete"),
-                    interfaces("beforeAttach"),
-                    interfaces("beforeDetach")
-            )
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        infix operator fun <V> Map<String, *>.invoke(key: String): V {
-            return this[key] as V
-        }
     }
 }

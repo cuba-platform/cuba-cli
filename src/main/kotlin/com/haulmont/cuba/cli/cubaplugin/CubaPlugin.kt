@@ -43,6 +43,7 @@ class CubaPlugin : CliPlugin {
             command("template", StaticTemplateCommand())
             command("bean", CreateComponentBeanCommand())
             command("entity-listener", CreateEntityListenerCommand())
+            command("app-component", AppComponentCommand())
         }
     }
 

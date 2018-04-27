@@ -31,8 +31,6 @@ abstract class AbstractCommand : CliCommand {
     protected open fun checkPreconditions() {
     }
 
-    protected open fun printHelp() {}
-
     @Throws(CommandExecutionException::class)
     protected fun onlyInProject() {
         if (!context.hasModel("project")) {

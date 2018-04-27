@@ -42,6 +42,9 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
     private tailrec fun CompositeQuestion.ask(): Answers {
         try {
             return this.fold<Question, Map<String, Answer>>(mapOf()) { doneAnswers, question ->
+                if (!question.askCondition(doneAnswers)) {
+                    return@fold doneAnswers
+                }
                 when (question) {
                     is PlainQuestion<*> -> {
                         val answer = askSimple(question, doneAnswers)

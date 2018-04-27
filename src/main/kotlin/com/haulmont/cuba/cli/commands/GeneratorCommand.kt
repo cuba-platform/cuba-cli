@@ -19,6 +19,8 @@ package com.haulmont.cuba.cli.commands
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.Prompts
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
 abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
     override fun execute() {
@@ -32,11 +34,7 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
         val model = createModel(answers)
         context.addModel(getModelName(), model)
 
-        val bindings: MutableMap<String, Any> = mutableMapOf()
-        context.getModels().toMap(bindings)
-        beforeGeneration(bindings)
-
-        generate(bindings.toMap())
+        generate(context.getModels())
     }
 
     abstract fun getModelName(): String
@@ -45,7 +43,17 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
 
     abstract fun createModel(answers: Answers): Model
 
-    open fun beforeGeneration(bindings: MutableMap<String, Any>) {}
-
     abstract fun generate(bindings: Map<String, Any>)
+}
+
+fun <R, T> nameFrom(answers: Answers): ReadOnlyProperty<R, T> = object : ReadOnlyProperty<R, T> {
+    override fun getValue(thisRef: R, property: KProperty<*>): T = answers[property.name] as T
+}
+
+/**
+ * Unsafe get value from map
+ */
+@Suppress("UNCHECKED_CAST")
+infix fun <V> String.from(map: Map<String, *>): V {
+    return map[this] as V
 }

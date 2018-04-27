@@ -43,7 +43,7 @@ public class SampleIntegrationTest {
         try (Transaction tx = persistence.createTransaction()) {
             EntityManager em = persistence.getEntityManager();
             TypedQuery<User> query = em.createQuery(
-                    "select u from sec\$User u where u.login = :userLogin", User.class);
+                    "select u from sec$User u where u.login = :userLogin", User.class);
             query.setParameter("userLogin", "admin");
             List<User> users = query.getResultList();
             tx.commit();

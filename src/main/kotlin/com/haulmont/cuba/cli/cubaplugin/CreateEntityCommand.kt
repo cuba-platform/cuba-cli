@@ -20,7 +20,8 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleType
 import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.generation.PropertiesAppender
+import com.haulmont.cuba.cli.commands.from
+import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.kodein
@@ -74,8 +75,8 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
 
         return EntityModel(
                 entityName,
-                answers["packageName"] as String,
-                answers["entityType"] as String,
+                "packageName" from answers,
+                "entityType" from answers,
                 tableName
         )
     }
@@ -90,7 +91,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
         val projectFiles = ProjectFiles()
 
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "entity", bindings) {
-            transform("")
+            transformWhole()
         }
 
         if (entityModel.type == "Not persistent") {
@@ -127,8 +128,8 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
 
         val messages = packageDirectory.resolve("messages.properties")
 
-        PropertiesAppender(messages, writer) {
-            append(entityModel.name, entityPrintableName)
+        PropertiesHelper(messages) {
+            set(entityModel.name, entityPrintableName)
         }
     }
 }

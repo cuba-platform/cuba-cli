@@ -30,7 +30,7 @@ class SingleCommandCli(private val args: Array<String>, commandsRegistry: Comman
 
     private val context: CliContext by kodein.instance()
 
-    private val errorsManager: ErrorsManager by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance()
 
     private val commandParser: CommandParser = CommandParser(commandsRegistry, false)
 
@@ -38,10 +38,10 @@ class SingleCommandCli(private val args: Array<String>, commandsRegistry: Comman
         val command = try {
             commandParser.parseCommand(args)
         } catch (e: MissingCommandException) {
-            errorsManager.unrecognizedCommand()
+            printHelper.unrecognizedCommand()
             return
         } catch (e: ParameterException) {
-            errorsManager.unrecognizedParameters()
+            printHelper.unrecognizedParameters()
             return
         }
 
@@ -58,7 +58,7 @@ class SingleCommandCli(private val args: Array<String>, commandsRegistry: Comman
         try {
             command.execute()
         } catch (e: Exception) {
-            errorsManager.handleCommandException(e)
+            printHelper.handleCommandException(e)
         }
         context.postEvent(AfterCommandExecutionEvent(command))
     }

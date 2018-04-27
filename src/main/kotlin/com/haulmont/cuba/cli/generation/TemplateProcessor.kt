@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.generation
 
+import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.kodein
 import org.apache.velocity.Template
@@ -34,6 +35,7 @@ class TemplateProcessor {
     private val bindings: Map<String, Any>
 
     private val writer: PrintWriter by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance()
 
     private val pathExpressionPattern: Regex = Regex("\\$\\{[a-zA-Z][0-9a-zA-Z]*(\\.[a-zA-Z][0-9a-zA-Z]*)*}")
     private val packageExpressionPattern: Regex = Regex("\\$\\[[a-zA-Z][0-9a-zA-Z]*(\\.[a-zA-Z][0-9a-zA-Z]*)*]")
@@ -93,7 +95,7 @@ class TemplateProcessor {
             template.merge(vc, writer)
         }
 
-        writer.println("\t@|green created|@\t$outputFile")
+        printHelper.fileCreated(outputFile)
     }
 
     private fun copyInternal(inputPath: Path, outputFile: Path) {

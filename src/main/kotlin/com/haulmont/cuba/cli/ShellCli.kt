@@ -36,7 +36,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
 
     private val writer: PrintWriter by kodein.instance()
 
-    private val errorsManager: ErrorsManager by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance()
 
     private val completer: Completer
 
@@ -74,10 +74,10 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
             } catch (e: UserInterruptException) {
                 continue
             } catch (e: MissingCommandException) {
-                errorsManager.unrecognizedCommand()
+                printHelper.unrecognizedCommand()
                 continue
             } catch (e: ParameterException) {
-                errorsManager.unrecognizedParameters()
+                printHelper.unrecognizedParameters()
                 continue
             } catch (e: EndOfFileException) {
                 return
@@ -90,7 +90,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
 
             when (command) {
                 is HelpCommand -> commandParser.printHelp()
-                is Stacktrace -> errorsManager.printLastStacktrace()
+                is Stacktrace -> printHelper.printLastStacktrace()
                 is ExitCommand -> return
                 else -> evalCommand(command)
             }
@@ -104,7 +104,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
         } catch (e: EndOfFileException) {
         } catch (e: UserInterruptException) {
         } catch (e: Exception) {
-            errorsManager.handleCommandException(e)
+            printHelper.handleCommandException(e)
         }
         context.postEvent(AfterCommandExecutionEvent(command))
     }

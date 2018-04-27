@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.generation
 
+import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.kodein
 import net.sf.practicalxml.DomUtil
 import net.sf.practicalxml.ParseUtil
@@ -28,6 +29,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 private val writer: PrintWriter by kodein.instance()
+private val printHelper: PrintHelper by kodein.instance()
 
 fun parse(path: Path): Document =
         Files.newInputStream(path).let(::InputSource).let(ParseUtil::parse)
@@ -42,7 +44,7 @@ fun updateXml(path: Path, definition: XmlDefinition.() -> Unit) {
     ensureXmlStructure(document.documentElement, definition)
     save(document, path)
 
-    writer.println("\t@|green altered|@\t$path")
+    printHelper.fileAltered(path)
 }
 
 fun Element.getChildElements() = (0..this.childNodes.length)

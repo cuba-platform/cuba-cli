@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<app-component xmlns="http://schemas.haulmont.com/cuba/app-component.xsd"
+               dependsOn="com.haulmont.cuba">
+    <module blocks="*"
+            name="global">
+        <artifact appJar="true"
+                  name="${component.modulePrefix}-global"/>
+        <property name="cuba.persistenceConfig"
+                  value="+${project.rootPackageDirectory}/persistence.xml"/>
+        <property name="cuba.metadataConfig"
+                  value="+${project.rootPackageDirectory}/metadata.xml"/>
+        <property name="cuba.viewsConfig"
+                  value="+${project.rootPackageDirectory}/views.xml"/>
+    </module>
+    <module blocks="core"
+            dependsOn="global"
+            name="core">
+        <artifact appJar="true"
+                  name="${component.modulePrefix}-core"/>
+        <artifact classifier="db"
+                  configuration="dbscripts"
+                  ext="zip"
+                  name="${component.modulePrefix}-core"/>
+        <property name="cuba.springContextConfig"
+                  value="+${project.rootPackageDirectory}/spring.xml"/>
+        <property name="cuba.mainMessagePack"
+                  value="+${project.rootPackage}.core"/>
+    </module>
+    <module blocks="web"
+            name="web">
+        <artifact appJar="true"
+                  name="${component.modulePrefix}-web"/>
+        <artifact classifier="web"
+                  configuration="webcontent"
+                  ext="zip"
+                  name="${component.modulePrefix}-web"/>
+        <property name="cuba.springContextConfig"
+                  value="+${project.rootPackageDirectory}/web-spring.xml"/>
+        <property name="cuba.dispatcherSpringContextConfig"
+                  value="+${project.rootPackageDirectory}/web-dispatcher-spring.xml"/>
+        <property name="cuba.windowConfig"
+                  value="+${project.rootPackageDirectory}/web-screens.xml"/>
+        <property name="cuba.menuConfig"
+                  value="+${project.rootPackageDirectory}/web-menu.xml"/>
+        <property name="cuba.permissionConfig"
+                  value="+${project.rootPackageDirectory}/web-permissions.xml"/>
+        <property name="cuba.mainMessagePack"
+                  value="+${project.rootPackage}.web"/>
+    </module>
+</app-component>

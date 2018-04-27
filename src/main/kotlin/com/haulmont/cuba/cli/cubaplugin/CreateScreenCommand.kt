@@ -21,7 +21,7 @@ import com.google.common.base.CaseFormat
 import com.haulmont.cuba.cli.ModuleType
 import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.generation.PropertiesAppender
+import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.kodein
@@ -73,7 +73,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         val screenModel = context.getModel<ScreenModel>(ScreenModel.MODEL_NAME)
 
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "screen", bindings) {
-            transform("")
+            transformWhole()
         }
 
         val webModule = ProjectFiles().getModule(ModuleType.WEB)
@@ -83,8 +83,8 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
 
         val messages = webModule.src.resolve(namesUtils.packageToDirectory(screenModel.packageName)).resolve("messages.properties")
 
-        PropertiesAppender(messages, writer) {
-            append("caption", screenModel.screenName)
+        PropertiesHelper(messages) {
+            set("caption", screenModel.screenName)
         }
     }
 

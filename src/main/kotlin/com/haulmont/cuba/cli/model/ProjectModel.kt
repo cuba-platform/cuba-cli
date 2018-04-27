@@ -42,6 +42,8 @@ class ProjectModel(projectFiles: ProjectFiles) {
 
     val cubaVersion: String
 
+    val modulePrefix: String
+
     init {
         try {
             val global = projectFiles.getModule(ModuleType.GLOBAL)
@@ -55,7 +57,6 @@ class ProjectModel(projectFiles: ProjectFiles) {
             namespace = parseNamespace(global.persistenceXml)
 
 //        build.gradle
-            val artifactParseError: () -> Nothing = { throw ProjectScanException("Can not parse artifact info") }
 
             val buildGradle = File("build.gradle").readText()
 
@@ -71,6 +72,9 @@ class ProjectModel(projectFiles: ProjectFiles) {
 
             val cubaVersionRegex = Regex("ext\\.cubaVersion *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]")
             cubaVersion = cubaVersionRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
+
+            val modulePrefixRegex = Regex("def *modulePrefix *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]")
+            modulePrefix = modulePrefixRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
         } catch (e: ProjectFileNotFoundException) {
             throw ProjectScanException(e.message!!, e)
         }
@@ -78,6 +82,10 @@ class ProjectModel(projectFiles: ProjectFiles) {
 
     companion object {
         const val MODEL_NAME = "project"
+
+        fun artifactParseError(): Nothing {
+            throw ProjectScanException("Can not parse artifact info")
+        }
     }
 }
 

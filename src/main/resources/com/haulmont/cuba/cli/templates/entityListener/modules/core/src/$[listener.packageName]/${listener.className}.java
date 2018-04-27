@@ -3,6 +3,7 @@ package ${listener.packageName};
 #set( $entity = ${listener.entityName} )
 
 import ${listener.entityPackageName}.$entity;
+import org.springframework.stereotype.Component;
 #if( ${listener.beforeInsert} )
 import com.haulmont.cuba.core.listener.BeforeInsertEntityListener;
 #set( $interfaces = ${names.join($interfaces,"BeforeInsertEntityListener<$entity>",", ")} )
@@ -55,7 +56,7 @@ public class ${listener.className} implements $interfaces {
 #if( ${listener.beforeUpdate} )
 
     @Override
-    public void onAfterUpdate(${listener.entityName} entity, Connection connection) {
+    public void onBeforeUpdate(${listener.entityName} entity, EntityManager entityManager) {
 
     }
 #end
