@@ -18,6 +18,8 @@ package com.haulmont.cuba.cli.prompting
 
 sealed class Question(val name: String) : Conditional {
     override var askCondition: (Answers) -> Boolean = { true }
+
+    fun shouldAsk(answers: Answers) = askCondition(answers)
 }
 
 abstract class PlainQuestion<T : Any>(name: String, val caption: String) : Question(name), Print<T>, Read<T>, WithValidation<T>, HasDefault<T> {
@@ -39,7 +41,7 @@ abstract class PlainQuestion<T : Any>(name: String, val caption: String) : Quest
 }
 
 abstract class CompositeQuestion(name: String) : Iterable<Question>, Question(name), WithValidation<Answers> {
-    override var validation: (Answers) -> Unit = acceptAll
+    override var validation: (Answers, Answers) -> Unit = acceptAll
 
     protected val questions: MutableList<Question> = mutableListOf()
 
@@ -67,6 +69,10 @@ abstract class CompositeQuestion(name: String) : Iterable<Question>, Question(na
         }
     }
 
+    fun repeating(name: String, offer: String, configuration: CompositeQuestion.() -> Unit) {
+        questions.add(RepeatingQuestion(name, offer, configuration))
+    }
+
     fun questionList(name: String = "", configure: QuestionsList.() -> Unit) {
         questions.add(QuestionsList(name, configure))
     }
@@ -86,13 +92,18 @@ class QuestionsList(name: String = "", setup: (QuestionsList.() -> Unit)) : Comp
     }
 }
 
+class RepeatingQuestion(name: String, offer: String, setup: (CompositeQuestion.() -> Unit)) : Question(name) {
+    val offerQuestion: ConfirmationQuestion = ConfirmationQuestion("", offer)
+    val questions: QuestionsList = QuestionsList(name, setup)
+}
+
 class StringQuestion(name: String, caption: String) :
         PlainQuestion<String>(name, caption),
         HasDefault<String>,
         WithValidation<String>,
         StringQuestionConfigurationScope {
 
-    override var validation: (String) -> Unit = acceptAll
+    override var validation: (String, Answers) -> Unit = acceptAll
 
     override var defaultValue: DefaultValue<String> = None
 
@@ -111,10 +122,10 @@ class OptionsQuestion(name: String, caption: String, val options: List<String>) 
 
     override var defaultValue: DefaultValue<Int> = None
 
-    override var validation: (Int) -> Unit = {
-        ValidationHelper(it).run {
+    override var validation: (Int, Answers) -> Unit = { value, answers ->
+        ValidationHelper(value, answers).run {
             try {
-                if (it in (0 until options.size))
+                if (value in (0 until options.size))
                     return@run
             } catch (e: NumberFormatException) {
             }
@@ -156,7 +167,7 @@ class ConfirmationQuestion(name: String, caption: String) :
         ConfirmationQuestionConfigurationScope {
 
     override var defaultValue: DefaultValue<Boolean> = None
-    override var validation: (Boolean) -> Unit = acceptAll
+    override var validation: (Boolean, Answers) -> Unit = acceptAll
 
     override fun String.read(): Boolean {
         val asChars = this.toLowerCase().trim().toCharArray()
@@ -206,22 +217,22 @@ interface HasDefault<T : Any> : DefaultValueConfigurable<T> {
     }
 }
 
-private val acceptAll: (Any) -> Unit = {}
+private val acceptAll: (Any, Answers) -> Unit = { value, answers -> }
 
 interface ValidationConfigurable<T : Any> {
-    fun validate(block: ValidationHelper<T>.(T) -> Unit)
+    fun validate(block: ValidationHelper<T>.() -> Unit)
 }
 
 interface WithValidation<T : Any> : ValidationConfigurable<T> {
-    var validation: (T) -> Unit
+    var validation: (T, Answers) -> Unit
 
-    override fun validate(block: ValidationHelper<T>.(T) -> Unit) {
+    override fun validate(block: ValidationHelper<T>.() -> Unit) {
         check(validation == acceptAll)
-        validation = { ValidationHelper(it).block(it) }
+        validation = { value, answers -> ValidationHelper(value, answers).block() }
     }
 }
 
-class ValidationHelper<T : Any>(private val value: T) {
+class ValidationHelper<T : Any>(val value: T, val answers: Answers) {
     fun checkRegex(pattern: String, failMessage: String = "Invalid value") {
         if (value !is String) {
             throw RuntimeException("Trying to validate non string value with regex")
@@ -237,6 +248,15 @@ class ValidationHelper<T : Any>(private val value: T) {
             checkRegex("\\b[A-Z]+[\\w\\d]*", failMessage)
 
     fun fail(cause: String): Nothing = throw ValidationException(cause)
+
+    fun checkIsInt(failMessage: String = "Input integer number") {
+        value is Int || try {
+            value.toString().toInt()
+            true
+        } catch (e: NumberFormatException) {
+            false
+        } || fail(failMessage)
+    }
 }
 
 interface Print<in T : Any> {

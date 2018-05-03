@@ -21,6 +21,7 @@ import com.google.common.base.CaseFormat
 import com.haulmont.cuba.cli.ModuleType
 import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
@@ -30,14 +31,11 @@ import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
 import java.io.File
-import java.io.PrintWriter
 import java.nio.file.Path
 
 @Parameters
 class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
     private val namesUtils: NamesUtils by kodein.instance()
-
-    private val writer: PrintWriter by kodein.instance()
 
     override fun getModelName(): String = ScreenModel.MODEL_NAME
 
@@ -50,7 +48,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
                 checkRegex("([a-zA-Z]*[a-zA-Z0-9]+)(-[a-zA-Z]*[a-zA-Z0-9]+)*", "Invalid screen name")
             }
         }
-        question("package", "Package name") {
+        question("packageName", "Package name") {
             default { "${projectModel.rootPackage}.web.screens" }
             validate {
                 checkIsPackage()
@@ -58,16 +56,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         }
     }
 
-    override fun createModel(answers: Answers): ScreenModel {
-        val screenName = answers["screenName"] as String
-        val controllerName = CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, screenName)
-
-        return ScreenModel(
-                screenName,
-                controllerName,
-                answers["package"] as String
-        )
-    }
+    override fun createModel(answers: Answers): ScreenModel = ScreenModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
         val screenModel = context.getModel<ScreenModel>(ScreenModel.MODEL_NAME)
@@ -100,10 +89,11 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
     override fun checkPreconditions() = onlyInProject()
 }
 
-data class ScreenModel(
-        val screenName: String,
-        val controllerName: String,
-        val packageName: String) {
+class ScreenModel(answers: Answers) {
+    val screenName: String by nameFrom(answers)
+    val controllerName: String = CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, screenName)
+    val packageName: String by nameFrom(answers)
+
     companion object {
         const val MODEL_NAME = "screen"
     }

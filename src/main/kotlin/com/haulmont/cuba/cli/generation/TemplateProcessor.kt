@@ -31,7 +31,6 @@ import java.nio.file.*
 import kotlin.reflect.full.memberProperties
 
 class TemplateProcessor {
-
     private val bindings: Map<String, Any>
 
     private val writer: PrintWriter by kodein.instance()
@@ -147,31 +146,33 @@ class TemplateProcessor {
         return kClass.memberProperties.first { it.name == name }.getter.call(obj)!!
     }
 
-    fun copy(subPath: Path, to: Path = Paths.get("")) {
+    fun copy(subPath: Path, to: Path = projectRoot) {
         process(templatePath.resolve(subPath), to, false)
     }
 
-    fun copy(subPath: String, to: Path = Paths.get("")) {
+    fun copy(subPath: String, to: Path = projectRoot) {
         process(templatePath.resolve(subPath), to, false)
     }
 
-    fun transform(subPath: Path, to: Path = Paths.get("")) {
+    fun transform(subPath: Path, to: Path = projectRoot) {
         process(templatePath.resolve(subPath), to, true)
     }
 
-    fun transform(subPath: String, to: Path = Paths.get("")) {
+    fun transform(subPath: String, to: Path = projectRoot) {
         process(templatePath.resolve(subPath), to, true)
     }
 
-    fun transformWhole(to: Path = Paths.get("")) {
+    fun transformWhole(to: Path = projectRoot) {
         transform("", to)
     }
 
-    fun copyWhole(to: Path = Paths.get("")) {
+    fun copyWhole(to: Path = projectRoot) {
         copy("", to)
     }
 
     companion object {
+        val projectRoot: Path = Paths.get("")
+
         private val CUSTOM_TEMPLATES_PATH = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "templates")
                 .also {
                     if (!Files.exists(it)) {

@@ -47,11 +47,12 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
 }
 
 fun <R, T> nameFrom(answers: Answers): ReadOnlyProperty<R, T> = object : ReadOnlyProperty<R, T> {
+    @Suppress("UNCHECKED_CAST")
     override fun getValue(thisRef: R, property: KProperty<*>): T = answers[property.name] as T
 }
 
 /**
- * Unsafe get value from map
+ * Unsafe get value from map with automatic type casting
  */
 @Suppress("UNCHECKED_CAST")
 infix fun <V> String.from(map: Map<String, *>): V {

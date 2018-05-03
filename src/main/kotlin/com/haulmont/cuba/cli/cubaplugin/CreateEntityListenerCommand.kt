@@ -80,8 +80,8 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
                 }
             }
 
-            validate { answers ->
-                if (interfaces.none { answers[it] as Boolean }) {
+            validate {
+                if (interfaces.none { value[it] as Boolean }) {
                     fail("Listener must implement at least one of the interfaces")
                 }
             }

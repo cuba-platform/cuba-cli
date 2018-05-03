@@ -34,7 +34,7 @@ import java.nio.file.Paths
 @Parameters(commandDescription = "Generates artifacts from custom template")
 class StaticTemplateCommand : GeneratorCommand<Answers>() {
 
-    @Parameter(names = ["--template", "-t"], required = true, description = "Template name")
+    @Parameter(required = true, description = "Template name")
     private var templateName: String? = null
 
     private var template: Template? = null

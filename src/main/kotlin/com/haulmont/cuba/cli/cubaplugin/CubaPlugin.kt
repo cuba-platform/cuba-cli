@@ -44,6 +44,7 @@ class CubaPlugin : CliPlugin {
             command("bean", CreateComponentBeanCommand())
             command("entity-listener", CreateEntityListenerCommand())
             command("app-component", AppComponentCommand())
+            command("enumeration", CreateEnumerationCommand())
         }
     }
 

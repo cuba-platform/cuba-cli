@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
@@ -47,11 +48,11 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
             validate {
                 val invalidNameRegex = Regex("[^\\w\\-]")
 
-                if (invalidNameRegex.find(it) != null) {
+                if (invalidNameRegex.find(value) != null) {
                     fail("Project name should contain only Latin letters, digits, dashes and underscores.")
                 }
 
-                if (it.isBlank()) {
+                if (value.isBlank()) {
                     fail("Empty names not allowed")
                 }
             }
@@ -81,16 +82,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
         }
     }
 
-    override fun createModel(answers: Answers): ProjectInitModel {
-        val rootPackage = answers["rootPackage"] as String
-        return ProjectInitModel(
-                answers["projectName"] as String,
-                answers["namespace"] as String,
-                rootPackage,
-                answers["platformVersion"] as String,
-                rootPackage.replace('.', File.separatorChar)
-        )
-    }
+    override fun createModel(answers: Answers): ProjectInitModel = ProjectInitModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
         val cwd = Paths.get("")
@@ -115,11 +107,13 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     }
 }
 
-data class ProjectInitModel(
-        val name: String,
-        val namespace: String,
-        val rootPackage: String,
-        val platformVersion: String,
-        val rootPackageDirectory: String)
+class ProjectInitModel(answers: Answers) {
+    val projectName: String by nameFrom(answers)
+    val namespace: String by nameFrom(answers)
+    val rootPackage: String by nameFrom(answers)
+    val platformVersion: String by nameFrom(answers)
+    val rootPackageDirectory: String = rootPackage.replace('.', File.separatorChar)
+
+}
 
 private val availablePlatformVersions = listOf("6.8.5", "6.9-SNAPSHOT")

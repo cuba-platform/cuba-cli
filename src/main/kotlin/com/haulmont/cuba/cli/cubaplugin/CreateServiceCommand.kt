@@ -20,6 +20,7 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleType
 import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.model.ProjectModel
@@ -39,7 +40,7 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
 
         question("interfaceName", "Service interface name") {
             validate {
-                if (!it.endsWith("Service")) {
+                if (!value.endsWith("Service")) {
                     fail("Service name should ends with \"Service\"")
                 }
                 checkIsClass()
@@ -93,20 +94,13 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
     }
 }
 
-class ServiceModel(val interfaceName: String,
-                   val beanName: String,
-                   val packageName: String,
-                   val serviceName: String) {
+class ServiceModel(answers: Answers) {
+    val interfaceName: String by nameFrom(answers)
+    val beanName: String by nameFrom(answers)
+    val packageName: String by nameFrom(answers)
+    val serviceName: String by nameFrom(answers)
+
     companion object {
         const val MODEL_NAME = "service"
-
-        operator fun invoke(answers: Answers): ServiceModel {
-            return ServiceModel(
-                    answers["interfaceName"] as String,
-                    answers["beanName"] as String,
-                    answers["packageName"] as String,
-                    answers["serviceName"] as String
-            )
-        }
     }
 }

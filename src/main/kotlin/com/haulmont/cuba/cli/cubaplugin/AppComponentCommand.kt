@@ -52,7 +52,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
                 validate {
                     val invalidNameRegex = Regex("[^\\w\\-]")
 
-                    if (invalidNameRegex.find(it) != null) {
+                    if (invalidNameRegex.find(value) != null) {
                         fail("Project name should contain only Latin letters, digits, dashes and underscores.")
                     }
                 }

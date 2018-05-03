@@ -30,44 +30,65 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
     private val reader: LineReader by kodein.instance(arg = NullCompleter())
     private val writer: PrintWriter by kodein.instance()
 
-    fun ask(): Answers = questionsList.ask()
+    fun ask(): Answers = questionsList.ask { it }
 
-    private fun <T : Any> askSimple(question: PlainQuestion<T>, answers: Answers): Answer {
-        val value = question.ask(answers)
-        return if (question is OptionsQuestion) {
-            question.options[value as Int]
-        } else value
-    }
-
-    private tailrec fun CompositeQuestion.ask(): Answers {
+    private tailrec fun CompositeQuestion.ask(rootAnswers: (Answers) -> Answers): Answers {
         try {
-            return this.fold<Question, Map<String, Answer>>(mapOf()) { doneAnswers, question ->
-                if (!question.askCondition(doneAnswers)) {
-                    return@fold doneAnswers
+            return this.fold<Question, Answers>(mapOf()) { answers, question ->
+                if (!question.shouldAsk(rootAnswers(answers))) {
+                    return@fold answers
                 }
-                when (question) {
+
+                return@fold when (question) {
                     is PlainQuestion<*> -> {
-                        val answer = askSimple(question, doneAnswers)
-                        doneAnswers + (question.name to answer)
+                        val answer = question.ask(rootAnswers(answers))
+                        answers + (question.name to answer)
+                    }
+                    is RepeatingQuestion -> {
+                        val storeFn = { it: Answer ->
+                            answers + (question.name to it)
+                        }
+                        question.ask {
+                            rootAnswers(storeFn(it))
+                        }.let(storeFn)
                     }
                     is CompositeQuestion -> {
-                        val answer = question.ask()
-                        if (question.isFlat) {
-                            doneAnswers + answer
-                        } else {
-                            doneAnswers + (question.name to answer)
+                        val storeFn = { it: Answers ->
+                            mergeAnswers(answers, it)
                         }
+                        question.ask {
+                            rootAnswers(storeFn(it))
+                        }.let(storeFn)
                     }
                 }
-            }.also(validation)
+            }.also { localAnswers ->
+                validation(localAnswers, rootAnswers(localAnswers))
+            }
         } catch (e: ValidationException) {
             writer.println("@|red ${e.message}|@")
         }
-        return this.ask()
+        return this.ask(rootAnswers)
     }
 
-    private tailrec fun <T : Any> PlainQuestion<T>.ask(answers: Answers, maybePrompts: String? = null): T {
-        val prompts = maybePrompts ?: printPrompts(answers)
+
+    private fun RepeatingQuestion.ask(rootAnswers: (List<Answers>) -> Answers): List<Answers> {
+        val answersList: MutableList<Answers> = mutableListOf()
+        while (offerQuestion.ask(rootAnswers(answersList))) {
+            questions.ask {
+                rootAnswers(answersList + it)
+            }.let(answersList::add)
+        }
+        return answersList
+    }
+
+    private fun CompositeQuestion.mergeAnswers(targetAnswers: Answers, toMerge: Answers): Answers =
+            if (isFlat) {
+                targetAnswers + toMerge
+            } else {
+                targetAnswers + (name to toMerge)
+            }
+
+    private tailrec fun <T : Any> PlainQuestion<T>.ask(answers: Answers, prompts: String = printPrompts(answers)): T {
         try {
             return read(prompts).let {
                 if (it.isNotEmpty()) return@let it.read()
@@ -78,14 +99,18 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
                     else -> it.read()
                 }
             }.also {
-                validation(it)
+                validation(it, answers)
+            }.let {
+                when {
+                    this is OptionsQuestion -> this.options[it as Int] as T
+                    else -> it
+                }
             }
         } catch (e: Exception) {
             when (e) {
                 is ValidationException, is ReadException -> writer.println("@|red ${e.message}|@")
                 else -> throw e
             }
-
         }
 
         return ask(answers, prompts)
@@ -96,29 +121,31 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
     fun askNonInteractive(): Answers {
         val answers = CommonParameters.nonInteractive
 
-        if (!questionsList.all { it is PlainQuestion<*> }) {
-            throw CommandExecutionException("Non interactive mode unavailable for complex questions")
-        }
+        questionsList.all {
+            it is PlainQuestion<*>
+        } || throw CommandExecutionException("Non interactive mode unavailable for complex questions")
 
-        questionsList.filterIsInstance(PlainQuestion::class.java).forEach {
-            checkQuestion(it, answers)
-        }
+        questionsList
+                .filterIsInstance(PlainQuestion::class.java)
+                .forEach {
+                    checkQuestion(it, answers)
+                }
 
         return answers
     }
 
-    private fun <T : Any> checkQuestion(it: PlainQuestion<T>, answers: Map<String, String>) {
-        if (it.name !in answers) {
-            throw ValidationException("Parameter ${it.name} not passed")
-        }
-        val value = answers[it.name] as String
+    private fun <T : Any> checkQuestion(question: PlainQuestion<T>, answers: Map<String, String>) {
+        question.name in answers ||
+                throw ValidationException("Parameter ${question.name} not passed")
 
-        when (it) {
-            is OptionsQuestion -> if (value !in it.options) {
-                throw ValidationException("Invalid value $value for parameter ${it.name}. Available values are ${it.options}.")
-            }
-            else -> it.run {
-                validation(value.read())
+        val value = answers[question.name] as String
+
+        when (question) {
+            is OptionsQuestion -> value in question.options ||
+                    throw ValidationException("Invalid value $value for parameter ${question.name}. Available values are ${question.options}.")
+
+            else -> question.run {
+                validation(value.read(), answers)
             }
         }
     }
