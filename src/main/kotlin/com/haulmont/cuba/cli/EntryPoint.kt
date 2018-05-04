@@ -60,10 +60,8 @@ private fun loadPlugins(context: CliContext, commandsRegistry: CommandsRegistry)
 }
 
 private fun createCli(args: Array<String>, commandsRegistry: CommandsRegistry): Cli {
-    if (args.isNotEmpty()) {
-        if (args.first() == "shell") {
-            return ShellCli(commandsRegistry)
-        }
+    if (args.isEmpty() || args.first() == "shell") {
+        return ShellCli(commandsRegistry)
     }
 
     return SingleCommandCli(args, commandsRegistry)
