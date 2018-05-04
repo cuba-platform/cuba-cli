@@ -38,7 +38,9 @@ class CubaPlugin : CliPlugin {
         event.commandsRegistry {
             command("create-app", ProjectInitCommand())
             command("entity", CreateEntityCommand())
-            command("screen", CreateScreenCommand())
+            command("screen", CreateScreenCommand()) {
+                command("extend", ExtendDefaultScreenCommand())
+            }
             command("service", CreateServiceCommand())
             command("template", StaticTemplateCommand())
             command("bean", CreateComponentBeanCommand())
