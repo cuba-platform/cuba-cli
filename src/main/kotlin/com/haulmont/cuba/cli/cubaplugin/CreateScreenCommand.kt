@@ -54,6 +54,9 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
                 checkIsPackage()
             }
         }
+        confirmation("addToMenu", "Add screen to main menu?") {
+            default(true)
+        }
     }
 
     override fun createModel(answers: Answers): ScreenModel = ScreenModel(answers)
@@ -75,6 +78,16 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         PropertiesHelper(messages) {
             set("caption", screenModel.screenName)
         }
+
+        if (screenModel.addToMenu) {
+            updateXml(webModule.rootPackageDirectory.resolve("web-menu.xml")) {
+                "menu" {
+                    add("item") {
+                        "screen" mustBe screenModel.screenName
+                    }
+                }
+            }
+        }
     }
 
     private fun addToScreensXml(screensXml: Path, screenModel: ScreenModel) {
@@ -93,6 +106,7 @@ class ScreenModel(answers: Answers) {
     val screenName: String by nameFrom(answers)
     val controllerName: String = CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, screenName)
     val packageName: String by nameFrom(answers)
+    val addToMenu: Boolean by nameFrom(answers)
 
     companion object {
         const val MODEL_NAME = "screen"
