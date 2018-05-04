@@ -26,7 +26,9 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
 import java.io.File
 import java.io.PrintWriter
+import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.attribute.PosixFilePermission
 
 @Parameters(commandDescription = "Create new project")
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
@@ -91,9 +93,16 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
             listOf("modules", "build.gradle", "settings.gradle").forEach {
                 transform(it)
             }
-            copy("gitignore", Paths.get(".gitignore"))
+            copy("gitignore")
+            Files.move(Paths.get("gitignore"), Paths.get(".gitignore"))
+
             listOf("gradle", "gradlew", "gradlew.bat").forEach {
                 copy(it)
+            }
+            try {
+                Files.setPosixFilePermissions(Paths.get("gradlew"), setOf(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ))
+            } catch (e: Exception) {
+                //todo warn if current system is *nix
             }
         }
 
