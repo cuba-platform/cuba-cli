@@ -16,13 +16,10 @@
 
 package com.haulmont.cuba.cli.cubaplugin
 
-import com.haulmont.cuba.cli.ModuleType
-import com.haulmont.cuba.cli.PrintHelper
-import com.haulmont.cuba.cli.ProjectFiles
+import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -31,6 +28,8 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
+    private val messages: Messages = Messages(javaClass)
+
     private val printHelper: PrintHelper by kodein.instance()
 
     override fun getModelName(): String = AppComponentModel.MODEL_NAME
@@ -39,12 +38,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
         val projectModel = context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
 
         if (projectModel.modulePrefix == "app") {
-            confirmation("changePrefix", """
-                |Your project modules have the default prefix: app.
-                |
-                |In order to use a project as an application component, it should have a unique module prefix. For example, the prefix can reflect the application name.
-                |Change the prefix?""".trimMargin())
-
+            confirmation("changePrefix", messages.getMessage("appComponent.changePrefix"))
 
             question("modulePrefix", "New prefix") {
                 askIf("changePrefix")
@@ -86,16 +80,11 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
         val buildGradle = Paths.get("build.gradle").toFile()
         val buildGradleText = buildGradle.readText()
 
-        if (Regex("attributes\\('App-Component-Id': cuba.artifact.group\\)").find(buildGradleText) == null) {
-            buildGradleText.replace("configure(globalModule) {", """
-                |configure(globalModule) {
-                |    jar {
-                |        manifest {
-                |            attributes('App-Component-Id': cuba.artifact.group)
-                |            attributes('App-Component-Version': cuba.artifact.version + (cuba.artifact.isSnapshot ? '-SNAPSHOT' : ''))
-                |        }
-                |    }
-            """.trimMargin()).let {
+        if (Regex(messages.getMessage("appComponent.addToManifest.attributePattern")).find(buildGradleText) == null) {
+            buildGradleText.replace(
+                    messages.getMessage("appComponent.addToManifest.searchString"),
+                    messages.getMessage("appComponent.addToManifest.replaceString").replace("\t", "    ")
+            ).let {
                 buildGradle.writeText(it)
             }
         }
@@ -139,9 +128,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
         printHelper.fileAltered(gradleScriptPath)
     }
 
-    override fun checkPreconditions() {
-        onlyInProject()
-    }
+    override fun checkPreconditions() = onlyInProject()
 }
 
 data class AppComponentModel(val changePrefix: Boolean, val modulePrefix: String) {
