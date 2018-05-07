@@ -43,7 +43,7 @@ dependencies {
 
 }
 
-def hsql = 'org.hsqldb:hsqldb:2.2.9'
+def ${project.database.driverDependencyName} = ${project.database.driverDependency}
 
 configure([globalModule, coreModule, webModule]) {
     apply(plugin: 'java')
@@ -79,8 +79,8 @@ configure(coreModule) {
     dependencies {
         compile(globalModule)
         provided(servletApi)
-        jdbc(hsql)
-        testRuntime(hsql)
+        jdbc(${project.database.driverDependencyName})
+        testRuntime(${project.database.driverDependencyName})
 
     }
 
@@ -101,7 +101,10 @@ configure(coreModule) {
     }
 
     task createDb(dependsOn: assembleDbScripts, description: 'Creates local database', type: CubaDbCreation) {
-        dbms = 'hsql'
+#if (${project.database.connectionParams} != "")
+        connectionParams = '${project.database.connectionParams}'
+#end
+        dbms = '${project.database.driverDependencyName}'
         host = 'localhost'
         dbName = '${project.namespace}'
         dbUser = 'sa'
@@ -109,7 +112,10 @@ configure(coreModule) {
     }
 
     task updateDb(dependsOn: assembleDbScripts, description: 'Updates local database', type: CubaDbUpdate) {
-        dbms = 'hsql'
+#if (${project.database.connectionParams} != "")
+    connectionParams = '${project.database.connectionParams}'
+#end
+        dbms = '${project.database.driverDependencyName}'
         host = 'localhost'
         dbName = '${project.namespace}'
         dbUser = 'sa'
