@@ -25,26 +25,19 @@ import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
 import java.io.File
-import java.io.PrintWriter
 import java.nio.file.Path
 
 @Parameters(commandDescription = "Create new entity")
 class CreateEntityCommand : GeneratorCommand<EntityModel>() {
-    private val writer: PrintWriter by kodein.instance()
-
     private val namesUtils: NamesUtils by kodein.instance()
 
     override fun getModelName(): String = EntityModel.MODEL_NAME
 
     override fun QuestionsList.prompting() {
-
-        val projectModel = context.getModel<ProjectModel>("project")
-
         question("entityName", "Entity Name") {
             validate {
                 checkRegex("\\b[A-Z]+[\\w\\d_$]*", "Invalid entity name")
@@ -64,7 +57,6 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     }
 
     override fun createModel(answers: Answers): EntityModel {
-        val projectModel = context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
         val entityName = answers["entityName"] as String
 
         val tableName = buildString {

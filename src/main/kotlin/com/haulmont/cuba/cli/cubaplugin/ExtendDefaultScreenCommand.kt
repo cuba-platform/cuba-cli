@@ -24,7 +24,6 @@ import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
@@ -38,8 +37,6 @@ class ExtendDefaultScreenCommand : GeneratorCommand<ScreenExtensionModel>() {
     override fun getModelName(): String = ScreenExtensionModel.MODEL_NAME
 
     override fun QuestionsList.prompting() {
-        val projectModel = context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
-
         options("screen", "Which screen to extend?", listOf("login", "main"))
         question("packageName", "Package name") {
             default(projectModel.rootPackage + ".web.screens")
@@ -52,7 +49,7 @@ class ExtendDefaultScreenCommand : GeneratorCommand<ScreenExtensionModel>() {
         val screenModel = context.getModel<ScreenExtensionModel>(ScreenExtensionModel.MODEL_NAME)
 
         val templatePath = CubaPlugin.TEMPLATES_BASE_PATH + "screenExtension/" + screenModel.screen
-        TemplateProcessor(templatePath, bindings) {
+        TemplateProcessor(templatePath, bindings, projectModel.platformVersion) {
             transformWhole()
         }
 

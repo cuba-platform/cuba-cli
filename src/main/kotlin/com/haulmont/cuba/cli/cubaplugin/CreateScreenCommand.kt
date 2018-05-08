@@ -26,7 +26,6 @@ import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
@@ -40,8 +39,6 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
     override fun getModelName(): String = ScreenModel.MODEL_NAME
 
     override fun QuestionsList.prompting() {
-        val projectModel = context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
-
         question("screenName", "Screen name") {
             default("screen")
             validate {
@@ -64,7 +61,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
     override fun generate(bindings: Map<String, Any>) {
         val screenModel = context.getModel<ScreenModel>(ScreenModel.MODEL_NAME)
 
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "screen", bindings) {
+        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "screen", bindings, projectModel.platformVersion) {
             transformWhole()
         }
 

@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.commands
 
+import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.Prompts
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -23,6 +24,12 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
+    val projectModel: ProjectModel by lazy {
+        if (context.hasModel(ProjectModel.MODEL_NAME)) {
+            context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
+        } else fail("No project module found")
+    }
+
     override fun execute() {
         super.execute()
         val questions = QuestionsList { prompting() }

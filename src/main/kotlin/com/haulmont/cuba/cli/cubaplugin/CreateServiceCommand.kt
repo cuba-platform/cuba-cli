@@ -23,7 +23,6 @@ import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
-import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
@@ -36,8 +35,6 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
     }
 
     override fun QuestionsList.prompting() {
-        val projectModel = context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
-
         question("interfaceName", "Service interface name") {
             validate {
                 if (!value.endsWith("Service")) {
@@ -66,7 +63,7 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
     override fun createModel(answers: Answers): ServiceModel = ServiceModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "service", bindings) {
+        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "service", bindings, projectModel.platformVersion) {
             transformWhole()
         }
 

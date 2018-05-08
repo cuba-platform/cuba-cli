@@ -17,6 +17,7 @@
 package com.haulmont.cuba.cli.model
 
 import com.haulmont.cuba.cli.ModuleType
+import com.haulmont.cuba.cli.PlatformVersion
 import com.haulmont.cuba.cli.ProjectFileNotFoundException
 import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.generation.parse
@@ -36,7 +37,9 @@ class ProjectModel(projectFiles: ProjectFiles) {
 
     val group: String
 
-    val version: String
+    val platformVersionString: String
+
+    val platformVersion: PlatformVersion
 
     val copyright: String?
 
@@ -64,8 +67,9 @@ class ProjectModel(projectFiles: ProjectFiles) {
             group = groupRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
 
             val versionRegex = Regex("version *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]")
-            version = versionRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
+            platformVersionString = versionRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
 
+            platformVersion = PlatformVersion(platformVersionString)
 
             val copyrightRegex = Regex("copyright *= *'''(.*)'''")
             copyright = copyrightRegex.findAll(buildGradle) groupNOrNull 1

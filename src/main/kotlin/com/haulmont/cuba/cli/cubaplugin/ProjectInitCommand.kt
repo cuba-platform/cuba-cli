@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.Messages
+import com.haulmont.cuba.cli.PlatformVersion
 import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
@@ -98,9 +99,11 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     override fun createModel(answers: Answers): ProjectInitModel = ProjectInitModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
+        val model = context.getModel<ProjectInitModel>("project")
+
         val cwd = Paths.get("")
 
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "project", bindings) {
+        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "project", bindings, PlatformVersion(model.platformVersion)) {
             listOf("modules", "build.gradle", "settings.gradle").forEach {
                 transform(it)
             }
@@ -119,7 +122,6 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
         writer.println(messages.getMessage("createProject.createProjectTips", cwd.toAbsolutePath()))
 
-        val model = context.getModel<ProjectInitModel>("project")
         val dpTipsMessageName = when (model.database.database) {
             DATABASES[5] -> "createProject.oracleDbTips"
             DATABASES[6] -> "createProject.mysqlDbTips"

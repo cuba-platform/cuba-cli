@@ -59,7 +59,7 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
 
     override fun generate(bindings: Map<String, Any>) {
         val template = template!!
-        TemplateProcessor(template.path, bindings) {
+        TemplateProcessor(template.path, bindings, projectModel.platformVersion) {
             for (instruction in template.instructions) {
                 if (instruction.transform) {
                     transform(instruction.from, Paths.get(instruction.to))

@@ -20,7 +20,6 @@ import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
@@ -35,8 +34,6 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
     override fun getModelName(): String = AppComponentModel.MODEL_NAME
 
     override fun QuestionsList.prompting() {
-        val projectModel = context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
-
         if (projectModel.modulePrefix == "app") {
             confirmation("changePrefix", messages.getMessage("appComponent.changePrefix"))
 
@@ -55,8 +52,6 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
     }
 
     override fun createModel(answers: Answers): AppComponentModel {
-        val projectModel = context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
-
         val modulePrefix: String = answers["modulePrefix"] as String? ?: projectModel.modulePrefix
         val changePrefix = answers["changePrefix"] as Boolean? ?: false
         return AppComponentModel(changePrefix, modulePrefix)
@@ -69,7 +64,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
             changePrefix(componentModel.modulePrefix)
         }
 
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "appComponent", bindings) {
+        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "appComponent", bindings, projectModel.platformVersion) {
             transformWhole()
         }
 

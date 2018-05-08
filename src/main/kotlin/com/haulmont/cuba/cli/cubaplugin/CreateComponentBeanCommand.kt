@@ -19,7 +19,6 @@ package com.haulmont.cuba.cli.cubaplugin
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
@@ -27,8 +26,6 @@ class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>() {
     override fun getModelName(): String = ComponentBeanModel.MODEL_NAME
 
     override fun QuestionsList.prompting() {
-        val projectModel = context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
-
         question("name", "Class name") {
             validate {
                 checkIsClass()
@@ -53,7 +50,7 @@ class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>() {
                     "package" from answers)
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "componentBean", bindings) {
+        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "componentBean", bindings, projectModel.platformVersion) {
             transformWhole()
         }
     }

@@ -41,8 +41,6 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
     override fun getModelName(): String = EntityListenerModel.MODEL_NAME
 
     override fun QuestionsList.prompting() {
-        val projectModel = context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
-
         val persistenceXml = ProjectFiles().getModule(ModuleType.GLOBAL).persistenceXml
         val entitiesList = parse(persistenceXml).documentElement
                 .let { DomUtil.getChild(it, "persistence-unit") }
@@ -91,7 +89,7 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
     override fun createModel(answers: Answers): EntityListenerModel = EntityListenerModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "entityListener", bindings) {
+        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "entityListener", bindings, projectModel.platformVersion) {
             transformWhole()
         }
 

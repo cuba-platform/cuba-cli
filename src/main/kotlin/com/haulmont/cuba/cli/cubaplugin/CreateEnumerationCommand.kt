@@ -20,7 +20,6 @@ import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
@@ -28,9 +27,6 @@ class CreateEnumerationCommand : GeneratorCommand<EnumerationModel>() {
     override fun getModelName(): String = EnumerationModel.MODEL_NAME
 
     override fun QuestionsList.prompting() {
-        val projectModel = context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
-
-
         question("className", "Class name") {
             validate {
                 checkIsClass()
@@ -75,7 +71,7 @@ class CreateEnumerationCommand : GeneratorCommand<EnumerationModel>() {
     override fun createModel(answers: Answers): EnumerationModel = EnumerationModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "enumeration", bindings) {
+        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "enumeration", bindings, projectModel.platformVersion) {
             transformWhole()
         }
     }

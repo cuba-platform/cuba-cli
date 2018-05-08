@@ -39,5 +39,5 @@ abstract class AbstractCommand : CliCommand {
     }
 
     @Throws(CommandExecutionException::class)
-    protected fun fail(cause: String): Unit = throw CommandExecutionException(cause)
+    protected fun fail(cause: String): Nothing = throw CommandExecutionException(cause)
 }

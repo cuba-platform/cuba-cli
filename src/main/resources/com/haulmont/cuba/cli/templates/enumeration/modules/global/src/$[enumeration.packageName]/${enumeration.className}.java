@@ -1,4 +1,4 @@
-package ${enumaration.packageName};
+package ${enumeration.packageName};
 #set( $idClass = ${enumeration.idType} )
 
 import com.haulmont.chile.core.datatypes.impl.EnumClass;
@@ -24,7 +24,7 @@ public enum ${enumeration.className} implements EnumClass<$idClass> {
 
     private $idClass id;
 
-    NewEnum($idClass value) {
+    ${enumeration.className}($idClass value) {
         this.id = value;
     }
 
@@ -33,8 +33,8 @@ public enum ${enumeration.className} implements EnumClass<$idClass> {
     }
 
     @Nullable
-    public static NewEnum fromId($idClass id) {
-        for (NewEnum at : NewEnum.values()) {
+    public static ${enumeration.className} fromId($idClass id) {
+        for (${enumeration.className} at : ${enumeration.className}.values()) {
             if (at.getId().equals(id)) {
                 return at;
             }
