@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin
+package com.haulmont.cuba.cli.cubaplugin.componentbean
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
+import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -61,8 +62,3 @@ class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>() {
     }
 }
 
-data class ComponentBeanModel(val name: String, val module: String, val packageName: String) {
-    companion object {
-        const val MODEL_NAME = "component"
-    }
-}

@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin
+package com.haulmont.cuba.cli.cubaplugin.screen
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.commands.nameFrom
+import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
+import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
@@ -30,60 +31,68 @@ import org.kodein.di.generic.instance
 import java.io.File
 import java.nio.file.Path
 
-@Parameters(commandDescription = "Extends login and main screens")
-class ExtendDefaultScreenCommand : GeneratorCommand<ScreenExtensionModel>() {
-
+@Parameters(commandDescription = "Creates new screen")
+class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
     private val namesUtils: NamesUtils by kodein.instance()
 
-    override fun getModelName(): String = ScreenExtensionModel.MODEL_NAME
+    override fun getModelName(): String = ScreenModel.MODEL_NAME
 
     override fun preExecute() = checkProjectExistence()
 
     override fun QuestionsList.prompting() {
-        options("screen", "Which screen to extend?", listOf("login", "main"))
+        question("screenName", "Screen name") {
+            default("screen")
+            validate {
+                checkRegex("([a-zA-Z]*[a-zA-Z0-9]+)(-[a-zA-Z]*[a-zA-Z0-9]+)*", "Invalid screen name")
+            }
+        }
         question("packageName", "Package name") {
-            default(projectModel.rootPackage + ".web.screens")
+            default { "${projectModel.rootPackage}.web.screens" }
+            validate {
+                checkIsPackage()
+            }
+        }
+        confirmation("addToMenu", "Add screen to main menu?") {
+            default(true)
         }
     }
 
-    override fun createModel(answers: Answers): ScreenExtensionModel = ScreenExtensionModel(answers)
+    override fun createModel(answers: Answers): ScreenModel = ScreenModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
-        val templatePath = CubaPlugin.TEMPLATES_BASE_PATH + "screenExtension/" + model.screen
-        TemplateProcessor(templatePath, bindings, projectModel.platformVersion) {
+        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "screen", bindings, projectModel.platformVersion) {
             transformWhole()
         }
 
         val webModule = projectStructure.getModule(WEB_MODULE)
         val screensXml = webModule.screensXml
 
-        addToScreensXml(screensXml)
+        addToScreensXml(screensXml, model)
 
         val messages = webModule.src.resolve(namesUtils.packageToDirectory(model.packageName)).resolve("messages.properties")
 
-        PropertiesHelper(messages) {}
+        PropertiesHelper(messages) {
+            set("caption", model.screenName)
+        }
+
+        if (model.addToMenu) {
+            updateXml(webModule.rootPackageDirectory.resolve("web-menu.xml")) {
+                "menu" {
+                    add("item") {
+                        "screen" mustBe model.screenName
+                    }
+                }
+            }
+        }
     }
 
-    private fun addToScreensXml(screensXml: Path) {
+    private fun addToScreensXml(screensXml: Path, screenModel: ScreenModel) {
         updateXml(screensXml) {
             add("screen") {
-                if (model.screen == "login") {
-                    "id" mustBe "loginWindow"
-                    "template" mustBe (namesUtils.packageToDirectory(model.packageName) + File.separatorChar + "ext-loginWindow.xml")
-                } else {
-                    "id" mustBe "mainWindow"
-                    "template" mustBe (namesUtils.packageToDirectory(model.packageName) + File.separatorChar + "ext-mainwindow.xml")
-                }
+                "id" mustBe screenModel.screenName
+                "template" mustBe (namesUtils.packageToDirectory(screenModel.packageName) + File.separatorChar + screenModel.screenName + ".xml")
             }
         }
     }
 }
 
-class ScreenExtensionModel(answers: Answers) {
-    val screen: String by nameFrom(answers)
-    val packageName: String by nameFrom(answers)
-
-    companion object {
-        const val MODEL_NAME = "screen"
-    }
-}

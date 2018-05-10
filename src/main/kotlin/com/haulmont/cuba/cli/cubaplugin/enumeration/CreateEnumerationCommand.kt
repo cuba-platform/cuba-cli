@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin
+package com.haulmont.cuba.cli.cubaplugin.enumeration
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
-import com.haulmont.cuba.cli.commands.nameFrom
+import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -79,18 +79,3 @@ class CreateEnumerationCommand : GeneratorCommand<EnumerationModel>() {
     }
 }
 
-class EnumerationModel(answers: Answers) {
-    val className: String by nameFrom(answers)
-    val packageName: String by nameFrom(answers)
-    val idType: String by nameFrom(answers)
-    val values: List<EnumValue> = (answers["values"] as List<Answers>).map(::EnumValue)
-
-    companion object {
-        const val MODEL_NAME = "enumeration"
-    }
-}
-
-class EnumValue(mapRepresentation: Answers) {
-    val name: String by nameFrom(mapRepresentation)
-    val id: String by nameFrom(mapRepresentation)
-}

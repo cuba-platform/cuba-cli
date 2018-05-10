@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin
+package com.haulmont.cuba.cli.cubaplugin.statictemplate
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
@@ -28,7 +28,6 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
 import net.sf.practicalxml.DomUtil
 import org.w3c.dom.Element
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
 
 @Parameters(commandDescription = "Generates artifacts from custom template")
@@ -126,10 +125,3 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
                     }.toList()
 
 }
-
-data class Template(val path: Path, val modelName: String, val questions: List<TemplateQuestion>, val instructions: List<GenerationInstruction>)
-data class GenerationInstruction(val from: String, val to: String, val transform: Boolean)
-
-sealed class TemplateQuestion(val name: String, val caption: String)
-class PlainQuestion(name: String, caption: String) : TemplateQuestion(name, caption)
-class OptionsQuestion(name: String, caption: String, val options: List<String>) : TemplateQuestion(name, caption)

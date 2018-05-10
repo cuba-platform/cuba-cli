@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin
+package com.haulmont.cuba.cli.cubaplugin.service
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.commands.nameFrom
+import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.prompting.Answers
@@ -87,13 +87,3 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
     }
 }
 
-class ServiceModel(answers: Answers) {
-    val interfaceName: String by nameFrom(answers)
-    val beanName: String by nameFrom(answers)
-    val packageName: String by nameFrom(answers)
-    val serviceName: String by nameFrom(answers)
-
-    companion object {
-        const val MODEL_NAME = "service"
-    }
-}

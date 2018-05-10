@@ -1,4 +1,20 @@
-package com.haulmont.cuba.cli.cubaplugin
+/*
+ * Copyright (c) 2008-2018 Haulmont.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.haulmont.cuba.cli.cubaplugin.theme
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.Messages
@@ -6,6 +22,7 @@ import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
+import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
@@ -51,7 +68,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
             writer.println("Only ${themesToExtend.first()} theme rest to extend.")
         }
 
-        confirmation("confirmed", messages.getMessage("themeExtension.confirmationMessage"))
+        confirmation("confirmed", messages.getMessage("confirmationMessage"))
     }
 
     override fun createModel(answers: Answers): ThemeExtensionModel {
@@ -78,7 +95,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         val moduleRegistered = projectStructure.settingsGradle
                 .toFile()
                 .readLines()
-                .contains(messages.getMessage("themeExtension.settingsGradle.moduleRegistration"))
+                .contains(messages.getMessage("settingsGradle.moduleRegistration"))
 
         if (!moduleRegistered) {
             registerModule()
@@ -95,7 +112,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
                     (modules + "\":\${modulePrefix}-web-themes\"").joinToString(" ,", "include(", ")")
                 }
             } else it
-        } + messages.getMessage("themeExtension.settingsGradle.moduleRegistration")
+        } + messages.getMessage("settingsGradle.moduleRegistration")
 
         settingsGradle.toFile().writeText(lines.joinToString("\n"))
 
@@ -105,20 +122,14 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         val buildGradle = projectStructure.buildGradle
         buildGradle.toFile()
                 .readText()
-                .replace(messages.getMessage("themeExtension.buildGradle.webModuleSearch"),
-                        messages.getMessage("themeExtension.buildGradle.webModuleReplace"))
+                .replace(messages.getMessage("buildGradle.webModuleSearch"),
+                        messages.getMessage("buildGradle.webModuleReplace"))
                 .replace(
-                        messages.getMessage("themeExtension.buildGradle.configureWebModuleSearch").replace("\t", "    "),
-                        messages.getMessage("themeExtension.buildGradle.configureWebModuleReplace").replace("\t", "    "))
+                        messages.getMessage("buildGradle.configureWebModuleSearch").replace("\t", "    "),
+                        messages.getMessage("buildGradle.configureWebModuleReplace").replace("\t", "    "))
                 .let {
                     buildGradle.toFile().writeText(it)
                 }
         printHelper.fileAltered(buildGradle)
-    }
-}
-
-class ThemeExtensionModel(val themeName: String) {
-    companion object {
-        const val MODEL_NAME = "theme"
     }
 }

@@ -20,6 +20,17 @@ import com.google.common.eventbus.Subscribe
 import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.CliPlugin
 import com.haulmont.cuba.cli.ProjectStructure
+import com.haulmont.cuba.cli.cubaplugin.appcomponent.AppComponentCommand
+import com.haulmont.cuba.cli.cubaplugin.componentbean.CreateComponentBeanCommand
+import com.haulmont.cuba.cli.cubaplugin.entity.CreateEntityCommand
+import com.haulmont.cuba.cli.cubaplugin.entitylistener.CreateEntityListenerCommand
+import com.haulmont.cuba.cli.cubaplugin.enumeration.CreateEnumerationCommand
+import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
+import com.haulmont.cuba.cli.cubaplugin.screen.CreateScreenCommand
+import com.haulmont.cuba.cli.cubaplugin.screenextension.ExtendDefaultScreenCommand
+import com.haulmont.cuba.cli.cubaplugin.service.CreateServiceCommand
+import com.haulmont.cuba.cli.cubaplugin.statictemplate.StaticTemplateCommand
+import com.haulmont.cuba.cli.cubaplugin.theme.ThemeExtensionCommand
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent

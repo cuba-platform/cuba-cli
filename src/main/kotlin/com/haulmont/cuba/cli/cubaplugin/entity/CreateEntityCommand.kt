@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin
+package com.haulmont.cuba.cli.cubaplugin.entity
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.ProjectStructure
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
+import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
+import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.updateXml
@@ -33,6 +35,8 @@ import java.nio.file.Path
 
 @Parameters(commandDescription = "Create new entity")
 class CreateEntityCommand : GeneratorCommand<EntityModel>() {
+    private val entityTypes = listOf("Persistent", "Persistent embedded", "Not persistent")
+
     private val namesUtils: NamesUtils by kodein.instance()
 
     override fun getModelName(): String = EntityModel.MODEL_NAME
@@ -121,11 +125,3 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
         }
     }
 }
-
-data class EntityModel(val name: String, val packageName: String, val type: String, val tableName: String) {
-    companion object {
-        const val MODEL_NAME = "entity"
-    }
-}
-
-private val entityTypes = listOf("Persistent", "Persistent embedded", "Not persistent")

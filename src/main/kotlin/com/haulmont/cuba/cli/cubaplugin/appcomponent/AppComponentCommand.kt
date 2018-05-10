@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin
+package com.haulmont.cuba.cli.cubaplugin.appcomponent
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.Messages
@@ -22,6 +22,7 @@ import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
@@ -33,7 +34,7 @@ import java.nio.file.Paths
 
 @Parameters(commandDescription = "Generates app-component.xml")
 class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
-    private val messages: Messages = Messages(javaClass)
+    private val messages = Messages(javaClass)
 
     private val printHelper: PrintHelper by kodein.instance()
 
@@ -45,7 +46,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
 
     override fun QuestionsList.prompting() {
         if (projectModel.modulePrefix == "app") {
-            confirmation("changePrefix", messages.getMessage("appComponent.changePrefix"))
+            confirmation("changePrefix", messages.getMessage("changePrefix"))
 
             question("modulePrefix", "New prefix") {
                 askIf("changePrefix")
@@ -83,10 +84,10 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
         val buildGradle = Paths.get("build.gradle").toFile()
         val buildGradleText = buildGradle.readText()
 
-        if (Regex(messages.getMessage("appComponent.addToManifest.attributePattern")).find(buildGradleText) == null) {
+        if (Regex(messages.getMessage("addToManifest.attributePattern")).find(buildGradleText) == null) {
             buildGradleText.replace(
-                    messages.getMessage("appComponent.addToManifest.searchString"),
-                    messages.getMessage("appComponent.addToManifest.replaceString").replace("\t", "    ")
+                    messages.getMessage("addToManifest.searchString"),
+                    messages.getMessage("addToManifest.replaceString").replace("\t", "    ")
             ).let {
                 buildGradle.writeText(it)
             }
@@ -130,8 +131,3 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
     }
 }
 
-data class AppComponentModel(val changePrefix: Boolean, val modulePrefix: String) {
-    companion object {
-        const val MODEL_NAME = "component"
-    }
-}

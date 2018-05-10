@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin
+package com.haulmont.cuba.cli.cubaplugin.entitylistener
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.commands.from
-import com.haulmont.cuba.cli.commands.nameFrom
+import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
+import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.getChildElements
 import com.haulmont.cuba.cli.generation.parse
@@ -157,31 +157,3 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
     }
 }
 
-class EntityListenerModel(answers: Answers) {
-    val className: String = "name" from answers
-    val packageName: String by nameFrom(answers)
-    val beanName: String by nameFrom(answers)
-
-    val beforeInsert: Boolean by nameFrom(answers)
-    val beforeUpdate: Boolean by nameFrom(answers)
-    val beforeDelete: Boolean by nameFrom(answers)
-    val afterInsert: Boolean by nameFrom(answers)
-    val afterUpdate: Boolean by nameFrom(answers)
-    val afterDelete: Boolean by nameFrom(answers)
-    val beforeAttach: Boolean by nameFrom(answers)
-    val beforeDetach: Boolean by nameFrom(answers)
-
-    val entityName: String
-    val entityPackageName: String
-
-    init {
-        val entity: String = "entityType" from answers
-        val lastDotIndex = entity.lastIndexOf('.')
-        entityName = if (lastDotIndex == -1) entity else entity.substring(lastDotIndex + 1)
-        entityPackageName = entity.removeSuffix(".$entityName")
-    }
-
-    companion object {
-        const val MODEL_NAME = "listener"
-    }
-}
