@@ -29,4 +29,6 @@ class NamesUtils {
                 another
             else
                 "$one$on$another"
+
+    fun packageToUnderscore(packageName: String) = packageName.replace('.', '_')
 }

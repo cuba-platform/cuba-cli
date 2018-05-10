@@ -17,9 +17,8 @@
 package com.haulmont.cuba.cli.cubaplugin
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.ModuleType
+import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.PrintHelper
-import com.haulmont.cuba.cli.ProjectFiles
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.commands.nameFrom
@@ -27,7 +26,6 @@ import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.getChildElements
 import com.haulmont.cuba.cli.generation.parse
 import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import net.sf.practicalxml.DomUtil
@@ -40,8 +38,10 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
 
     override fun getModelName(): String = EntityListenerModel.MODEL_NAME
 
+    override fun preExecute()= checkProjectExistence()
+
     override fun QuestionsList.prompting() {
-        val persistenceXml = ProjectFiles().getModule(ModuleType.GLOBAL).persistenceXml
+        val persistenceXml = projectStructure.getModule(GLOBAL_MODULE).persistenceXml
         val entitiesList = parse(persistenceXml).documentElement
                 .let { DomUtil.getChild(it, "persistence-unit") }
                 .getChildElements()
@@ -97,9 +97,7 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
     }
 
     private fun registerListener() {
-        val model = context.getModel<EntityListenerModel>(EntityListenerModel.MODEL_NAME)
-
-        val entityPath = ProjectFiles().getModule(ModuleType.GLOBAL)
+        val entityPath = projectStructure.getModule(GLOBAL_MODULE)
                 .src
                 .resolve(namesUtils.packageToDirectory(model.entityPackageName))
                 .resolve(model.entityName + ".java")
@@ -156,10 +154,6 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
         }
 
         printHelper.fileAltered(entityPath)
-    }
-
-    override fun checkPreconditions() {
-        onlyInProject()
     }
 }
 

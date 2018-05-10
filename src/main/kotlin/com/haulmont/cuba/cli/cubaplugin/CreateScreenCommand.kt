@@ -18,8 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin
 
 import com.beust.jcommander.Parameters
 import com.google.common.base.CaseFormat
-import com.haulmont.cuba.cli.ModuleType
-import com.haulmont.cuba.cli.ProjectFiles
+import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.generation.PropertiesHelper
@@ -32,11 +31,13 @@ import org.kodein.di.generic.instance
 import java.io.File
 import java.nio.file.Path
 
-@Parameters
+@Parameters(commandDescription = "Creates new screen")
 class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
     private val namesUtils: NamesUtils by kodein.instance()
 
     override fun getModelName(): String = ScreenModel.MODEL_NAME
+
+    override fun preExecute() = checkProjectExistence()
 
     override fun QuestionsList.prompting() {
         question("screenName", "Screen name") {
@@ -59,28 +60,26 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
     override fun createModel(answers: Answers): ScreenModel = ScreenModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
-        val screenModel = context.getModel<ScreenModel>(ScreenModel.MODEL_NAME)
-
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "screen", bindings, projectModel.platformVersion) {
             transformWhole()
         }
 
-        val webModule = ProjectFiles().getModule(ModuleType.WEB)
+        val webModule = projectStructure.getModule(WEB_MODULE)
         val screensXml = webModule.screensXml
 
-        addToScreensXml(screensXml, screenModel)
+        addToScreensXml(screensXml, model)
 
-        val messages = webModule.src.resolve(namesUtils.packageToDirectory(screenModel.packageName)).resolve("messages.properties")
+        val messages = webModule.src.resolve(namesUtils.packageToDirectory(model.packageName)).resolve("messages.properties")
 
         PropertiesHelper(messages) {
-            set("caption", screenModel.screenName)
+            set("caption", model.screenName)
         }
 
-        if (screenModel.addToMenu) {
+        if (model.addToMenu) {
             updateXml(webModule.rootPackageDirectory.resolve("web-menu.xml")) {
                 "menu" {
                     add("item") {
-                        "screen" mustBe screenModel.screenName
+                        "screen" mustBe model.screenName
                     }
                 }
             }
@@ -95,8 +94,6 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
             }
         }
     }
-
-    override fun checkPreconditions() = onlyInProject()
 }
 
 class ScreenModel(answers: Answers) {

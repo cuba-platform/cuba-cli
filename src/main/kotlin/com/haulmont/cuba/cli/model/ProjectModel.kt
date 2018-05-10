@@ -16,17 +16,17 @@
 
 package com.haulmont.cuba.cli.model
 
-import com.haulmont.cuba.cli.ModuleType
+import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.PlatformVersion
 import com.haulmont.cuba.cli.ProjectFileNotFoundException
-import com.haulmont.cuba.cli.ProjectFiles
+import com.haulmont.cuba.cli.ProjectStructure
 import com.haulmont.cuba.cli.generation.parse
 import net.sf.practicalxml.DomUtil
 import java.io.File
 import java.nio.file.Path
 
 @Suppress("MemberVisibilityCanBePrivate")
-class ProjectModel(projectFiles: ProjectFiles) {
+class ProjectModel(projectStructure: ProjectStructure) {
     val name: String
 
     val rootPackage: String
@@ -49,9 +49,9 @@ class ProjectModel(projectFiles: ProjectFiles) {
 
     init {
         try {
-            val global = projectFiles.getModule(ModuleType.GLOBAL)
+            val global = projectStructure.getModule(GLOBAL_MODULE)
 
-            rootPackageDirectory = projectFiles.rootPackageDirectory.toString()
+            rootPackageDirectory = projectStructure.rootPackageDirectory.toString()
 
             rootPackage = rootPackageDirectory.replace(File.separatorChar, '.')
 

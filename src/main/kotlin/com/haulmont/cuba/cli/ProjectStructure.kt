@@ -27,9 +27,11 @@ import java.nio.file.Paths
  * Provides access for important project files. All paths are calculated lazily.
  * If file represented by path absents, rises {@link ProjectFileNotFoundException} on access.
  */
-class ProjectFiles {
+class ProjectStructure {
     //    fail first if no build.gradle found
     val buildGradle: Path = Paths.get("build.gradle") orFail "No build.gradle found"
+
+    val settingsGradle: Path = Paths.get("settings.gradle") orFail "No settings.gradle found"
 
     val rootPackage: String by lazy {
         findRootPackage() ?: throw ProjectFileNotFoundException("Unable to find root package")
@@ -39,14 +41,10 @@ class ProjectFiles {
         rootPackage.replace('.', File.separatorChar).let { Paths.get(it) }
     }
 
-    fun getModule(type: ModuleType): ModuleFiles = when (type) {
-        ModuleType.GLOBAL -> "global"
-        ModuleType.CORE -> "core"
-        ModuleType.WEB -> "web"
-    }.let { ModuleFiles(it, rootPackage) }
+    fun getModule(name: String): ModuleStructure = ModuleStructure(name, rootPackage)
 }
 
-class ModuleFiles(val name: String, val rootPackage: String) {
+class ModuleStructure(val name: String, val rootPackage: String) {
     val path: Path = Paths.get("modules", name) orFail "Module $name not found"
 
     val src: Path by lazy {
@@ -78,13 +76,15 @@ class ModuleFiles(val name: String, val rootPackage: String) {
         val fileName = if (name == "core") "spring.xml" else "web-spring.xml"
         src.findFile(fileName) orFail "Module $name spring.xml not found"
     }
+
+    companion object {
+        const val CORE_MODULE = "core"
+        const val GLOBAL_MODULE = "global"
+        const val WEB_MODULE = "web"
+    }
 }
 
 class ProjectFileNotFoundException(message: String) : RuntimeException(message)
-
-enum class ModuleType {
-    GLOBAL, CORE, WEB
-}
 
 private infix fun Path?.orTry(another: Path?): Path? =
         this?.takeIf { Files.exists(this) } ?: another

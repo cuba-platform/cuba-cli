@@ -19,7 +19,7 @@ package com.haulmont.cuba.cli.cubaplugin
 import com.google.common.eventbus.Subscribe
 import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.CliPlugin
-import com.haulmont.cuba.cli.ProjectFiles
+import com.haulmont.cuba.cli.ProjectStructure
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
@@ -47,6 +47,7 @@ class CubaPlugin : CliPlugin {
             command("entity-listener", CreateEntityListenerCommand())
             command("app-component", AppComponentCommand())
             command("enumeration", CreateEnumerationCommand())
+            command("theme", ThemeExtensionCommand())
         }
     }
 
@@ -54,14 +55,14 @@ class CubaPlugin : CliPlugin {
     fun beforeCommand(event: BeforeCommandExecutionEvent) {
         context.addModel("names", namesUtils)
 
-        val projectFiles = try {
-            ProjectFiles()
+        val projectStructure = try {
+            ProjectStructure()
         } catch (e: Exception) {
             return
         }
 
         try {
-            context.addModel(ProjectModel.MODEL_NAME, ProjectModel(projectFiles))
+            context.addModel(ProjectModel.MODEL_NAME, ProjectModel(projectStructure))
         } catch (e: ProjectScanException) {
             println(e.message)
         }
@@ -73,6 +74,6 @@ class CubaPlugin : CliPlugin {
     }
 
     companion object {
-        const val TEMPLATES_BASE_PATH = "/com/haulmont/cuba/cli/templates/"
+        const val TEMPLATES_BASE_PATH = "/com/haulmont/cuba/cli/cubaplugin/templates/"
     }
 }

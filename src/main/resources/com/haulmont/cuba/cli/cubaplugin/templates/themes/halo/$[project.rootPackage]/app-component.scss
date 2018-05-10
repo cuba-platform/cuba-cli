@@ -1,0 +1,5 @@
+@import "halo-ext";
+
+@mixin ${names.packageToUnderscore($project.rootPackage)} {
+  @include ${names.packageToUnderscore($project.rootPackage)}-halo-ext;
+}

@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.commands
 
+import com.haulmont.cuba.cli.ProjectStructure
 import com.haulmont.cuba.cli.model.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.Prompts
@@ -24,14 +25,23 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
+    val projectStructure: ProjectStructure by lazy { ProjectStructure() }
+
     val projectModel: ProjectModel by lazy {
         if (context.hasModel(ProjectModel.MODEL_NAME)) {
             context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
         } else fail("No project module found")
     }
 
+    val model: Model by lazy {
+        if (context.hasModel(getModelName())) {
+            context.getModel<Model>(getModelName())
+        } else fail("Model has not yet been created")
+    }
+
     override fun execute() {
-        super.execute()
+        preExecute()
+
         val questions = QuestionsList { prompting() }
         val answers = if (CommonParameters.nonInteractive.isEmpty()) {
             Prompts(questions).ask()
@@ -42,7 +52,11 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
         context.addModel(getModelName(), model)
 
         generate(context.getModels())
+
+        postExecute()
     }
+
+    open fun preExecute() {}
 
     abstract fun getModelName(): String
 
@@ -51,6 +65,8 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
     abstract fun createModel(answers: Answers): Model
 
     abstract fun generate(bindings: Map<String, Any>)
+
+    open fun postExecute() {}
 }
 
 fun <R, T> nameFrom(answers: Answers): ReadOnlyProperty<R, T> = object : ReadOnlyProperty<R, T> {

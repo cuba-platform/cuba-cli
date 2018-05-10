@@ -92,7 +92,7 @@ class TemplateProcessor {
                             .replace(baseTemplatePath, targetDirectoryPath)
                             .let { applyPathTransform(it, bindings) }
                             .let { Paths.get(it) }
-                            .let { targetAbsolutePath.relativize(it) }
+                            .let { projectRoot.relativize(it) }
 
                     ensureFolders(outputFile)
 
@@ -195,7 +195,7 @@ class TemplateProcessor {
     }
 
     companion object {
-        val projectRoot: Path = Paths.get("")
+        val projectRoot: Path = Paths.get("").toAbsolutePath()
 
         private val CUSTOM_TEMPLATES_PATH = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "templates")
                 .also {

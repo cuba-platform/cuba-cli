@@ -22,4 +22,4 @@ interface CliCommand {
     fun execute()
 }
 
-class CommandExecutionException @JvmOverloads constructor(message: String, cause: Throwable? = null) : Exception(message, cause)
+class CommandExecutionException @JvmOverloads constructor(message: String, cause: Throwable? = null, val silent: Boolean = false) : Exception(message, cause)

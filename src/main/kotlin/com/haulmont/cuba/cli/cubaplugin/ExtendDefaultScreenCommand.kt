@@ -16,8 +16,8 @@
 
 package com.haulmont.cuba.cli.cubaplugin
 
-import com.haulmont.cuba.cli.ModuleType
-import com.haulmont.cuba.cli.ProjectFiles
+import com.beust.jcommander.Parameters
+import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.generation.PropertiesHelper
@@ -30,11 +30,14 @@ import org.kodein.di.generic.instance
 import java.io.File
 import java.nio.file.Path
 
+@Parameters(commandDescription = "Extends login and main screens")
 class ExtendDefaultScreenCommand : GeneratorCommand<ScreenExtensionModel>() {
 
     private val namesUtils: NamesUtils by kodein.instance()
 
     override fun getModelName(): String = ScreenExtensionModel.MODEL_NAME
+
+    override fun preExecute() = checkProjectExistence()
 
     override fun QuestionsList.prompting() {
         options("screen", "Which screen to extend?", listOf("login", "main"))
@@ -46,38 +49,34 @@ class ExtendDefaultScreenCommand : GeneratorCommand<ScreenExtensionModel>() {
     override fun createModel(answers: Answers): ScreenExtensionModel = ScreenExtensionModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
-        val screenModel = context.getModel<ScreenExtensionModel>(ScreenExtensionModel.MODEL_NAME)
-
-        val templatePath = CubaPlugin.TEMPLATES_BASE_PATH + "screenExtension/" + screenModel.screen
+        val templatePath = CubaPlugin.TEMPLATES_BASE_PATH + "screenExtension/" + model.screen
         TemplateProcessor(templatePath, bindings, projectModel.platformVersion) {
             transformWhole()
         }
 
-        val webModule = ProjectFiles().getModule(ModuleType.WEB)
+        val webModule = projectStructure.getModule(WEB_MODULE)
         val screensXml = webModule.screensXml
 
-        addToScreensXml(screensXml, screenModel)
+        addToScreensXml(screensXml)
 
-        val messages = webModule.src.resolve(namesUtils.packageToDirectory(screenModel.packageName)).resolve("messages.properties")
+        val messages = webModule.src.resolve(namesUtils.packageToDirectory(model.packageName)).resolve("messages.properties")
 
         PropertiesHelper(messages) {}
     }
 
-    private fun addToScreensXml(screensXml: Path, screenModel: ScreenExtensionModel) {
+    private fun addToScreensXml(screensXml: Path) {
         updateXml(screensXml) {
             add("screen") {
-                if (screenModel.screen == "login") {
+                if (model.screen == "login") {
                     "id" mustBe "loginWindow"
-                    "template" mustBe (namesUtils.packageToDirectory(screenModel.packageName) + File.separatorChar + "ext-loginWindow.xml")
+                    "template" mustBe (namesUtils.packageToDirectory(model.packageName) + File.separatorChar + "ext-loginWindow.xml")
                 } else {
                     "id" mustBe "mainWindow"
-                    "template" mustBe (namesUtils.packageToDirectory(screenModel.packageName) + File.separatorChar + "ext-mainwindow.xml")
+                    "template" mustBe (namesUtils.packageToDirectory(model.packageName) + File.separatorChar + "ext-mainwindow.xml")
                 }
             }
         }
     }
-
-    override fun checkPreconditions() = onlyInProject()
 }
 
 class ScreenExtensionModel(answers: Answers) {

@@ -17,8 +17,8 @@
 package com.haulmont.cuba.cli.cubaplugin
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.ModuleType
-import com.haulmont.cuba.cli.ProjectFiles
+import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
+import com.haulmont.cuba.cli.ProjectStructure
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.generation.PropertiesHelper
@@ -73,47 +73,43 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
         )
     }
 
-    override fun checkPreconditions() {
-        onlyInProject()
+    override fun preExecute() {
+        checkProjectExistence()
     }
 
     override fun generate(bindings: Map<String, Any>) {
-        val entityModel = context.getModel<EntityModel>(EntityModel.MODEL_NAME)
-
-        val projectFiles = ProjectFiles()
-
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "entity", bindings) {
             transformWhole()
         }
 
-        if (entityModel.type == "Not persistent") {
-            val metadataXml = projectFiles.getModule(ModuleType.GLOBAL).metadataXml
-            addEntityToConfig(metadataXml, "metadata-model", entityModel)
+        if (model.type == "Not persistent") {
+            val metadataXml = projectStructure.getModule(GLOBAL_MODULE).metadataXml
+            addEntityToConfig(metadataXml, "metadata-model", model)
         } else {
-            val persistenceXml = projectFiles.getModule(ModuleType.GLOBAL).persistenceXml
-            addEntityToConfig(persistenceXml, "persistence-unit", entityModel)
+            val persistenceXml = projectStructure.getModule(GLOBAL_MODULE).persistenceXml
+            addEntityToConfig(persistenceXml, "persistence-unit", model)
         }
 
-        addToMessages(projectFiles, entityModel)
+        addToMessages(projectStructure)
     }
 
-    private fun addEntityToConfig(configPath: Path, elementName: String, entityModel: EntityModel) {
+    private fun addEntityToConfig(configPath: Path, elementName: String, model: EntityModel) {
         updateXml(configPath) {
             elementName {
                 add("class") {
-                    +(entityModel.packageName + "." + entityModel.name)
+                    +(model.packageName + "." + model.name)
                 }
             }
         }
     }
 
-    private fun addToMessages(projectFiles: ProjectFiles, entityModel: EntityModel) {
-        val packageDirectory = projectFiles.getModule(ModuleType.GLOBAL)
+    private fun addToMessages(projectStructure: ProjectStructure) {
+        val packageDirectory = projectStructure.getModule(GLOBAL_MODULE)
                 .src
-                .resolve(entityModel.packageName.replace('.', File.separatorChar))
+                .resolve(model.packageName.replace('.', File.separatorChar))
 
         val entityPrintableName = Regex("([A-Z][a-z0-9]*)")
-                .findAll(entityModel.name)
+                .findAll(model.name)
                 .map { it.value }
                 .joinToString(" ")
 
@@ -121,7 +117,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
         val messages = packageDirectory.resolve("messages.properties")
 
         PropertiesHelper(messages) {
-            set(entityModel.name, entityPrintableName)
+            set(model.name, entityPrintableName)
         }
     }
 }

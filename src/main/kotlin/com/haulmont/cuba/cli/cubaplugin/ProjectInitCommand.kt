@@ -39,16 +39,14 @@ private val messages: Messages = Messages(ProjectInitCommand::class.java)
 private val PLATFORM_VERSIONS = messages.getMessage("createProject.platformVersions").split(',')
 private val DATABASES = messages.getMessage("createProject.databases").split(',')
 
-@Parameters(commandDescription = "Create new project")
+@Parameters(commandDescription = "Creates new project")
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     private val writer: PrintWriter by kodein.instance()
 
     override fun getModelName(): String = "project"
 
-    override fun checkPreconditions() {
-        super.checkPreconditions()
-
-        check(!context.hasModel("project")) { "There is an existing project found in current directory." }
+    override fun preExecute() {
+        !context.hasModel("project") || fail("There is an existing project found in current directory.")
     }
 
     override fun QuestionsList.prompting() {
@@ -99,8 +97,6 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     override fun createModel(answers: Answers): ProjectInitModel = ProjectInitModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
-        val model = context.getModel<ProjectInitModel>("project")
-
         val cwd = Paths.get("")
 
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "project", bindings, PlatformVersion(model.platformVersion)) {

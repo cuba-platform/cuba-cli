@@ -17,8 +17,7 @@
 package com.haulmont.cuba.cli.cubaplugin
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.ModuleType
-import com.haulmont.cuba.cli.ProjectFiles
+import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.generation.TemplateProcessor
@@ -30,9 +29,7 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
 class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
     override fun getModelName(): String = ServiceModel.MODEL_NAME
 
-    override fun checkPreconditions() {
-        onlyInProject()
-    }
+    override fun preExecute() = checkProjectExistence()
 
     override fun QuestionsList.prompting() {
         question("interfaceName", "Service interface name") {
@@ -67,9 +64,8 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
             transformWhole()
         }
 
-        val springXml = ProjectFiles().getModule(ModuleType.WEB).springXml
+        val springXml = projectStructure.getModule(WEB_MODULE).springXml
 
-        val serviceModel = context.getModel<ServiceModel>(ServiceModel.MODEL_NAME)
         updateXml(springXml) {
             "bean" {
                 "class" mustBe "com.haulmont.cuba.web.sys.remoting.WebRemoteProxyBeanCreator"
@@ -81,8 +77,8 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
                     "name" mustBe "remoteServices"
                     "map" {
                         add("entry") {
-                            "key" mustBe serviceModel.serviceName
-                            "value" mustBe "${serviceModel.packageName}.${serviceModel.interfaceName}"
+                            "key" mustBe model.serviceName
+                            "value" mustBe "${model.packageName}.${model.interfaceName}"
                         }
                     }
                 }

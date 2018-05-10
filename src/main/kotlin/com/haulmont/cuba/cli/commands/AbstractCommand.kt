@@ -23,21 +23,13 @@ import org.kodein.di.generic.instance
 abstract class AbstractCommand : CliCommand {
     val context: CliContext by kodein.instance()
 
-    override fun execute() {
-        checkPreconditions()
-    }
-
     @Throws(CommandExecutionException::class)
-    protected open fun checkPreconditions() {
-    }
-
-    @Throws(CommandExecutionException::class)
-    protected fun onlyInProject() {
+    protected fun checkProjectExistence() {
         if (!context.hasModel("project")) {
             fail("Command should be started in project directory")
         }
     }
 
     @Throws(CommandExecutionException::class)
-    protected fun fail(cause: String): Nothing = throw CommandExecutionException(cause)
+    protected fun fail(cause: String, silent: Boolean = false): Nothing = throw CommandExecutionException(cause, silent = silent)
 }

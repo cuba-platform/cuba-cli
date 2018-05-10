@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli
 
+import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.commands.CommonParameters
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
@@ -36,6 +37,8 @@ class PrintHelper {
     }
 
     fun handleCommandException(e: Exception) {
+        e !is CommandExecutionException || !e.silent || return
+
         saveStacktrace(e)
 
         if (CommonParameters.stacktrace) {

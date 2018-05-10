@@ -17,15 +17,16 @@
 package com.haulmont.cuba.cli.commands
 
 class CommandsRegistry {
+    private val builders = mutableListOf<HasSubCommand.() -> Unit>()
 
-    private val root: HasSubCommand = HasSubCommand()
-
-    operator fun invoke(setup: HasSubCommand.() -> Unit) {
-        root.setup()
+    operator fun invoke(builder: HasSubCommand.() -> Unit) {
+        builders.add(builder)
     }
 
     fun traverse(visitor: CommandVisitor) {
-        traverse(root, visitor)
+        HasSubCommand().apply {
+            builders.forEach { it() }
+        }.let { traverse(it, visitor) }
     }
 
     private fun traverse(hasSubCommand: HasSubCommand, visitor: CommandVisitor) {
@@ -51,7 +52,7 @@ open class HasSubCommand internal constructor() {
         check(name.isNotBlank()) {
             "Empty names for commands are not allowed"
         }
-        check(commands[name] == null) {
+        check(name !in commands) {
             "Command with such name is already presented by ${commands[name]!!.cliCommand::class}"
         }
 

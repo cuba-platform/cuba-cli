@@ -16,20 +16,30 @@
 
 package com.haulmont.cuba.cli.cubaplugin
 
-import com.haulmont.cuba.cli.*
+import com.beust.jcommander.Parameters
+import com.haulmont.cuba.cli.Messages
+import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
+import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
+import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
+import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
 import java.nio.file.Path
 import java.nio.file.Paths
 
+@Parameters(commandDescription = "Generates app-component.xml")
 class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
     private val messages: Messages = Messages(javaClass)
 
     private val printHelper: PrintHelper by kodein.instance()
+
+    override fun preExecute() {
+        checkProjectExistence()
+    }
 
     override fun getModelName(): String = AppComponentModel.MODEL_NAME
 
@@ -58,10 +68,8 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
     }
 
     override fun generate(bindings: Map<String, Any>) {
-        val componentModel = context.getModel<AppComponentModel>(AppComponentModel.MODEL_NAME)
-
-        if (componentModel.changePrefix) {
-            changePrefix(componentModel.modulePrefix)
+        if (model.changePrefix) {
+            changePrefix(model.modulePrefix)
         }
 
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "appComponent", bindings, projectModel.platformVersion) {
@@ -89,9 +97,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
         replacePrefix(Paths.get("build.gradle"), prefix)
         replacePrefix(Paths.get("settings.gradle"), prefix)
 
-        val projectFiles = ProjectFiles()
-
-        val webAppProperties = projectFiles.getModule(ModuleType.WEB)
+        val webAppProperties = projectStructure.getModule(WEB_MODULE)
                 .rootPackageDirectory
                 .resolve("web-app.properties")
 
@@ -102,7 +108,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
             set("cuba.webContextName", prefix)
         }
 
-        val appProperties = projectFiles.getModule(ModuleType.CORE)
+        val appProperties = projectStructure.getModule(CORE_MODULE)
                 .rootPackageDirectory
                 .resolve("app.properties")
 
@@ -122,8 +128,6 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
 
         printHelper.fileAltered(gradleScriptPath)
     }
-
-    override fun checkPreconditions() = onlyInProject()
 }
 
 data class AppComponentModel(val changePrefix: Boolean, val modulePrefix: String) {

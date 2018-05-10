@@ -16,14 +16,19 @@
 
 package com.haulmont.cuba.cli.cubaplugin
 
+import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
+@Parameters(commandDescription = "Creates @Component bean")
 class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>() {
     override fun getModelName(): String = ComponentBeanModel.MODEL_NAME
+
+    override fun preExecute() = checkProjectExistence()
+
 
     override fun QuestionsList.prompting() {
         question("name", "Class name") {
@@ -53,10 +58,6 @@ class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>() {
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "componentBean", bindings, projectModel.platformVersion) {
             transformWhole()
         }
-    }
-
-    override fun checkPreconditions() {
-        onlyInProject()
     }
 }
 

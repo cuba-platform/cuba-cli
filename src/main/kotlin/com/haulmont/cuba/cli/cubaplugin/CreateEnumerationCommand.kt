@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin
 
+import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.commands.nameFrom
@@ -23,6 +24,7 @@ import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
+@Parameters(commandDescription = "Creates new Enumeration")
 class CreateEnumerationCommand : GeneratorCommand<EnumerationModel>() {
     override fun getModelName(): String = EnumerationModel.MODEL_NAME
 
