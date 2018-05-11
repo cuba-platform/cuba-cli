@@ -37,9 +37,25 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
 
     override fun getModelName(): String = "polymer"
 
-    override fun QuestionsList.prompting() {}
+    override fun preExecute() {
+        checkProjectExistence()
 
-    override fun createModel(answers: Answers): PolymerModel = PolymerModel(projectModel)
+        val alreadyContainsModule = projectStructure.settingsGradle.toFile()
+                .readText().contains("polymer-client")
+
+        !alreadyContainsModule || fail(messages.getMessage("moduleExistsError"))
+    }
+
+    override fun QuestionsList.prompting() {
+        confirmation("confirm", messages.getMessage("confirmationCaption")) {
+            default(true)
+        }
+    }
+
+    override fun createModel(answers: Answers): PolymerModel = if (answers["confirm"] as Boolean) {
+        PolymerModel(projectModel)
+    } else fail("rejected", true)
+
 
     override fun generate(bindings: Map<String, Any>) {
         val destinationDir = Paths.get("modules/polymer-client")
