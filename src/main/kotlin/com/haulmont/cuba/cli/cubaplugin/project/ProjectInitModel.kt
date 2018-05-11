@@ -35,7 +35,7 @@ class ProjectInitModel(answers: Answers) {
 class DatabaseModel(val database: String) {
     private val messages = Messages(javaClass)
 
-    private val DATABASES = messages.getMessage("databases").split(',')
+    private val DATABASES = messages["databases"].split(',')
 
     val schema: String
     val driver: String

@@ -37,4 +37,8 @@ class Messages(clazz: Class<*>, messagesFileName: String = "messages.properties"
     fun getMessage(name: String) = properties.getProperty(name) ?: ""
 
     fun getMessage(name: String, vararg args: Any) = properties.getProperty(name)?.format(*args) ?: ""
+
+    operator fun get(name: String): String = getMessage(name)
+
+    operator fun get(name: String, vararg args: Any): String = getMessage(name, *args)
 }

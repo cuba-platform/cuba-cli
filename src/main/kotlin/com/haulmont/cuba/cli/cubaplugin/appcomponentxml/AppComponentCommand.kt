@@ -24,6 +24,7 @@ import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.PropertiesHelper
+import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
@@ -38,6 +39,12 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
 
     private val printHelper: PrintHelper by kodein.instance()
 
+    private val snippets: Snippets by lazy {
+        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "appcomponentxml/",
+                "appComponetGradleSnippets.xml",
+                projectModel.platformVersion)
+    }
+
     override fun preExecute() {
         checkProjectExistence()
     }
@@ -46,7 +53,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
 
     override fun QuestionsList.prompting() {
         if (projectModel.modulePrefix == "app") {
-            confirmation("changePrefix", messages.getMessage("changePrefix"))
+            confirmation("changePrefix", messages["changePrefix"])
 
             question("modulePrefix", "New prefix") {
                 askIf("changePrefix")
@@ -84,10 +91,10 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
         val buildGradle = Paths.get("build.gradle").toFile()
         val buildGradleText = buildGradle.readText()
 
-        if (Regex(messages.getMessage("addToManifest.attributePattern")).find(buildGradleText) == null) {
+        if (Regex(snippets["addToManifest.attributePattern"]).find(buildGradleText) == null) {
             buildGradleText.replace(
-                    messages.getMessage("addToManifest.searchString"),
-                    messages.getMessage("addToManifest.replaceString").replace("\t", "    ")
+                    snippets["addToManifest.searchString"],
+                    snippets["addToManifest.replaceString"]
             ).let {
                 buildGradle.writeText(it)
             }

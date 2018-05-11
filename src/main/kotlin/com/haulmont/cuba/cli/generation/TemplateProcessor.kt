@@ -16,11 +16,8 @@
 
 package com.haulmont.cuba.cli.generation
 
-import com.haulmont.cuba.cli.LatestVersion
-import com.haulmont.cuba.cli.PrintHelper
-import com.haulmont.cuba.cli.PlatformVersion
+import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.CommandExecutionException
-import com.haulmont.cuba.cli.kodein
 import org.apache.velocity.Template
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
@@ -28,8 +25,9 @@ import org.apache.velocity.runtime.RuntimeSingleton
 import org.kodein.di.generic.instance
 import java.io.File
 import java.io.PrintWriter
-import java.net.URI
-import java.nio.file.*
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.stream.Collectors
 import kotlin.reflect.full.memberProperties
 
@@ -48,36 +46,12 @@ class TemplateProcessor {
     val templatePath: Path
 
     private constructor(templateBasePath: Path, bindings: Map<String, Any>, version: PlatformVersion) {
-        templatePath = findMostSuitableVersion(templateBasePath, version)
+        templatePath = version.findMostSuitableVersionDirectory(templateBasePath)
         this.bindings = bindings
         this.velocityContext = VelocityContext().apply {
             bindings.forEach { k, v -> put(k, v) }
         }
     }
-
-    private fun findMostSuitableVersion(templateBasePath: Path, version: PlatformVersion): Path {
-        Files.walk(templateBasePath, 1)
-                .filter { Files.isDirectory(it) && it != templateBasePath }
-                .collect(Collectors.toList())
-                .associateBy {
-                    try {
-                        PlatformVersion(it.fileName.toString())
-                    } catch (e: Exception) {
-//                        found directory that doesn't conform any version naming rules
-                        return templateBasePath
-                    }
-                }.toSortedMap()
-                .onEach { (dirVersion, directory) ->
-                    if (dirVersion >= version)
-                        return directory
-                }.let {
-                    if (it.isNotEmpty())
-                        return it[it.lastKey()]!!
-                }
-
-        return templateBasePath
-    }
-
 
     private fun process(from: Path, to: Path, withTransform: Boolean) {
         val targetAbsolutePath = to.toAbsolutePath()
@@ -194,10 +168,12 @@ class TemplateProcessor {
         copy("", to)
     }
 
-    fun Path.walk(depth: Int) = Files.walk(this, depth).filter { it != this}.collect(Collectors.toList())
+    fun Path.walk(depth: Int) = Files.walk(this, depth).filter { it != this }.collect(Collectors.toList())
 
     companion object {
         val projectRoot: Path = Paths.get("").toAbsolutePath()
+
+        private val resources: Resources by kodein.instance()
 
         private val CUSTOM_TEMPLATES_PATH = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "templates")
                 .also {
@@ -218,25 +194,7 @@ class TemplateProcessor {
             TemplateProcessor(templateBasePath, bindings, platformVersion).block()
         }
 
-        fun findTemplate(templateBasePath: String): Path {
-            val templateUri = TemplateProcessor::class.java.getResource(templateBasePath)?.toURI()
-
-            if (templateUri != null) {
-                return if (templateUri.scheme == "jar") {
-                    val fileSystem = getFileSystem(templateUri)
-                    fileSystem.getPath(templateBasePath)
-                } else {
-                    Paths.get(templateUri)
-                }
-            }
-
-            return CUSTOM_TEMPLATES_PATH.resolve(templateBasePath)
-        }
-
-        private fun getFileSystem(templateUri: URI?) = try {
-            FileSystems.getFileSystem(templateUri)
-        } catch (e: FileSystemNotFoundException) {
-            FileSystems.newFileSystem(templateUri, mutableMapOf<String, Any>())
-        }
+        fun findTemplate(templateBasePath: String): Path =
+                resources.getResourcePath(templateBasePath) ?: CUSTOM_TEMPLATES_PATH.resolve(templateBasePath)
     }
 }

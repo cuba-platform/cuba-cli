@@ -23,6 +23,7 @@ import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
+import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
@@ -36,6 +37,13 @@ import java.util.stream.Collectors
 @Parameters(commandDescription = "Generates halo or havana themes extension")
 class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
     private val messages = Messages(javaClass)
+
+    private val snippets: Snippets by lazy {
+        Snippets(
+                CubaPlugin.SNIPPETS_BASE_PATH + "theme/",
+                "themeExtensionGradleSnippets.xml",
+                projectModel.platformVersion)
+    }
 
     private val writer: PrintWriter by kodein.instance()
 
@@ -52,7 +60,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         } else listOf<String>()
 
 
-        val restThemes = listOf("halo", "havana") - alreadyExtended
+        val restThemes = listOf("halo") - alreadyExtended
 
         restThemes.isNotEmpty() || fail("Halo and havana themes already extended")
 
@@ -68,7 +76,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
             writer.println("Only ${themesToExtend.first()} theme rest to extend.")
         }
 
-        confirmation("confirmed", messages.getMessage("confirmationMessage"))
+        confirmation("confirmed", messages["confirmationMessage"])
     }
 
     override fun createModel(answers: Answers): ThemeExtensionModel {
@@ -98,7 +106,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         val moduleRegistered = projectStructure.settingsGradle
                 .toFile()
                 .readLines()
-                .contains(messages.getMessage("settingsGradle.moduleRegistration"))
+                .contains(snippets["settingsGradle.moduleRegistration"])
 
         if (!moduleRegistered) {
             registerModule()
@@ -115,7 +123,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
                     (modules + "\":\${modulePrefix}-web-themes\"").joinToString(" ,", "include(", ")")
                 }
             } else it
-        } + messages.getMessage("settingsGradle.moduleRegistration")
+        } + snippets["settingsGradle.moduleRegistration"]
 
         settingsGradle.toFile().writeText(lines.joinToString("\n"))
 
@@ -125,11 +133,11 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         val buildGradle = projectStructure.buildGradle
         buildGradle.toFile()
                 .readText()
-                .replace(messages.getMessage("buildGradle.webModuleSearch"),
-                        messages.getMessage("buildGradle.webModuleReplace"))
+                .replace(snippets["buildGradle.webModuleSearch"],
+                        snippets["buildGradle.webModuleReplace"])
                 .replace(
-                        messages.getMessage("buildGradle.configureWebModuleSearch").replace("\t", "    "),
-                        messages.getMessage("buildGradle.configureWebModuleReplace").replace("\t", "    "))
+                        snippets["buildGradle.configureWebModuleSearch"],
+                        snippets["buildGradle.configureWebModuleReplace"])
                 .let {
                     buildGradle.toFile().writeText(it)
                 }

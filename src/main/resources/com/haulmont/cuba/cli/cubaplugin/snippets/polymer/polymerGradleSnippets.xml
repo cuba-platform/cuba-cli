@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2008-2018 Haulmont.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<snippets>
+    <snippet name="moduleVarSearch">
+|def webModule = project(":${modulePrefix}-web")|
+    </snippet>
+    <snippet name="moduleVarReplace">
+|def webModule = project(":${modulePrefix}-web")
+def polymerClientModule = project(":${modulePrefix}-polymer-client")|
+    </snippet>
+    <snippet name="moduleConfigureSearch">
+|task undeploy(type: Delete, dependsOn: ":${modulePrefix}-web:cleanConf") {|
+    </snippet>
+    <snippet name="moduleConfigureReplace">
+|configure(polymerClientModule) {
+    apply(plugin: 'cuba')
+    apply(plugin: 'idea')
+
+    apply(plugin: 'war')
+    apply(plugin: 'maven')
+
+    def frontAppDir = "${modulePrefix}-front"
+    def mainBuildDir = 'build/es6-unbundled'
+
+    task installBowerPackages(type: NodeTask, dependsOn: npmInstall) {
+        script = file("node_modules/bower/bin/bower")
+        args = ['install','-F']
+        inputs.file "bower.json"
+        outputs.dir "bower_components"
+    }
+
+    task buildPolymer(type: NodeTask, dependsOn: installBowerPackages) {
+        script = file("node_modules/polymer-cli/bin/polymer")
+        args = ['build']
+        inputs.files fileTree('./') {
+        exclude 'build'
+    }
+    outputs.dir "build"
+    }
+
+    assemble.dependsOn buildPolymer
+
+    task deployUnbundled(type: Copy) {
+        from file('./')
+        include 'bower_components/**'
+        include 'src/**'
+        into "$cuba.tomcat.dir/webapps/$frontAppDir"
+    }
+
+    task deploy(type: Copy, dependsOn: [assemble, deployUnbundled]) {
+        from file(mainBuildDir)
+        into "$cuba.tomcat.dir/webapps/$frontAppDir"
+    }
+
+    war {
+        from file(mainBuildDir)
+    }
+}
+
+task undeploy(type: Delete, dependsOn: ":${modulePrefix}-web:cleanConf") {|
+    </snippet>
+    <snippet name="undeploySearch">
+|    delete("$cuba.tomcat.dir/webapps/${modulePrefix}")|
+    </snippet>
+    <snippet name="undeployReplace">
+|    delete("$cuba.tomcat.dir/webapps/${modulePrefix}")
+    delete("$cuba.tomcat.dir/webapps/${modulePrefix}-front")|
+    </snippet>
+    <snippet name="moduleRegistration">
+|project(":${modulePrefix}-polymer-client").projectDir = new File(settingsDir, 'modules/polymer-client')|
+    </snippet>
+</snippets>

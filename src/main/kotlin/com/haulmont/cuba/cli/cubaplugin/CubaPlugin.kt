@@ -90,5 +90,6 @@ class CubaPlugin : CliPlugin {
 
     companion object {
         const val TEMPLATES_BASE_PATH = "/com/haulmont/cuba/cli/cubaplugin/templates/"
+        const val SNIPPETS_BASE_PATH = "/com/haulmont/cuba/cli/cubaplugin/snippets/"
     }
 }

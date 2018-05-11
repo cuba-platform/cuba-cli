@@ -21,6 +21,7 @@ import com.haulmont.cuba.cli.Messages
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
+import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
@@ -30,8 +31,11 @@ import java.nio.file.Paths
 
 @Parameters(commandDescription = "Creates empty polymer module")
 class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
-
     private val messages = Messages(javaClass)
+
+    private val snippets: Snippets by lazy {
+        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "polymer", "polymerGradleSnippets.xml", projectModel.platformVersion)
+    }
 
     private val printHelper: PrintHelper by kodein.instance()
 
@@ -43,11 +47,11 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
         val alreadyContainsModule = projectStructure.settingsGradle.toFile()
                 .readText().contains("polymer-client")
 
-        !alreadyContainsModule || fail(messages.getMessage("moduleExistsError"))
+        !alreadyContainsModule || fail(messages["moduleExistsError"])
     }
 
     override fun QuestionsList.prompting() {
-        confirmation("confirm", messages.getMessage("confirmationCaption")) {
+        confirmation("confirm", messages["confirmationCaption"]) {
             default(true)
         }
     }
@@ -71,9 +75,9 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
 
         projectStructure.buildGradle.toFile().apply {
             readText()
-                    .replace(messages.getMessage("moduleVarSearch"), messages.getMessage("moduleVarReplace"))
-                    .replace(messages.getMessage("moduleConfigureSearch"), messages.getMessage("moduleConfigureReplace"))
-                    .replace(messages.getMessage("undeploySearch"), messages.getMessage("undeployReplace"))
+                    .replace(snippets["moduleVarSearch"], snippets["moduleVarReplace"])
+                    .replace(snippets["moduleConfigureSearch"], snippets["moduleConfigureReplace"])
+                    .replace(snippets["undeploySearch"], snippets["undeployReplace"])
                     .let {
                         writeText(it)
                     }
@@ -89,7 +93,7 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
                         (modules + "\":\${modulePrefix}-polymer-client\"").joinToString(" ,", "include(", ")")
                     }
                 } else it
-            } + messages.getMessage("moduleRegistration")
+            } + snippets["moduleRegistration"]
             writeText(lines.joinToString("\n"))
         }
         printHelper.fileAltered(projectStructure.settingsGradle)

@@ -7,6 +7,8 @@ import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import java.io.File
+import java.nio.file.Paths
 
 class PlatformVersionTest : Spek({
     describe("PlatformVersion") {
@@ -74,6 +76,78 @@ class PlatformVersionTest : Spek({
             on("comparision, first should be less") {
                 assertTrue(one < another)
                 assertTrue(another > one)
+            }
+        }
+    }
+
+    given("directories structure") {
+        beforeGroup {
+            listOf("1.2.3", "3.4.5", "5.6.7").forEach {
+                File("tmp", it).mkdirs()
+            }
+        }
+
+        afterGroup {
+            File("tmp").deleteRecursively()
+        }
+
+        given("latestVersion") {
+            val latest = LatestVersion
+            on("finding optimal directory") {
+                val optimal = latest.findMostSuitableVersionDirectory(Paths.get("tmp")).fileName.toString()
+
+                it("will be 5.6.7") {
+                    assertEquals("5.6.7", optimal)
+                }
+            }
+        }
+
+        given("version 4") {
+            val version = PlatformVersion("4")
+
+            on("finding optimal directory") {
+                val optimal = version.findMostSuitableVersionDirectory(Paths.get("tmp")).fileName.toString()
+
+                it("will be 5.6.7") {
+                    assertEquals("5.6.7", optimal)
+                }
+            }
+        }
+
+        given("version 3.4.5") {
+            val version = PlatformVersion("3.4.5")
+
+            on("finding optimal directory") {
+                val optimal = version.findMostSuitableVersionDirectory(Paths.get("tmp")).fileName.toString()
+
+                it("will be 3.4.5") {
+                    assertEquals("3.4.5", optimal)
+                }
+            }
+        }
+
+    }
+
+    given("directories structure with some rubbish") {
+        beforeGroup {
+            listOf("1.2.3", "3.4.5", "5.6.7", "not looks likes version name").forEach {
+                File("tmp", it).mkdirs()
+            }
+        }
+
+        afterGroup {
+            File("tmp").deleteRecursively()
+        }
+
+        given("anyVersion") {
+            val latest = LatestVersion
+
+            on("finding optimal directory") {
+                val optimal = latest.findMostSuitableVersionDirectory(Paths.get("tmp")).fileName.toString()
+
+                it("will be root directory") {
+                    assertEquals("tmp", optimal)
+                }
             }
         }
     }

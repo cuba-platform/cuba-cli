@@ -36,8 +36,8 @@ import java.nio.file.attribute.PosixFilePermission
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     private val messages = Messages(javaClass)
 
-    private val platformVersions = messages.getMessage("platformVersions").split(',')
-    private val databases = messages.getMessage("databases").split(',')
+    private val platformVersions = messages["platformVersions"].split(',')
+    private val databases = messages["databases"].split(',')
 
     private val writer: PrintWriter by kodein.instance()
 
@@ -114,7 +114,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
             }
         }
 
-        writer.println(messages.getMessage("createProjectTips", cwd.toAbsolutePath()))
+        writer.println(messages["createProjectTips", cwd.toAbsolutePath()])
 
         val dpTipsMessageName = when (model.database.database) {
             databases[5] -> "oracleDbTips"
@@ -122,6 +122,6 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
             else -> return
         }
 
-        writer.println(messages.getMessage(dpTipsMessageName))
+        writer.println(messages[dpTipsMessageName])
     }
 }

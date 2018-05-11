@@ -27,7 +27,6 @@ import com.haulmont.cuba.cli.generation.xpath
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import net.sf.practicalxml.xpath.XPathWrapper
 import org.kodein.di.generic.instance
 import java.nio.file.Paths
 
@@ -41,9 +40,9 @@ class ComponentInstallCommand : GeneratorCommand<ComponentModel>() {
     override fun getModelName(): String = ComponentModel.MODEL_NAME
 
     override fun QuestionsList.prompting() {
-        question("artifactCoordinates", messages.getMessage("artifactCoordinatesQuestionCaption")) {
+        question("artifactCoordinates", messages["artifactCoordinatesQuestionCaption"]) {
             validate {
-                value.split(':').size == 3 || fail(messages.getMessage("invalidArtifactCoordinates"))
+                value.split(':').size == 3 || fail(messages["invalidArtifactCoordinates"])
             }
         }
     }

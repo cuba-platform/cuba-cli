@@ -1,5 +1,0 @@
-@import "havana-ext";
-
-@mixin ${names.packageToUnderscore($project.rootPackage)} {
-  @include ${names.packageToUnderscore($project.rootPackage)}-havana-ext;
-}

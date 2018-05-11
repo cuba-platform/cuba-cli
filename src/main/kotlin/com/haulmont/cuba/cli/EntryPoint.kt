@@ -33,6 +33,8 @@ val kodein by lazy {
         bind<CliContext>() with instance(context)
 
         bind<NamesUtils>() with instance(NamesUtils())
+
+        bind<Resources>() with instance(Resources())
     }
 }
 
