@@ -1,0 +1,100 @@
+<!doctype html>
+
+<!--
+  ~ Copyright (c) 2008-2018 Haulmont.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+  <title>$names.capitalize($project.name)</title>
+
+  <!--
+    The `<base>` tag below is being changed in a build time.
+    See the `basePath` property in `polymer.json`.
+  -->
+  <base href="/">
+
+  <link rel="icon" href="images/favicon.ico">
+  <link rel="icon" href="images/app-icon/icon-32x32.png" sizes="32x32">
+  <link rel="icon" href="images/app-icon/icon-64x64.png" sizes="64x64">
+
+  <link rel="manifest" href="manifest.json">
+
+  <meta name="theme-color" content="#2196F3">
+
+  <!-- Add to homescreen for Chrome on Android. Fallback for manifest.json -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="$project.name">
+
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Homescreen icons -->
+  <link rel="apple-touch-icon" href="images/app-icon/icon-48x48.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="images/app-icon/icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="96x96" href="images/app-icon/icon-96x96.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="images/app-icon/icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="images/app-icon/icon-192x192.png">
+
+  <!-- Tile icon for Windows 8 (144x144 + tile color) -->
+  <meta name="msapplication-TileImage" content="images/app-icon/icon-144x144.png">
+  <meta name="msapplication-TileColor" content="#2196F3">
+  <meta name="msapplication-tap-highlight" content="no">
+
+  <script>
+    // Setup Polymer options
+    window.Polymer = {
+      dom: 'shadow',
+      lazyRegister: true
+    };
+
+    (function() {
+      'use strict';
+
+      if (!window.fetch) {
+        var fetchScript = document.createElement('script');
+        fetchScript.src = 'bower_components/fetch/fetch.js';
+        document.head.appendChild(fetchScript);
+      }
+    })();
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
+
+  <!-- Load webcomponents-loader.js to check and load any polyfills your browser needs -->
+  <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+
+  <link rel="import" href="src/${project.namespace}-shell.html">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', 'Noto', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <${project.namespace}-shell api-url="/app/rest/"></${project.namespace}-shell>
+</body>
+</html>

@@ -31,4 +31,6 @@ class NamesUtils {
                 "$one$on$another"
 
     fun packageToUnderscore(packageName: String) = packageName.replace('.', '_')
+
+    fun capitalize(string: String) = string.capitalize()
 }

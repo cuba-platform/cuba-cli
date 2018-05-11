@@ -59,6 +59,7 @@ module cuba.cli.main {
     opens com.haulmont.cuba.cli.cubaplugin.statictemplate;
     opens com.haulmont.cuba.cli.cubaplugin.theme;
     opens com.haulmont.cuba.cli.cubaplugin.installcomponent;
+    opens com.haulmont.cuba.cli.cubaplugin.polymer;
 
     exports com.haulmont.cuba.cli.model;
 }

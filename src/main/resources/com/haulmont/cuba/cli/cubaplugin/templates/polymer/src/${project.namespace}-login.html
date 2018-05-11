@@ -1,0 +1,110 @@
+
+<!--
+  ~ Copyright (c) 2008-2018 Haulmont.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/cuba-app/cuba-localize-behavior.html">
+<link rel="import" href="../bower_components/cuba-login/cuba-login.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+
+
+<link rel="import" href="${project.namespace}-locale-select.html">
+
+<link rel="import" href="shared-styles.html">
+<dom-module id="${project.namespace}-login">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+        height: 100%;
+      }
+      .login-wrapper {
+        background: var(--google-grey-100);
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100vh;
+        align-items: center;
+        justify-content: center;
+      }
+      .login-card {
+        display: block;
+        min-width: 300px;
+        min-height: 300px;
+        padding: 24px;
+        margin: 0 auto;
+      }
+      #logo {
+        --iron-icon-width: 32px;
+        --iron-icon-height: 32px;
+        margin-right: 12px;
+      }
+      mpg-locale-select {
+        margin-top: 24px;
+      }
+      
+      ${project.namespace}-locale-select {
+        margin-top: 20px;
+      }
+      
+      .login-button {
+        width: 100%;
+        margin: 24px 0 12px;
+        background-color: var(--primary-color);
+        color: #FFF;
+      }
+    </style>
+    <div class="login-wrapper">
+      <paper-card class="login-card">
+        <div class="card-content">
+          <iron-icon id="logo" src="images/app-icon/icon-32x32.png"></iron-icon>
+          Welcome to $names.capitalize($project.name)
+          <cuba-login on-cuba-login-error="_handleLoginError">
+            <paper-button slot="login-button" raised class="login-button">Login</paper-button>
+          </cuba-login>
+        </div>
+      </paper-card>
+      
+      <${project.namespace}-locale-select></${project.namespace}-locale-select>
+      
+    </div>
+    <paper-toast id="loginError" horizontal-align="right">
+      [[msg('Login failed')]]
+    </paper-toast>
+  </template>
+  <script>
+    {
+      /**
+       * @extends {Polymer.Element}
+       * @appliesMixin CubaLocalizeBehavior
+       */
+      class ${polymer.login} extends Polymer.mixinBehaviors([CubaLocalizeBehavior], Polymer.Element) {
+        static get is() {
+          return '${project.namespace}-login'
+        }
+
+        _handleLoginError() {
+          this.$.loginError.show();
+        }
+      }
+
+      customElements.define(${polymer.login}.is, ${polymer.login});
+    }
+  </script>
+</dom-module>

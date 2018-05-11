@@ -1,0 +1,200 @@
+
+<!--
+  ~ Copyright (c) 2008-2018 Haulmont.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<!-- Ensure Web Animations polyfill is loaded since neon-animation 2.0 doesn't import it -->
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-lazy-pages/iron-lazy-pages.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/cuba-app/cuba-app.html">
+<link rel="import" href="../bower_components/cuba-app/cuba-app-aware-behavior.html">
+<link rel="import" href="../bower_components/cuba-app/cuba-localize-behavior.html">
+<link rel="import" href="../bower_components/cuba-styles/cuba-styles.html">
+<link rel="import" href="../bower_components/cuba-data/cuba-data.html">
+<link rel="import" href="../bower_components/cuba-form/cuba-form.html">
+<link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker-light.html">
+<link rel="import" href="shared-styles.html">
+
+<link rel="import" href="${project.namespace}-menu.html">
+<link rel="import" href="${project.namespace}-user-menu.html">
+<link rel="import" href="${project.namespace}-login.html">
+<link rel="import" href="home/${project.namespace}-home.html">
+
+
+<dom-module id="${project.namespace}-shell">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+      }
+      app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+      }
+      app-toolbar {
+        background-color: var(--primary-color);
+        color: #fff;
+      }
+      iron-lazy-pages > * {
+        max-width: 1080px;
+        margin: 12px auto;
+        padding: 12px 24px;
+      }
+      @media (max-width: 1366px) {
+        iron-lazy-pages > * {
+          margin-top: 6px;
+          padding: 6px 12px;
+        }
+      }
+      @media (max-width: 768px) {
+        iron-lazy-pages > * {
+          margin-top: 0;
+          padding: 0;
+        }
+      }
+    </style>
+
+    <cuba-app api-url="[[apiUrl]]"
+              on-cuba-token-expired="_handleTokenExpired">
+    </cuba-app>
+
+
+    <app-location route="{{route}}" use-hash-as-path></app-location>
+    <app-route route="{{route}}"
+               pattern="/:page"
+               data="{{routeData}}"
+               tail="{{routeTail}}">
+    </app-route>
+
+    <template is="dom-if" if="[[!authenticated]]">
+      <${project.namespace}-login on-cuba-login-success="_handleLogin">
+      </${project.namespace}-login>
+    </template>
+
+    <template is="dom-if" if="[[authenticated]]" restamp="true">
+      <app-drawer-layout id="drawerLayout" fullbleed>
+
+        <app-drawer id="drawer" slot="drawer">
+          <app-toolbar>
+            <div class="title">[[msg('$names.capitalize($project.name)')]]</div>
+          </app-toolbar>
+          <div class="content fit drawer-content">
+            <${project.namespace}-menu on-menu-navigate="_closeDrawer"></${project.namespace}-menu>
+          </div>
+        </app-drawer>
+
+        <app-header-layout main>
+          <app-header slot="header" fixed>
+            <app-toolbar class="main-toolbar">
+              <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+              <div main-title></div>
+              <${project.namespace}-user-menu></${project.namespace}-user-menu>
+            </app-toolbar>
+          </app-header>
+          <iron-lazy-pages
+            selected="[[_computeSelectedPage(routeData.page)]]"
+            attr-for-selected="data-route"
+            selected-attribute="active"
+            class="content fit">
+              <${project.namespace}-home data-route=""></${project.namespace}-home>
+          </iron-lazy-pages>
+        </app-header-layout>
+
+      </app-drawer-layout>
+    </template>
+
+  </template>
+  <script>
+    {
+      /**
+       * @extends {Polymer.Element}
+       * @appliesMixin CubaAppAwareBehavior
+       * @appliesMixin CubaLocalizeBehavior
+       */
+      class ${polymer.shellMenu} extends Polymer.mixinBehaviors([CubaAppAwareBehavior, CubaLocalizeBehavior], Polymer.Element) {
+        static get is() {
+          return '${project.namespace}-shell';
+        }
+
+        static get properties() {
+          return {
+            authenticated: Boolean,
+            apiUrl: String
+          };
+        }
+
+        static get observers() {
+          return [
+            '_init(app)'
+          ];
+        }
+
+        ready() {
+          super.ready();
+          this.addEventListener('navigate', this._onNavigate);
+        }
+
+        _init(app) {
+          if (this.app.restApiToken) {
+            this.app.loadEnums().then(() => {
+              this.authenticated = true;
+            });
+            this.app.loadEntitiesMessages();
+          } else {
+            this.authenticated = false;
+          }
+        }
+
+        _handleLogin() {
+          this.authenticated = true;
+          this.app.loadEnums();
+          this.app.loadEntitiesMessages();
+        }
+
+        _handleTokenExpired() {
+          this.authenticated = false;
+        }
+
+        _closeDrawer() {
+          this.async(() => {
+            const drawerLayout = this.shadowRoot.querySelector('#drawerLayout');
+            if (drawerLayout && drawerLayout.narrow) {
+              this.shadowRoot.querySelector('#drawer').close();
+            }
+          });
+        }
+
+        _computeSelectedPage(page) {
+          return page || '';
+        }
+
+        _onNavigate(event) {
+          this.set("route.path", event.detail);
+        }
+
+      }
+
+      customElements.define(${polymer.shellMenu}.is, ${polymer.shellMenu});
+    }
+  </script>
+</dom-module>

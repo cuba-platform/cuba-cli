@@ -1,0 +1,22 @@
+<dom-module id="shared-styles">
+  <template>
+    <style>
+      :host > * {
+        --primary-color: #2196F3;
+        --selected-color: #F3F3F3;
+      }
+      a {
+        color: var(--primary-color);
+      }
+      a:visited {
+        color: var(--primary-color);
+      }
+      .row.iron-selected, .row.iron-selected:hover {
+        background: var(--selected-color);
+      }
+      paper-card.iron-selected {
+        background: var(--selected-color);
+      }
+    </style>
+  </template>
+</dom-module>

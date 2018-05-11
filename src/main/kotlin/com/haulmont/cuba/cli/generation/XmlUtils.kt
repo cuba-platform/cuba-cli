@@ -49,7 +49,7 @@ private fun createDocumentBuilder(): DocumentBuilder {
     try {
         return dbf.newDocumentBuilder()
     } catch (e: ParserConfigurationException) {
-        throw XmlException("unable to confiure parser", e)
+        throw XmlException("unable to configure parser", e)
     }
 }
 

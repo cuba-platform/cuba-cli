@@ -45,7 +45,7 @@ class TemplateProcessor {
     private val variablePartPattern: Regex = Regex("[a-zA-Z][0-9a-zA-Z]*")
     private val velocityContext: VelocityContext
 
-    private val templatePath: Path
+    val templatePath: Path
 
     private constructor(templateBasePath: Path, bindings: Map<String, Any>, version: PlatformVersion) {
         templatePath = findMostSuitableVersion(templateBasePath, version)
@@ -193,6 +193,8 @@ class TemplateProcessor {
     fun copyWhole(to: Path = projectRoot) {
         copy("", to)
     }
+
+    fun Path.walk(depth: Int) = Files.walk(this, depth).filter { it != this}.collect(Collectors.toList())
 
     companion object {
         val projectRoot: Path = Paths.get("").toAbsolutePath()
