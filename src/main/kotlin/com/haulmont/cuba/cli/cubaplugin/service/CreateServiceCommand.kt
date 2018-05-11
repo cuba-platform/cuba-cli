@@ -20,10 +20,12 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
-import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.generation.updateXml
+import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import net.sf.practicalxml.DomUtil
+import net.sf.practicalxml.xpath.XPathWrapper
+import org.w3c.dom.Element
 
 @Parameters(commandDescription = "Create new CUBA service")
 class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
@@ -65,23 +67,24 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
         }
 
         val springXml = projectStructure.getModule(WEB_MODULE).springXml
-
         updateXml(springXml) {
-            "bean" {
-                "class" mustBe "com.haulmont.cuba.web.sys.remoting.WebRemoteProxyBeanCreator"
-                "property" {
-                    "name" mustBe "serverSelector"
-                    "ref" mustBe "cuba_ServerSelector"
-                }
-                "property" {
-                    "name" mustBe "remoteServices"
-                    "map" {
-                        add("entry") {
-                            "key" mustBe model.serviceName
-                            "value" mustBe "${model.packageName}.${model.interfaceName}"
+            val proxyCreator = xpath("//bean[@class='com.haulmont.cuba.web.sys.remoting.WebRemoteProxyBeanCreator']").firstOrNull() as Element?
+                    ?: appendChild("bean") {
+                        this["class"] = "com.haulmont.cuba.web.sys.remoting.WebRemoteProxyBeanCreator"
+                        appendChild("property") {
+                            this["name"] = "serverSelector"
+                            this["ref"] = "cuba_ServerSelector"
+                        }
+                        appendChild("property") {
+                            this["name"] = "remoteServices"
+                            appendChild("map")
                         }
                     }
-                }
+
+            val servicesMap = proxyCreator.xpath("//property[@name='remoteServices']/map").first() as Element
+            servicesMap.appendChild("entry") {
+                this["key"] = model.serviceName
+                this["value"] = "${model.packageName}.${model.interfaceName}"
             }
         }
     }

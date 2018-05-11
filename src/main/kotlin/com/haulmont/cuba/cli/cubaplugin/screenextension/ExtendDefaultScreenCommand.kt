@@ -21,12 +21,11 @@ import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
-import com.haulmont.cuba.cli.generation.PropertiesHelper
-import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.generation.updateXml
+import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import net.sf.practicalxml.DomUtil
 import org.kodein.di.generic.instance
 import java.io.File
 import java.nio.file.Path
@@ -67,13 +66,13 @@ class ExtendDefaultScreenCommand : GeneratorCommand<ScreenExtensionModel>() {
 
     private fun addToScreensXml(screensXml: Path) {
         updateXml(screensXml) {
-            add("screen") {
+            appendChild("screen") {
                 if (model.screen == "login") {
-                    "id" mustBe "loginWindow"
-                    "template" mustBe (namesUtils.packageToDirectory(model.packageName) + File.separatorChar + "ext-loginWindow.xml")
+                    this["id"] = "loginWindow"
+                    this["template"] = (namesUtils.packageToDirectory(model.packageName) + File.separatorChar + "ext-loginWindow.xml")
                 } else {
-                    "id" mustBe "mainWindow"
-                    "template" mustBe (namesUtils.packageToDirectory(model.packageName) + File.separatorChar + "ext-mainwindow.xml")
+                    this["id"] = "mainWindow"
+                    this["template"] = (namesUtils.packageToDirectory(model.packageName) + File.separatorChar + "ext-mainwindow.xml")
                 }
             }
         }

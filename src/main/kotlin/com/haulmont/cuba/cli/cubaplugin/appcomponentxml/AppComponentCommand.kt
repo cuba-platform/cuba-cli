@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin.appcomponent
+package com.haulmont.cuba.cli.cubaplugin.appcomponentxml
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.Messages

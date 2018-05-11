@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin.appcomponent
+package com.haulmont.cuba.cli.cubaplugin.installcomponent
 
-data class AppComponentModel(val changePrefix: Boolean, val modulePrefix: String) {
+data class ComponentModel(val artifactCoordinates: String) {
+
     companion object {
         const val MODEL_NAME = "component"
     }

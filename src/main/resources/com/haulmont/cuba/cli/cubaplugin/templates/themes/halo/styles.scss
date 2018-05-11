@@ -1,7 +1,7 @@
 @import "halo-defaults";
-@import "${project.rootDirectory}/halo-ext-defaults";
+@import "${project.rootPackage}/halo-ext-defaults";
 @import "app-components";
-@import "${project.rootDirectory}/halo-ext";
+@import "${project.rootPackage}/halo-ext";
 
 .halo {
   // include auto-generated app components SCSS

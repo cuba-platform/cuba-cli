@@ -47,7 +47,7 @@ module cuba.cli.main {
     opens com.haulmont.cuba.cli.cubaplugin;
     opens com.haulmont.cuba.cli.commands;
 
-    opens com.haulmont.cuba.cli.cubaplugin.appcomponent;
+    opens com.haulmont.cuba.cli.cubaplugin.appcomponentxml;
     opens com.haulmont.cuba.cli.cubaplugin.componentbean;
     opens com.haulmont.cuba.cli.cubaplugin.entity;
     opens com.haulmont.cuba.cli.cubaplugin.entitylistener;
@@ -58,6 +58,7 @@ module cuba.cli.main {
     opens com.haulmont.cuba.cli.cubaplugin.service;
     opens com.haulmont.cuba.cli.cubaplugin.statictemplate;
     opens com.haulmont.cuba.cli.cubaplugin.theme;
+    opens com.haulmont.cuba.cli.cubaplugin.installcomponent;
 
     exports com.haulmont.cuba.cli.model;
 }

@@ -1,7 +1,7 @@
 @import "havana-defaults";
-@import "${project.rootDirectory}/havana-ext-defaults";
+@import "${project.rootPackage}/havana-ext-defaults";
 @import "app-components";
-@import "${project.rootDirectory}/havana-ext";
+@import "${project.rootPackage}/havana-ext";
 
 .havana {
   // include auto-generated app components SCSS

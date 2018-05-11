@@ -21,12 +21,11 @@ import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
-import com.haulmont.cuba.cli.generation.PropertiesHelper
-import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.generation.updateXml
+import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import net.sf.practicalxml.DomUtil
 import org.kodein.di.generic.instance
 import java.io.File
 import java.nio.file.Path
@@ -77,10 +76,10 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
 
         if (model.addToMenu) {
             updateXml(webModule.rootPackageDirectory.resolve("web-menu.xml")) {
-                "menu" {
-                    add("item") {
-                        "screen" mustBe model.screenName
-                    }
+                val menuItem = findFirstChild("menu") ?: appendChild("menu")
+
+                menuItem.appendChild("item") {
+                    this["screen"] = model.screenName
                 }
             }
         }
@@ -88,9 +87,10 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
 
     private fun addToScreensXml(screensXml: Path, screenModel: ScreenModel) {
         updateXml(screensXml) {
-            add("screen") {
-                "id" mustBe screenModel.screenName
-                "template" mustBe (namesUtils.packageToDirectory(screenModel.packageName) + File.separatorChar + screenModel.screenName + ".xml")
+            appendChild("screen") {
+                this["id"] = screenModel.screenName
+                val template = namesUtils.packageToDirectory(screenModel.packageName) + File.separatorChar + screenModel.screenName + ".xml"
+                this["template"] = template
             }
         }
     }

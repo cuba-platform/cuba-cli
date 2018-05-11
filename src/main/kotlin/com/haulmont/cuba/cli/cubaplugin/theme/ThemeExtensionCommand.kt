@@ -89,7 +89,10 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         TemplateProcessor(
                 CubaPlugin.TEMPLATES_BASE_PATH + "themes/" + model.themeName,
                 bindings, projectModel.platformVersion) {
-            transformWhole(to = targetDirectory)
+            transform("styles.scss", to = targetDirectory)
+            transform("\${project.rootPackage}", to = targetDirectory)
+            copy("favicon.ico", to = targetDirectory)
+            copy("branding", to = targetDirectory)
         }
 
         val moduleRegistered = projectStructure.settingsGradle
