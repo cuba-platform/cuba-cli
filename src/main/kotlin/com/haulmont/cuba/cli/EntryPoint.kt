@@ -24,6 +24,8 @@ import com.haulmont.cuba.cli.event.InitPluginEvent
 import org.kodein.di.Kodein
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
+import java.lang.module.ModuleFinder
+import java.nio.file.Paths
 import java.util.*
 
 val kodein by lazy {
@@ -54,7 +56,24 @@ fun main(args: Array<String>) {
 }
 
 private fun loadPlugins(context: CliContext, commandsRegistry: CommandsRegistry) {
-    ServiceLoader.load(CliPlugin::class.java).forEach {
+    val pluginsDir = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "plugins")
+
+    val bootLayer = ModuleLayer.boot()
+
+    val pluginModulesFinder = ModuleFinder.of(pluginsDir)
+    val pluginModules = pluginModulesFinder.findAll().map {
+        it.descriptor().name()
+    }
+
+    val configuration = bootLayer.configuration().resolve(pluginModulesFinder, ModuleFinder.of(), pluginModules)
+
+    val pluginsLayer = ModuleLayer.defineModulesWithOneLoader(
+            configuration,
+            mutableListOf(bootLayer),
+            ClassLoader.getSystemClassLoader()
+    ).layer()
+
+    ServiceLoader.load(pluginsLayer, CliPlugin::class.java).forEach {
         context.registerListener(it)
     }
 

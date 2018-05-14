@@ -62,4 +62,7 @@ module cuba.cli.main {
     opens com.haulmont.cuba.cli.cubaplugin.polymer;
 
     exports com.haulmont.cuba.cli.model;
+    exports com.haulmont.cuba.cli;
+    exports com.haulmont.cuba.cli.event;
+    exports com.haulmont.cuba.cli.commands;
 }
