@@ -16,4 +16,52 @@
 
 package com.haulmont.cuba.cli
 
+/**
+ * Base interface for all plugins.
+ *
+ * To make CUBA CLI able to load your plugin your should add
+ * {@code provides com.haulmont.cuba.cli.CliPlugin with `your module class`}
+ * to module-info.java.
+ *
+ * Lifecycle is served by Guava EventBus. After plugin loading it will be registered in event bus.
+ *
+ * To subscribe an event simply add void method with single parameter of the event type and
+ * mark the method with an annotation {@link com.google.common.eventbus.Subscribe}.
+ *
+ * Available events are:
+ * <ul>
+ *     <li>{@link com.haulmont.cuba.cli.event.InitPluginEvent}</li>
+ *     <li>{@link com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent}</li>
+ *     <li>{@link com.haulmont.cuba.cli.event.AfterCommandExecutionEvent}</li>
+ *     <li>{@link com.haulmont.cuba.cli.event.ModelRegisteredEvent}</li>
+ *     <li>{@link com.haulmont.cuba.cli.event.DestroyPluginEvent}</li>
+ *     <li>{@link com.haulmont.cuba.cli.event.FailEvent}</li>
+ * </ul>
+ *
+ * After CLI is launched it fires {@code InitPluginEvent}, and all subscribed plugins may register their commands.
+ * Before CLI is closed it fires {@code DestroyEvent}.
+ *
+ * We use <a href="http://kodein.org/Kodein-DI/">Kodein-DI</a> as a dependency injection container.
+ *
+ * All default dependencies are available throw the {@link com.haulmont.cuba.cli.kodein} instance.
+ * But if you need to provide your own dependencies in your plugin, you can extend default kodein,
+ * and use it inside your plugin.
+ *
+ * {@code
+ *
+ * import com.haulmont.cuba.cli.kodein
+ * val localKodein = Kodein {
+ *  extend(kodein)
+ *
+ *  bind<Worker>() with singleton { Worker() }
+ * }
+ *
+ * ...
+ *
+ * private val worker: Worker by localKodein.instance()
+ *
+ * }
+ *
+ * {@see com.haulmont.cuba.cli.cubaplugin.CubaPlugin}
+ */
 interface CliPlugin

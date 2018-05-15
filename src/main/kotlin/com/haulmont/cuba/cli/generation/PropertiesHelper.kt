@@ -76,7 +76,7 @@ class PropertiesHelper private constructor(private var properties: String) {
             if (created)
                 printHelper.fileCreated(path)
             else
-                printHelper.fileAltered(path)
+                printHelper.fileModified(path)
         }
     }
 }

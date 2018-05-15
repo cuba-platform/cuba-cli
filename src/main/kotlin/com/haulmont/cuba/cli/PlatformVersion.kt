@@ -4,6 +4,22 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
 
+/**
+ * Represents CUBA Platform version.
+ *
+ * May be {@link com.haulmont.cuba.cli.SpecifiedVersion} or {@link com.haulmont.cuba.cli.LatestVersion}.
+ *
+ * It is used to choose most appropriate artifact template for current project CUBA Platform version.
+ *
+ * Choice rule is as follows:
+ *
+ * All first level child directories names in template root are tried to parse as version string.
+ * If at least one of the directories doesn't conforms version naming rule, all template is considered
+ * as not supporting versions, and the root template directory is been choosing.
+ *
+ * Parsed versions sorted in ascent order and directory with first equal or greater version is been choosing.
+ *
+ */
 sealed class PlatformVersion : Comparable<PlatformVersion> {
     override fun compareTo(other: PlatformVersion): Int {
         if (other == this) return 0
@@ -52,17 +68,19 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
     }
 
     companion object {
-        operator fun invoke(versionStr: String): PlatformVersion {
+        fun parse(versionStr: String): PlatformVersion {
             if (versionStr.isEmpty() || versionStr == "latest") {
                 return LatestVersion
             }
 
-            versionStr.replace(Regex("[^0-9.]"), "")
+            return versionStr.replace(Regex("[^0-9.]"), "")
                     .trim('.')
                     .split('.')
                     .map { it.toInt() }
-                    .let { return SpecificVersion(it) }
+                    .let { SpecificVersion(it) }
         }
+
+        operator fun invoke(versionStr: String): PlatformVersion = parse(versionStr)
     }
 }
 

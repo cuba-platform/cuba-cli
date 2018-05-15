@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin.polymer
+package com.haulmont.cuba.cli
 
-import com.haulmont.cuba.cli.ProjectModel
-
-class PolymerModel(projectModel: ProjectModel) {
-    val home: String = projectModel.namespace.capitalize() + "Home"
-    val localeSelect: String = projectModel.namespace.capitalize() + "LocaleSelect"
-    val userMenu: String = projectModel.namespace.capitalize() + "UserMenu"
-    val shellMenu: String = projectModel.namespace.capitalize() + "ShellMenu"
-    val login: String = projectModel.namespace.capitalize() + "Login"
-    val menu: String = projectModel.namespace.capitalize() + "Menu"
+enum class CliMode {
+    SHELL,
+    SINGLE_COMMAND
 }

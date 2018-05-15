@@ -23,8 +23,10 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.nio.file.Path
 
-class PrintHelper {
-    val writer: PrintWriter by kodein.instance()
+class PrintHelper : GenerationProgressPrinter {
+    private val writer: PrintWriter by kodein.instance()
+
+    private val messages: Messages = Messages(javaClass)
 
     private var lastStacktrace: String = ""
 
@@ -52,32 +54,18 @@ class PrintHelper {
         writer.println("@|red $lastStacktrace|@")
     }
 
-    fun fileCreated(path: Path) {
-        writer.println("\t@|green created|@\t$path")
+    override fun fileCreated(path: Path) {
+        writer.println("\t@|green created|@  $path")
     }
 
-    fun fileAltered(path: Path) {
-        writer.println("\t@|green altered|@\t$path")
+    override fun fileModified(path: Path) {
+        writer.println("\t@|green modified|@ $path")
     }
 
     private fun printFailMessage(e: Exception) {
         val message = e.message ?: e.javaClass.toString()
 
-        """
-
-            @|red FAILURE: Command execution failed with an exception.
-
-            * What went wrong:
-            > $message
-
-            * Try:
-            Run `stacktrace` command to get full stack trace or use --stacktrace option.
-
-            * Visit https://www.cuba-platform.com/discuss/ to get more help.
-            |@
-        """.trimIndent().let {
-            writer.println(it)
-        }
+        writer.println(messages["errorMessage", message])
     }
 
     private fun saveStacktrace(e: Exception) {

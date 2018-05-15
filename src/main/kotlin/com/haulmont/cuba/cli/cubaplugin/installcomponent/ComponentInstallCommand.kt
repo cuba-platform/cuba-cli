@@ -66,7 +66,7 @@ class ComponentInstallCommand : GeneratorCommand<ComponentModel>() {
                     "$firstAppComponent\n    appComponent(\"${model.artifactCoordinates}\")")
             writeText(withNewComponent)
         }
-        printHelper.fileAltered(projectStructure.buildGradle)
+        printHelper.fileModified(projectStructure.buildGradle)
     }
 
     private fun registerInWebXml() {
@@ -74,7 +74,7 @@ class ComponentInstallCommand : GeneratorCommand<ComponentModel>() {
                 .resolve(Paths.get("web", "WEB-INF", "web.xml"))
         updateXml(webXml) {
             val registeredComponentsElement = xpath("//context-param[param-name[text()='appComponents']]/param-value").first()
-            registeredComponentsElement.textContent = registeredComponentsElement.textContent + " " + model.artifactCoordinates
+            registeredComponentsElement.textContent = registeredComponentsElement.textContent + " " + model.artifactCoordinates.split(':')[0]
         }
     }
 }

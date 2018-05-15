@@ -17,6 +17,7 @@
 package com.haulmont.cuba.cli.di
 
 import com.haulmont.cuba.cli.ColoredWriter
+import com.haulmont.cuba.cli.GenerationProgressPrinter
 import com.haulmont.cuba.cli.PrintHelper
 import org.jline.reader.Completer
 import org.jline.reader.LineReader
@@ -24,6 +25,7 @@ import org.jline.reader.LineReaderBuilder
 import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
 import org.kodein.di.Kodein
+import org.kodein.di.direct
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.factory
 import org.kodein.di.generic.instance
@@ -45,4 +47,6 @@ val terminalModule = Kodein.Module {
     }
 
     bind<PrintHelper>() with singleton { PrintHelper() }
+
+    bind<GenerationProgressPrinter>() with singleton { kodein.direct.instance<PrintHelper>() }
 }

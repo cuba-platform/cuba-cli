@@ -40,7 +40,7 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
 
     override fun getModelName(): String = template!!.modelName
 
-    override fun execute() {
+    override fun run() {
         template = parseTemplate(templateName!!)
         super.execute()
     }

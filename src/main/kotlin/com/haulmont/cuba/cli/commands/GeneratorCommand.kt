@@ -16,32 +16,45 @@
 
 package com.haulmont.cuba.cli.commands
 
+import com.haulmont.cuba.cli.LatestVersion
 import com.haulmont.cuba.cli.ProjectStructure
-import com.haulmont.cuba.cli.model.ProjectModel
+import com.haulmont.cuba.cli.generation.TemplateProcessor
+import com.haulmont.cuba.cli.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.Prompts
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
+/**
+ * Base command for all commands, that generate any artifact.
+ *
+ * GeneratorCommand has special lifecycle.
+ *
+ * Prompting {@link GeneratorCommand#QuestionList.prompting()} is the first phase,
+ * at which user is asked with questions about ahead generated artifact.
+ *
+ * After that, the command creates artifact model based on the prompting phase user answers and register it in the cliContext
+ * by name retrieved from {@link #getModelName()}
+ *
+ * At generation phase, the command gets all available models as Map<String, Any> and generates artifact.
+ */
 abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
-    val projectStructure: ProjectStructure by lazy { ProjectStructure() }
+    protected val projectStructure: ProjectStructure by lazy { ProjectStructure() }
 
-    val projectModel: ProjectModel by lazy {
+    protected val projectModel: ProjectModel by lazy {
         if (context.hasModel(ProjectModel.MODEL_NAME)) {
             context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
         } else fail("No project module found")
     }
 
-    val model: Model by lazy {
+    protected val model: Model by lazy {
         if (context.hasModel(getModelName())) {
             context.getModel<Model>(getModelName())
         } else fail("Model has not yet been created")
     }
 
-    override fun execute() {
-        preExecute()
-
+    override fun run() {
         val questions = QuestionsList { prompting() }
         val answers = if (CommonParameters.nonInteractive.isEmpty()) {
             Prompts(questions).ask()
@@ -52,21 +65,28 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
         context.addModel(getModelName(), model)
 
         generate(context.getModels())
-
-        postExecute()
     }
-
-    open fun preExecute() {}
 
     abstract fun getModelName(): String
 
+    /**
+     * Specifies question that will be asked to user.
+     * User may provide answers in non-interactive mode by specifying answers as command options with syntax
+     * {@code `command -PquestionOne=answerOne -PquestionTwo=answerTwo ...`}.
+     */
     abstract fun QuestionsList.prompting()
 
     abstract fun createModel(answers: Answers): Model
 
     abstract fun generate(bindings: Map<String, Any>)
 
-    open fun postExecute() {}
+    fun processTemplate(templateName: String, bindings: Map<String, Any>, block: TemplateProcessor.() -> Unit) {
+        if (context.hasModel(ProjectModel.MODEL_NAME)) {
+            TemplateProcessor(templateName, bindings, projectModel.platformVersion, block)
+        } else {
+            TemplateProcessor(templateName, bindings, LatestVersion, block)
+        }
+    }
 }
 
 fun <R, T> nameFrom(answers: Answers): ReadOnlyProperty<R, T> = object : ReadOnlyProperty<R, T> {
@@ -75,7 +95,7 @@ fun <R, T> nameFrom(answers: Answers): ReadOnlyProperty<R, T> = object : ReadOnl
 }
 
 /**
- * Unsafe get value from map with automatic type casting
+ * Unsafe get value from map with automatic type casting.
  */
 @Suppress("UNCHECKED_CAST")
 infix fun <V> String.from(map: Map<String, *>): V {

@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.model
+package com.haulmont.cuba.cli
 
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
-import com.haulmont.cuba.cli.PlatformVersion
-import com.haulmont.cuba.cli.ProjectFileNotFoundException
-import com.haulmont.cuba.cli.ProjectStructure
 import com.haulmont.cuba.cli.generation.parse
+import com.haulmont.cuba.cli.generation.xpath
 import net.sf.practicalxml.DomUtil
 import java.io.File
 import java.nio.file.Path
+import java.nio.file.Paths
 
 @Suppress("MemberVisibilityCanBePrivate")
 class ProjectModel(projectStructure: ProjectStructure) {
     val name: String
+
+    val group: String
+
+    val version: String
 
     val rootPackage: String
 
@@ -35,17 +38,13 @@ class ProjectModel(projectStructure: ProjectStructure) {
 
     val namespace: String
 
-    val group: String
-
-    val platformVersionString: String
-
     val platformVersion: PlatformVersion
 
     val copyright: String?
 
-    val cubaVersion: String
-
     val modulePrefix: String
+
+    val appComponents: List<String>
 
     init {
         try {
@@ -55,11 +54,11 @@ class ProjectModel(projectStructure: ProjectStructure) {
 
             rootPackage = rootPackageDirectory.replace(File.separatorChar, '.')
 
-            name = File("").name
+            name = projectStructure.settingsGradle.toFile().readText().let {
+                Regex("rootProject.name *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]").findAll(it) groupNOrNull 1 ?: artifactParseError()
+            }
 
             namespace = parseNamespace(global.persistenceXml)
-
-//        build.gradle
 
             val buildGradle = File("build.gradle").readText()
 
@@ -67,21 +66,33 @@ class ProjectModel(projectStructure: ProjectStructure) {
             group = groupRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
 
             val versionRegex = Regex("version *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]")
-            platformVersionString = versionRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
-
-            platformVersion = PlatformVersion(platformVersionString)
+            version = versionRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
 
             val copyrightRegex = Regex("copyright *= *'''(.*)'''")
             copyright = copyrightRegex.findAll(buildGradle) groupNOrNull 1
 
-            val cubaVersionRegex = Regex("ext\\.cubaVersion *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]")
-            cubaVersion = cubaVersionRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
+            val platformVersionRegex = Regex("ext\\.cubaVersion *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]")
+            val platformVersionString = platformVersionRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
+
+            platformVersion = PlatformVersion(platformVersionString)
 
             val modulePrefixRegex = Regex("def *modulePrefix *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]")
             modulePrefix = modulePrefixRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
+
+            appComponents = parseAppComponents(projectStructure)
         } catch (e: ProjectFileNotFoundException) {
             throw ProjectScanException(e.message!!, e)
         }
+    }
+
+    private fun parseAppComponents(projectStructure: ProjectStructure): List<String> {
+        val webXml = projectStructure.getModule(ModuleStructure.WEB_MODULE).path
+                .resolve(Paths.get("web", "WEB-INF", "web.xml"))
+
+        return parse(webXml).documentElement
+                .xpath("//context-param[param-name[text()='appComponents']]/param-value")
+                .first()
+                .textContent.split(Regex(" +"))
     }
 
     companion object {

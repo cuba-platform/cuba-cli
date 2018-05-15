@@ -62,7 +62,7 @@ fun updateXml(path: Path, block: Element.() -> Unit) {
     document.documentElement.block()
     save(document, path)
 
-    printHelper.fileAltered(path)
+    printHelper.fileModified(path)
 }
 
 fun Element.getChildElements() = (0..this.childNodes.length)

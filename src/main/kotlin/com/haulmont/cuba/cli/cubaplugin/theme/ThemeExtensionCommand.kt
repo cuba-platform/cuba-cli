@@ -127,7 +127,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
 
         settingsGradle.toFile().writeText(lines.joinToString("\n"))
 
-        printHelper.fileAltered(settingsGradle)
+        printHelper.fileModified(settingsGradle)
 
 
         val buildGradle = projectStructure.buildGradle
@@ -141,6 +141,6 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
                 .let {
                     buildGradle.toFile().writeText(it)
                 }
-        printHelper.fileAltered(buildGradle)
+        printHelper.fileModified(buildGradle)
     }
 }

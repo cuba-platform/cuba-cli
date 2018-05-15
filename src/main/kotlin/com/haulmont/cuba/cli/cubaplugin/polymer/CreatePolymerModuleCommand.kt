@@ -82,7 +82,7 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
                         writeText(it)
                     }
         }
-        printHelper.fileAltered(projectStructure.buildGradle)
+        printHelper.fileModified(projectStructure.buildGradle)
 
 
         projectStructure.settingsGradle.toFile().apply {
@@ -96,6 +96,6 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
             } + snippets["moduleRegistration"]
             writeText(lines.joinToString("\n"))
         }
-        printHelper.fileAltered(projectStructure.settingsGradle)
+        printHelper.fileModified(projectStructure.settingsGradle)
     }
 }

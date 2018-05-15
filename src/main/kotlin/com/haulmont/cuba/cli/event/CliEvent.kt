@@ -16,20 +16,32 @@
 
 package com.haulmont.cuba.cli.event
 
-import com.haulmont.cuba.cli.CliContext
-import com.haulmont.cuba.cli.commands.CommandsRegistry
+import com.haulmont.cuba.cli.CliMode
 import com.haulmont.cuba.cli.commands.CliCommand
+import com.haulmont.cuba.cli.commands.CommandsRegistry
 
 interface CliEvent
 
-class InitPluginEvent(val commandsRegistry: CommandsRegistry) : CliEvent
+/**
+ * Fires after plugin loaded. Provides commandRegistry to make plugin able to register its commands.
+ */
+class InitPluginEvent(val commandsRegistry: CommandsRegistry, val cliMode: CliMode) : CliEvent
 
+/**
+ * Fires before every command execution.
+ */
 class BeforeCommandExecutionEvent(val command: CliCommand) : CliEvent
+
+/**
+ * Fires after every command execution.
+ */
+class AfterCommandExecutionEvent(val command: CliCommand) : CliEvent
 
 class ModelRegisteredEvent(val modelName: String) : CliEvent
 
-class AfterCommandExecutionEvent(val command: CliCommand) : CliEvent
-
+/**
+ * Fires before cli exit.
+ */
 class DestroyPluginEvent : CliEvent
 
 class FailEvent(val cause: Throwable? = null) : CliEvent

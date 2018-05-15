@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin.polymer
+package com.haulmont.cuba.cli
 
-import com.haulmont.cuba.cli.ProjectModel
+import java.nio.file.Path
 
-class PolymerModel(projectModel: ProjectModel) {
-    val home: String = projectModel.namespace.capitalize() + "Home"
-    val localeSelect: String = projectModel.namespace.capitalize() + "LocaleSelect"
-    val userMenu: String = projectModel.namespace.capitalize() + "UserMenu"
-    val shellMenu: String = projectModel.namespace.capitalize() + "ShellMenu"
-    val login: String = projectModel.namespace.capitalize() + "Login"
-    val menu: String = projectModel.namespace.capitalize() + "Menu"
+/**
+ * Prints default messages about files creation or modification.
+ */
+interface GenerationProgressPrinter {
+    fun fileCreated(path: Path)
+
+    fun fileModified(path: Path)
 }

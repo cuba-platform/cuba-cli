@@ -23,6 +23,20 @@ import org.kodein.di.generic.instance
 abstract class AbstractCommand : CliCommand {
     val context: CliContext by kodein.instance()
 
+    final override fun execute() {
+        preExecute()
+
+        run()
+
+        postExecute()
+    }
+
+    protected abstract fun run()
+
+    protected open fun preExecute() {}
+
+    protected open fun postExecute() {}
+
     @Throws(CommandExecutionException::class)
     protected fun checkProjectExistence() {
         if (!context.hasModel("project")) {
@@ -31,5 +45,6 @@ abstract class AbstractCommand : CliCommand {
     }
 
     @Throws(CommandExecutionException::class)
-    protected fun fail(cause: String, silent: Boolean = false): Nothing = throw CommandExecutionException(cause, silent = silent)
+    protected fun fail(cause: String, silent: Boolean = false): Nothing =
+            throw CommandExecutionException(cause, silent = silent)
 }

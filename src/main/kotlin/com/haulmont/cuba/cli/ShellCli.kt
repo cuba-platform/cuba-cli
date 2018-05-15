@@ -107,6 +107,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
             printHelper.handleCommandException(e)
         }
         context.postEvent(AfterCommandExecutionEvent(command))
+        context.clearModels()
     }
 
     private fun printWelcome() {

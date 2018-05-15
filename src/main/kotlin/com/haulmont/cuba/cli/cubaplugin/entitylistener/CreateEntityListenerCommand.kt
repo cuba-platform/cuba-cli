@@ -153,7 +153,7 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
             }
         }
 
-        printHelper.fileAltered(entityPath)
+        printHelper.fileModified(entityPath)
     }
 }
 

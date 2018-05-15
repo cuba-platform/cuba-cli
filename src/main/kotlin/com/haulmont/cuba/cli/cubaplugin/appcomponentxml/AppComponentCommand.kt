@@ -134,7 +134,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
                 .replace(modulePrefixRegex, "def modulePrefix = \"$prefix\"")
                 .let { scriptFile.writeText(it) }
 
-        printHelper.fileAltered(gradleScriptPath)
+        printHelper.fileModified(gradleScriptPath)
     }
 }
 

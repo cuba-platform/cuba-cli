@@ -17,9 +17,7 @@
 package com.haulmont.cuba.cli.cubaplugin
 
 import com.google.common.eventbus.Subscribe
-import com.haulmont.cuba.cli.CliContext
-import com.haulmont.cuba.cli.CliPlugin
-import com.haulmont.cuba.cli.ProjectStructure
+import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.cubaplugin.appcomponentxml.AppComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.componentbean.CreateComponentBeanCommand
 import com.haulmont.cuba.cli.cubaplugin.entity.CreateEntityCommand
@@ -33,12 +31,8 @@ import com.haulmont.cuba.cli.cubaplugin.screenextension.ExtendDefaultScreenComma
 import com.haulmont.cuba.cli.cubaplugin.service.CreateServiceCommand
 import com.haulmont.cuba.cli.cubaplugin.statictemplate.StaticTemplateCommand
 import com.haulmont.cuba.cli.cubaplugin.theme.ThemeExtensionCommand
-import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
-import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.model.ProjectModel
-import com.haulmont.cuba.cli.model.ProjectScanException
 import org.kodein.di.generic.instance
 
 class CubaPlugin : CliPlugin {
@@ -81,11 +75,6 @@ class CubaPlugin : CliPlugin {
         } catch (e: ProjectScanException) {
             println(e.message)
         }
-    }
-
-    @Subscribe
-    fun afterCommand(event: AfterCommandExecutionEvent) {
-        context.clearModels()
     }
 
     companion object {

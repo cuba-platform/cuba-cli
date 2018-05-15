@@ -24,38 +24,51 @@ import com.haulmont.cuba.cli.event.InitPluginEvent
 import org.kodein.di.Kodein
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
+import org.kodein.di.generic.singleton
 import java.lang.module.ModuleFinder
 import java.nio.file.Paths
 import java.util.*
 
-val kodein by lazy {
-    Kodein {
-        import(terminalModule)
+val kodein = Kodein {
+    import(terminalModule)
 
-        bind<CliContext>() with instance(context)
+    bind<CliContext>() with singleton { CliContext() }
 
-        bind<NamesUtils>() with instance(NamesUtils())
+    bind<NamesUtils>() with instance(NamesUtils())
 
-        bind<Resources>() with instance(Resources())
-    }
+    bind<Resources>() with instance(Resources())
 }
 
-private val context: CliContext = CliContext()
+private val context: CliContext by kodein.instance()
 
 fun main(args: Array<String>) {
 
+    val mode = getCliMode(args)
+
     val commandsRegistry = CommandsRegistry()
 
-    loadPlugins(context, commandsRegistry)
+    loadPlugins(context, commandsRegistry, mode)
 
-    val cli = createCli(args, commandsRegistry)
+    val cli: Cli = when (mode) {
+        CliMode.SHELL -> ShellCli(commandsRegistry)
+        CliMode.SINGLE_COMMAND -> SingleCommandCli(args, commandsRegistry)
+    }
 
     cli.run()
 
     context.postEvent(DestroyPluginEvent())
 }
 
-private fun loadPlugins(context: CliContext, commandsRegistry: CommandsRegistry) {
+fun getCliMode(args: Array<String>): CliMode =
+        if (args.isEmpty() || args.first() == "shell") {
+            CliMode.SHELL
+        } else {
+            CliMode.SINGLE_COMMAND
+        }
+
+
+private fun loadPlugins(context: CliContext, commandsRegistry: CommandsRegistry, mode: CliMode) {
+
     val pluginsDir = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "plugins")
 
     val bootLayer = ModuleLayer.boot()
@@ -77,15 +90,7 @@ private fun loadPlugins(context: CliContext, commandsRegistry: CommandsRegistry)
         context.registerListener(it)
     }
 
-    context.postEvent(InitPluginEvent(commandsRegistry))
-}
-
-private fun createCli(args: Array<String>, commandsRegistry: CommandsRegistry): Cli {
-    if (args.isEmpty() || args.first() == "shell") {
-        return ShellCli(commandsRegistry)
-    }
-
-    return SingleCommandCli(args, commandsRegistry)
+    context.postEvent(InitPluginEvent(commandsRegistry, mode))
 }
 
 const val CLI_VERSION = "CUBA CLI 1.0-SNAPSHOT"

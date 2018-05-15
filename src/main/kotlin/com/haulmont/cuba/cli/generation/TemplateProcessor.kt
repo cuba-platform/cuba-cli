@@ -31,6 +31,23 @@ import java.nio.file.Paths
 import java.util.stream.Collectors
 import kotlin.reflect.full.memberProperties
 
+/**
+ * TemplateProcessor is used to generate project files from templates.
+ *
+ * It uses Apache Velocity template engine.
+ * You can read about how to create Apache Velocity templates on its <a href="http://velocity.apache.org/engine/1.7/user-guide.html">documentation</a>.
+ *
+ * By default, it accepts Map<String, Any> as velocity context, where map key represents a model name from the CliContext
+ * and value represents the model itself. Models may be registered in the CliContext by {@link com.haulmont.cuba.cli.commands.GeneratorCommand}
+ * or by {@link com.haulmont.cuba.cli.CliPlugin}.
+ *
+ * Variables are allowed in template directories names. Records like {@code `${varpath}`} will be substituted with
+ * corresponding variable from Velocity Context. Records like {@code `$[packageNameVariable]`} is used to automatically
+ * convert package names to directories names.
+ *
+ * Packages of all your models should be opened in order to Apache Velocity may access them through reflexion.
+ *
+ */
 class TemplateProcessor {
     private val bindings: Map<String, Any>
 
