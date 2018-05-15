@@ -20,15 +20,17 @@ buildscript {
 group 'com.haulmont.cuba.cli'
 version '1.0-SNAPSHOT'
 
-def moduleName = "cuba.cli.main"
+def moduleName = "com.haulmont.cuba.cli"
 
 def velocityVersion = "1.7"
 def jCommanderVersion = "1.72"
 def jansiVersion = "1.17"
-def guavaVersion = "21.0"
+def guavaVersion = "25.0-cuba.0"
 def slf4jVersion = "1.7.25"
 def jlineVersion = "3.6.2"
 def kodeinVersion = "5.0.0"
+def coroutinesVersion = "0.22.5"
+def practicalxmlVersion = "1.1.0"
 
 apply plugin: 'kotlin'
 apply plugin: 'java-library'
@@ -40,7 +42,13 @@ targetCompatibility = 10
 
 repositories {
     mavenCentral()
-    jcenter()
+    maven {
+        credentials {
+            username System.getenv('HAULMONT_REPOSITORY_USER') ?: 'cuba'
+            password System.getenv('HAULMONT_REPOSITORY_PASSWORD') ?: 'cuba123'
+        }
+        url System.getenv('HAULMONT_REPOSITORY_URL') ?: 'https://repo.cuba-platform.com/content/groups/work'
+    }
 }
 
 dependencies {
@@ -51,17 +59,32 @@ dependencies {
     implementation "org.jline:jline:$jlineVersion"
     implementation "org.fusesource.jansi:jansi:$jansiVersion"
 
-    implementation "org.apache.velocity:velocity:$velocityVersion"
+    implementation("org.apache.velocity:velocity:$velocityVersion") {
+        // jlink: org.apache.commons.lang.enum: Invalid package name: 'enum' is not a Java identifier
+        exclude(group: 'commons-lang', module: 'commons-lang')
+    }
+    // Using custom JAR without 'enum' package
+    implementation("commons-lang:commons-lang:2.4-cuba.0")
 
-    implementation "com.google.guava:guava:$guavaVersion"
+    implementation("com.google.guava:guava:$guavaVersion") {
+        exclude(group: 'com.google.code.findbugs', module: 'jsr305')
+    }
 
     implementation "org.slf4j:slf4j-simple:$slf4jVersion"
 
     implementation "org.kodein.di:kodein-di-generic-jvm:$kodeinVersion"
 
-    implementation "net.sf.practicalxml:practicalxml:1.1.0"
+    implementation("net.sf.practicalxml:practicalxml:$practicalxmlVersion") {
+        exclude(group: "junit", module: "junit")
+    }
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+configurations {
+    compile {
+        exclude(group: 'org.jetbrains', module: 'annotations')
+    }
 }
 
 compileKotlin {
@@ -96,10 +119,6 @@ jar {
     from("src/main/kotlin") {
         include "**/*.properties"
     }
-
-    manifest {
-        attributes 'Main-Class': 'com.haulmont.cuba.cli.EntryPointKt'
-    }
 }
 
 mainClassName = "com.haulmont.cuba.cli.EntryPointKt"
@@ -116,5 +135,153 @@ startScripts {
                 "\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %CUBA_CLI_OPTS%  -classpath \"%CLASSPATH%\" $mainClassName %CMD_LINE_ARGS%",
                 "\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %CUBA_CLI_OPTS%  -p \"%CLASSPATH%\" -m $moduleName/$mainClassName %CMD_LINE_ARGS%")
 
+    }
+}
+
+// For some reason resulting JAR contains two versions of classes
+jar {
+    duplicatesStrategy = 'exclude'
+}
+
+def bundlesDir = file("bundles")
+def modulesDir = file("${project.buildDir}/modules")
+def bundleOutput = file("${buildDir}/bundle")
+def installedLibsDir = file("${buildDir}/install/cuba-cli/lib")
+def patchLibsDir = file("${buildDir}/jar-patch")
+
+def modulesConfig = [
+        'slf4j.api'                 : "slf4j-api-${slf4jVersion}.jar",
+        'slf4j.simple'              : "slf4j-simple-${slf4jVersion}.jar",
+        'commons.lang'              : "commons-lang-2.4-cuba.0.jar",
+        'commons.collections'       : "commons-collections-3.2.1.jar",
+        'velocity'                  : "velocity-${velocityVersion}.jar",
+        'checker.compat.qual'       : "checker-compat-qual-2.0.0.jar",
+        'error.prone.annotations'   : "error_prone_annotations-2.1.3.jar",
+        'j2objc.annotations'        : "j2objc-annotations-1.1.jar",
+        'animal.sniffer.annotations': "animal-sniffer-annotations-1.14.jar",
+        'com.google.common'         : "guava-${guavaVersion}.jar",
+        'practicalxml'              : "practicalxml-${practicalxmlVersion}.jar",
+        'jansi'                     : "jansi-${jansiVersion}.jar",
+        'jline'                     : "jline-${jlineVersion}.jar",
+        'jcommander'                : "jcommander-${jCommanderVersion}.jar",
+        'kotlin.stdlib'             : "kotlin-stdlib-${kotlin_version}.jar",
+        'kotlin.reflect'            : "kotlin-reflect-${kotlin_version}.jar",
+        'kotlin.stdlib.jdk7'        : "kotlin-stdlib-jdk7-${kotlin_version}.jar",
+        'kotlin.stdlib.jdk8'        : "kotlin-stdlib-jdk8-${kotlin_version}.jar",
+        'kodein.di.core.jvm'        : "kodein-di-core-jvm-${kodeinVersion}.jar",
+        'kodein.di.generic.jvm'     : "kodein-di-generic-jvm-${kodeinVersion}.jar"
+]
+
+task bundle(dependsOn: installDist,
+        group: 'distribution',
+        description: 'Builds bundle with custom JRE') {
+    outputs.dir bundleOutput
+    inputs.dir bundlesDir
+
+    inputs.files installDist.outputs.files
+
+    ext.appModulePaths = [patchLibsDir]
+    ext.appModulePaths.each { inputs.dir it }
+
+    doLast {
+        delete bundleOutput
+        delete modulesDir
+        delete patchLibsDir
+
+        modulesDir.mkdirs()
+
+        // Compile module definitions
+        copy {
+            from installedLibsDir
+            into patchLibsDir
+        }
+
+        def javaHome = System.getenv('JAVA_HOME')
+        if (javaHome == null
+                || javaHome.isEmpty()) {
+            throw new GradleException('JAVA_HOME is not set')
+        }
+
+        for (moduleItem in modulesConfig) {
+            def moduleItemName = moduleItem.key
+            def moduleItemJar = moduleItem.value
+
+            def jarFile = new File(patchLibsDir, moduleItemJar)
+
+            logger.info("Modularize ${moduleItemJar}")
+
+            logger.info("Compile module-info.class")
+
+            def compiledModuleDir = new File(modulesDir, moduleItemName)
+
+            exec {
+                workingDir modulesDir
+
+                commandLine(
+                        "${javaHome}/bin/javac",
+                        '-p', patchLibsDir.absolutePath,
+                        '-d', compiledModuleDir.absolutePath,
+                        '--patch-module', "${moduleItemName}=${jarFile.absolutePath}",
+                        new File(project.file("bundles"), "${moduleItemName}/module-info.java").absolutePath
+                )
+
+                standardOutput = System.out
+                errorOutput = System.out
+            }
+
+            logger.info("Update JAR")
+
+            exec {
+                workingDir patchLibsDir
+
+                commandLine(
+                        "${javaHome}/bin/jar",
+                        'uf',
+                        jarFile.absolutePath,
+                        '-C',
+                        compiledModuleDir.absolutePath,
+                        'module-info.class'
+                )
+
+                standardOutput = System.out
+                errorOutput = System.out
+            }
+        }
+
+        logger.info("Linking")
+
+        // Call jlink
+        exec {
+            workingDir buildDir
+
+            commandLine(
+                    "${javaHome}/bin/jlink",
+                    '--module-path', (["${javaHome}/jmods"] + ext.appModulePaths).grep().join(File.pathSeparator),
+                    '--add-modules', moduleName,
+                    '--output', bundleOutput,
+                    '--launcher', "launch=$moduleName/$mainClassName",
+                    '--compress=2',
+                    '--strip-debug',
+                    '--no-header-files',
+                    '--no-man-pages'
+            )
+
+            standardOutput = System.out
+            errorOutput = System.out
+
+            logger.info commandLine.join(' ')
+        }
+
+        logger.info("Fix permissions")
+
+        // fix non-writable files in 'legal/'
+        def osName = System.getProperty("os.name").toLowerCase();
+        if (osName.contains('nux')
+                || osName.contains('mac')) {
+            exec {
+                executable 'chmod'
+                args = ['u+w', '-R', bundleOutput]
+            }
+        }
     }
 }

@@ -17,8 +17,11 @@
 import com.haulmont.cuba.cli.CliPlugin;
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin;
 
-module cuba.cli.main {
+module com.haulmont.cuba.cli {
     requires java.base;
+
+    requires kotlin.stdlib.jdk8;
+    requires kotlin.stdlib.jdk7;
     requires kotlin.stdlib;
     requires kotlin.reflect;
 
@@ -28,7 +31,7 @@ module cuba.cli.main {
 
     requires velocity;
 
-    requires guava;
+    requires com.google.common;
 
     requires slf4j.simple;
     requires slf4j.api;
