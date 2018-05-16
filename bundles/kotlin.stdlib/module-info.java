@@ -1,4 +1,4 @@
-module kotlin.stdlib {
+open module kotlin.stdlib {
     exports kotlin;
     exports kotlin.annotation;
     exports kotlin.collections;

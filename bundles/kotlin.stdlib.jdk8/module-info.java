@@ -1,4 +1,4 @@
-module kotlin.stdlib.jdk8 {
+open module kotlin.stdlib.jdk8 {
     exports kotlin.collections.jdk8;
     exports kotlin.internal.jdk8;
     exports kotlin.streams.jdk8;
