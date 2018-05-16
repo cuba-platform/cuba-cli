@@ -113,7 +113,7 @@ configure(coreModule) {
 
     task updateDb(dependsOn: assembleDbScripts, description: 'Updates local database', type: CubaDbUpdate) {
 #if (${project.database.connectionParams} != "")
-    connectionParams = '${project.database.connectionParams}'
+        connectionParams = '${project.database.connectionParams}'
 #end
         dbms = '${project.database.driverDependencyName}'
         host = 'localhost'
@@ -121,6 +121,18 @@ configure(coreModule) {
         dbUser = 'sa'
         dbPassword = ''
     }
+
+#if (${project.database.driverDependencyName} == "hsql")
+    task startDb(description: 'Starts local HSQLDB server', type: CubaHsqlStart) {
+        dbPort = 9001
+        dbName = '${project.namespace}'
+    }
+
+    task stopDb(description: 'Stops local HSQLDB server', type: CubaHsqlStop)  {
+        dbPort = 9001
+        dbName = '${project.namespace}'
+    }
+#end
 }
 
 configure(webModule) {
