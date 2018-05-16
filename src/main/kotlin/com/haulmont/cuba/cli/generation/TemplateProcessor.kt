@@ -115,7 +115,7 @@ class TemplateProcessor {
     private fun copyInternal(inputPath: Path, outputFile: Path) {
         Files.copy(inputPath, outputFile)
 
-        writer.println("\t@|green created|@\t$outputFile")
+        printHelper.fileCreated(outputFile)
     }
 
     private fun ensureFolders(outputFile: Path) {
