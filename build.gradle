@@ -174,21 +174,16 @@ def modulesConfig = [
         'kodein.di.generic.jvm'     : "kodein-di-generic-jvm-${kodeinVersion}.jar"
 ]
 
-task bundle(dependsOn: installDist,
-        group: 'distribution',
-        description: 'Builds bundle with custom JRE') {
-    outputs.dir bundleOutput
+task jarPatch(dependsOn: installDist, group: 'build',
+        description: 'Patch dependencies with module information') {
     inputs.dir bundlesDir
+    outputs.dir patchLibsDir
 
     inputs.files installDist.outputs.files
 
-    ext.appModulePaths = [patchLibsDir]
-    ext.appModulePaths.each { inputs.dir it }
-
     doLast {
-        delete bundleOutput
-        delete modulesDir
         delete patchLibsDir
+        delete modulesDir
 
         modulesDir.mkdirs()
 
@@ -249,8 +244,27 @@ task bundle(dependsOn: installDist,
                 errorOutput = System.out
             }
         }
+    }
+}
+
+task bundle(dependsOn: jarPatch,
+        group: 'distribution',
+        description: 'Builds bundle with custom JRE') {
+    outputs.dir bundleOutput
+    inputs.dir patchLibsDir
+
+    ext.appModulePaths = [patchLibsDir]
+
+    doLast {
+        delete bundleOutput
 
         logger.info("Linking")
+
+        def javaHome = System.getenv('JAVA_HOME')
+        if (javaHome == null
+                || javaHome.isEmpty()) {
+            throw new GradleException('JAVA_HOME is not set')
+        }
 
         def targetOsJavaHome = project.hasProperty('targetOsJavaHome') ? project.property('targetOsJavaHome') : null
         if (targetOsJavaHome == null
