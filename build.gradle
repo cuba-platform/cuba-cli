@@ -143,7 +143,7 @@ jar {
     duplicatesStrategy = 'exclude'
 }
 
-def bundlePlatform = project.hasProperty('targetOsPlatform') != null ? '-' + project.property('targetOsPlatform') : '';
+def bundlePlatform = project.hasProperty('targetOsPlatform') ? '-' + project.property('targetOsPlatform') : '';
 
 def bundlesDir = file("bundles")
 def modulesDir = file("${project.buildDir}/modules")
