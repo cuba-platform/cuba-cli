@@ -143,9 +143,11 @@ jar {
     duplicatesStrategy = 'exclude'
 }
 
+def bundlePlatform = project.hasProperty('targetOsPlatform') != null ? '-' + project.property('targetOsPlatform') : '';
+
 def bundlesDir = file("bundles")
 def modulesDir = file("${project.buildDir}/modules")
-def bundleOutput = file("${buildDir}/bundle")
+def bundleOutput = file("${buildDir}/bundle" + bundlePlatform)
 def installedLibsDir = file("${buildDir}/install/cuba-cli/lib")
 def patchLibsDir = file("${buildDir}/jar-patch")
 
@@ -250,11 +252,13 @@ task bundle(dependsOn: installDist,
 
         logger.info("Linking")
 
-        def targetOsJavaHome = System.getenv('TARGET_OS_JAVA_HOME')
+        def targetOsJavaHome = project.hasProperty('targetOsJavaHome') ? project.property('targetOsJavaHome') : null
         if (targetOsJavaHome == null
             || targetOsJavaHome.isEmpty()) {
             targetOsJavaHome = javaHome
         }
+
+        logger.info('Target JAVA_HOME ' + targetOsJavaHome)
 
         // Call jlink
         exec {
