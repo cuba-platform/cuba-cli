@@ -250,13 +250,19 @@ task bundle(dependsOn: installDist,
 
         logger.info("Linking")
 
+        def targetOsJavaHome = System.getenv('TARGET_OS_JAVA_HOME')
+        if (targetOsJavaHome == null
+            || targetOsJavaHome.isEmpty()) {
+            targetOsJavaHome = javaHome
+        }
+
         // Call jlink
         exec {
             workingDir buildDir
 
             commandLine(
                     "${javaHome}/bin/jlink",
-                    '--module-path', (["${javaHome}/jmods"] + ext.appModulePaths).grep().join(File.pathSeparator),
+                    '--module-path', (["${targetOsJavaHome}/jmods"] + ext.appModulePaths).grep().join(File.pathSeparator),
                     '--add-modules', moduleName,
                     '--output', bundleOutput,
                     '--launcher', "launch=$moduleName/$mainClassName",
