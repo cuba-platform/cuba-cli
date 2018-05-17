@@ -212,6 +212,7 @@ class TemplateProcessor {
         }
 
         fun findTemplate(templateBasePath: String): Path =
-                resources.getResourcePath(templateBasePath) ?: CUSTOM_TEMPLATES_PATH.resolve(templateBasePath)
+                resources.getResourcePath(templateBasePath, javaClass)
+                        ?: CUSTOM_TEMPLATES_PATH.resolve(templateBasePath)
     }
 }

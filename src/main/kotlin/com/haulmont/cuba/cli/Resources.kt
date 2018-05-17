@@ -17,19 +17,25 @@
 package com.haulmont.cuba.cli
 
 import java.net.URI
-import java.nio.file.FileSystemNotFoundException
-import java.nio.file.FileSystems
-import java.nio.file.Path
-import java.nio.file.Paths
+import java.nio.file.*
 
 class Resources {
-    fun getResourcePath(name: String, clazz: Class<*> = javaClass): Path? {
-        val uri = clazz.getResource(name)?.toURI()
+
+    fun getResourcePath(resourceName: String, clazz: Class<Any>): Path? {
+        if (jrtFileSystem != null) {
+            val moduleName = clazz.module.name
+            val jrtPath = jrtFileSystem.getPath("/modules", moduleName, resourceName)
+            if (Files.exists(jrtPath)) {
+                return jrtPath
+            }
+        }
+
+        val uri = clazz.getResource(resourceName)?.toURI()
 
         return if (uri != null) {
             if (uri.scheme == "jar") {
                 val fileSystem = getFileSystem(uri)
-                fileSystem.getPath(name)
+                fileSystem.getPath(resourceName)
             } else {
                 Paths.get(uri)
             }
@@ -40,5 +46,13 @@ class Resources {
         FileSystems.getFileSystem(templateUri)
     } catch (e: FileSystemNotFoundException) {
         FileSystems.newFileSystem(templateUri, mutableMapOf<String, Any>())
+    }
+
+    companion object {
+        private val jrtFileSystem: FileSystem? = try {
+            FileSystems.getFileSystem(URI.create("jrt:/"))
+        } catch (e: Exception) {
+            null
+        }
     }
 }

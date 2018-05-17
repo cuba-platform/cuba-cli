@@ -34,7 +34,7 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
     private val messages = Messages(javaClass)
 
     private val snippets: Snippets by lazy {
-        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "polymer", "polymerGradleSnippets.xml", projectModel.platformVersion)
+        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "polymer", "polymerGradleSnippets.xml", javaClass, projectModel.platformVersion)
     }
 
     private val printHelper: PrintHelper by kodein.instance()

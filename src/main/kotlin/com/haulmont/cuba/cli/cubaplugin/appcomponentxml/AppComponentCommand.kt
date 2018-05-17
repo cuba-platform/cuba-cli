@@ -42,6 +42,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
     private val snippets: Snippets by lazy {
         Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "appcomponentxml/",
                 "appComponetGradleSnippets.xml",
+                javaClass,
                 projectModel.platformVersion)
     }
 

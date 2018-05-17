@@ -48,8 +48,8 @@ class Snippets(snippetPath: Path) {
     companion object {
         private val resources: Resources by kodein.instance()
 
-        operator fun invoke(basePath: String, snippetName: String, platformVersion: PlatformVersion = LatestVersion): Snippets {
-            val baseDirectory = resources.getResourcePath(basePath)!!
+        operator fun invoke(basePath: String, snippetName: String, clazz: Class<Any>, platformVersion: PlatformVersion = LatestVersion): Snippets {
+            val baseDirectory = resources.getResourcePath(basePath, clazz)!!
 
             return platformVersion.findMostSuitableVersionDirectory(baseDirectory)
                     .resolve(snippetName)

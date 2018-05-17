@@ -42,6 +42,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         Snippets(
                 CubaPlugin.SNIPPETS_BASE_PATH + "theme/",
                 "themeExtensionGradleSnippets.xml",
+                javaClass,
                 projectModel.platformVersion)
     }
 
