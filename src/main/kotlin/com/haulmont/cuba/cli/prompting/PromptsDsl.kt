@@ -217,6 +217,7 @@ interface HasDefault<T : Any> : DefaultValueConfigurable<T> {
     }
 }
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 private val acceptAll: (Any, Answers) -> Unit = { value, answers -> }
 
 interface ValidationConfigurable<T : Any> {

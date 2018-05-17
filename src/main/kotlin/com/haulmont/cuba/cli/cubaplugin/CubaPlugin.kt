@@ -35,6 +35,7 @@ import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
 import org.kodein.di.generic.instance
 
+@Suppress("UNUSED_PARAMETER")
 class CubaPlugin : CliPlugin {
     private val context: CliContext by kodein.instance()
 

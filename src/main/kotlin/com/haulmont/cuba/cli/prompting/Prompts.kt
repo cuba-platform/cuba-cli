@@ -32,6 +32,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
 
     fun ask(): Answers = questionsList.ask { it }
 
+    @Suppress("NON_TAIL_RECURSIVE_CALL")
     private tailrec fun CompositeQuestion.ask(rootAnswers: (Answers) -> Answers): Answers {
         try {
             return this.fold<Question, Answers>(mapOf()) { answers, question ->
@@ -101,6 +102,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
             }.also {
                 validation(it, answers)
             }.let {
+                @Suppress("UNCHECKED_CAST")
                 when {
                     this is OptionsQuestion -> this.options[it as Int] as T
                     else -> it

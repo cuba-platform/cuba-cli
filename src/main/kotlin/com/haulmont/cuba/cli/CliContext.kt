@@ -32,6 +32,7 @@ class CliContext {
         fail(throwable)
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun <T : Any> getModel(key: String): T = (models[key] as T)
 
     fun hasModel(key: String): Boolean = models.containsKey(key)
@@ -52,6 +53,7 @@ class CliContext {
 
     private fun fail(cause: Throwable) {
         postEvent(FailEvent(cause))
+        @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
         (cause as java.lang.Throwable).printStackTrace(writer)
         System.exit(1)
     }

@@ -23,6 +23,8 @@ class EnumerationModel(answers: Answers) {
     val className: String by nameFrom(answers)
     val packageName: String by nameFrom(answers)
     val idType: String by nameFrom(answers)
+
+    @Suppress("UNCHECKED_CAST")
     val values: List<EnumValue> = (answers["values"] as List<Answers>).map(::EnumValue)
 
     class EnumValue(mapRepresentation: Answers) {

@@ -34,7 +34,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.stream.Collectors
 
-@Parameters(commandDescription = "Generates halo or havana themes extension")
+@Parameters(commandDescription = "Generates halo theme extension")
 class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
     private val messages = Messages(javaClass)
 
