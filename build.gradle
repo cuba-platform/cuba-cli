@@ -295,6 +295,22 @@ task bundle(dependsOn: jarPatch,
             logger.info commandLine.join(' ')
         }
 
+        logger.info("Rename launcher")
+
+        def launchFile = new File(bundleOutput, "bin/launch")
+        if (launchFile.exists()) {
+            launchFile.renameTo(new File(bundleOutput, "bin/cuba-cli"))
+        }
+
+        def launchBatFile = new File(bundleOutput, "bin/launch.bat")
+        if (launchBatFile.exists()) {
+            launchBatFile.renameTo(new File(bundleOutput, "bin/cuba-cli.bat"))
+        }
+
+        if (launchBatFile.exists() && launchFile.exists()) {
+            launchFile.delete()
+        }
+
         logger.info("Fix permissions")
 
         // fix non-writable files in 'legal/'
