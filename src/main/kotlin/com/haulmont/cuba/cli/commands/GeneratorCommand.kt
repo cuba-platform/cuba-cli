@@ -31,13 +31,13 @@ import kotlin.reflect.KProperty
  *
  * GeneratorCommand has special lifecycle.
  *
- * Prompting {@link GeneratorCommand#QuestionList.prompting()} is the first phase,
+ * Prompting [GeneratorCommand.prompting] is the first phase,
  * at which user is asked with questions about ahead generated artifact.
  *
  * After that, the command creates artifact model based on the prompting phase user answers and register it in the cliContext
- * by name retrieved from {@link #getModelName()}
+ * by name retrieved from [getModelName].
  *
- * At generation phase, the command gets all available models as Map<String, Any> and generates artifact.
+ * At generation phase, the command gets all available models as ```Map<String, Any>``` and generates artifact.
  */
 abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
     protected val projectStructure: ProjectStructure by lazy { ProjectStructure() }
@@ -72,7 +72,9 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
     /**
      * Specifies question that will be asked to user.
      * User may provide answers in non-interactive mode by specifying answers as command options with syntax
-     * {@code `command -PquestionOne=answerOne -PquestionTwo=answerTwo ...`}.
+     * ```
+     * command -PquestionOne=answerOne -PquestionTwo=answerTwo ...
+     * ```
      */
     abstract fun QuestionsList.prompting()
 

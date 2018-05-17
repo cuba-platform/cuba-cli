@@ -22,7 +22,7 @@ package com.haulmont.cuba.cli.commands
  * Normally, exception message will be showed to user.
  * In shell mode exception will be stored and it stacktrace will be available to user by `stacktrace` command.
  *
- * If {@param silent} is true, user won't see any error message, and won't be able to access it by `stacktrace` command.
+ * If [silent] is true, user won't see any error message, and won't be able to access it by `stacktrace` command.
  * May be used to stop command execution by non-error causes, for example in case,
  * when user doesn't confirm some critical project change.
  */

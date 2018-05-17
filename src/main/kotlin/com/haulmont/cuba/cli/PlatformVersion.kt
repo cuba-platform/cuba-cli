@@ -7,7 +7,7 @@ import java.util.stream.Collectors
 /**
  * Represents CUBA Platform version.
  *
- * May be {@link com.haulmont.cuba.cli.SpecifiedVersion} or {@link com.haulmont.cuba.cli.LatestVersion}.
+ * May be [com.haulmont.cuba.cli.SpecifiedVersion] or [com.haulmont.cuba.cli.LatestVersion].
  *
  * It is used to choose most appropriate artifact template for current project CUBA Platform version.
  *

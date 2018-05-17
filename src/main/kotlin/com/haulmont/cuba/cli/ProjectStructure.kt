@@ -25,7 +25,7 @@ import java.nio.file.Paths
 
 /**
  * Provides access for important project files. All paths are calculated lazily.
- * If file represented by path absents, rises {@link ProjectFileNotFoundException} on access.
+ * If file represented by path absents, rises [ProjectFileNotFoundException] on access.
  */
 class ProjectStructure {
     //    fail first if no build.gradle found

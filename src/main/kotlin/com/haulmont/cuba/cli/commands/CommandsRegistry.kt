@@ -19,8 +19,7 @@ package com.haulmont.cuba.cli.commands
 /**
  * CommandRegistry stores hierarchy of commands provided by plugins.
  *
- * To register commands use {@link #command(builder: HasSubCommand.() -> Unit)} or
- * {@link #invoke(builder: HasSubCommand.() -> Unit)} methods.
+ * To register commands use [command] or [invoke] methods.
  *
  */
 class CommandsRegistry {
@@ -64,8 +63,8 @@ open class HasSubCommand internal constructor() {
     internal val commands: MutableMap<String, Command> = mutableMapOf()
 
     /**
-     * Registers {@param cliCommand} by {@param name} name.
-     * Optionally allows to register sub-commands with {@param setup} function.
+     * Registers [cliCommand] by [name] name.
+     * Optionally allows to register sub-commands with [setup] function.
      */
     fun command(name: String, cliCommand: CliCommand, setup: (HasSubCommand.() -> Unit)? = null) {
         check(name.isNotBlank()) {
