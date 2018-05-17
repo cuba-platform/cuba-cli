@@ -1,6 +1,4 @@
 module commons.collections {
-    // requires java.desktop;
-
     exports org.apache.commons.collections;
     exports org.apache.commons.collections.bag;
     exports org.apache.commons.collections.bidimap;

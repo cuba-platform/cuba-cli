@@ -1,5 +1,4 @@
 module practicalxml {
-    requires java.base;
     requires java.xml;
 
     exports net.sf.practicalxml;

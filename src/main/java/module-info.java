@@ -18,8 +18,6 @@ import com.haulmont.cuba.cli.CliPlugin;
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin;
 
 module com.haulmont.cuba.cli {
-    requires java.base;
-
     requires kotlin.stdlib.jdk8;
     requires kotlin.stdlib.jdk7;
     requires kotlin.stdlib;

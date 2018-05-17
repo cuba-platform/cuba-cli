@@ -1,5 +1,5 @@
 module commons.lang {
-    // requires java.sql;
+    requires java.sql;
 
     exports org.apache.commons.lang;
     exports org.apache.commons.lang.builder;
