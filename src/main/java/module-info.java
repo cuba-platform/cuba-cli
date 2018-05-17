@@ -68,4 +68,10 @@ module com.haulmont.cuba.cli {
     exports com.haulmont.cuba.cli.event;
     exports com.haulmont.cuba.cli.commands;
     exports com.haulmont.cuba.cli.generation;
+
+//    for debug
+    requires jdk.jdwp.agent;
+
+//    may be needed by plugins
+    requires java.sql;
 }

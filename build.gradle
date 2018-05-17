@@ -285,7 +285,6 @@ task bundle(dependsOn: jarPatch,
                     '--output', bundleOutput,
                     '--launcher', "launch=$moduleName/$mainClassName",
                     '--compress=2',
-                    '--strip-debug',
                     '--no-header-files',
                     '--no-man-pages'
             )
