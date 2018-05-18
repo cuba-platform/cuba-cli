@@ -51,7 +51,7 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
         if (entitiesList.isEmpty())
             fail("Project does not have any entities.")
 
-        question("name", "Listener name") {
+        question("className", "Listener name") {
             validate {
                 checkIsClass()
             }
@@ -64,7 +64,7 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
             }
         }
         question("beanName", "Bean name") {
-            default { projectModel.namespace + "_" + it["name"] }
+            default { projectModel.namespace + "_" + it["className"] }
         }
 
         questionList {

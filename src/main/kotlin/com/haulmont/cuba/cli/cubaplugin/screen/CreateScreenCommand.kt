@@ -25,7 +25,6 @@ import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import net.sf.practicalxml.DomUtil
 import org.kodein.di.generic.instance
 import java.io.File
 import java.nio.file.Path

@@ -26,7 +26,7 @@ import java.nio.file.Path
 class PrintHelper : GenerationProgressPrinter {
     private val writer: PrintWriter by kodein.instance()
 
-    private val messages: Messages = Messages(javaClass)
+    private val messages by localMessages()
 
     private var lastStacktrace: String = ""
 

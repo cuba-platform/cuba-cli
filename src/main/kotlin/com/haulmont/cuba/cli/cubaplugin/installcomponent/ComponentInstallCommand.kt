@@ -17,7 +17,6 @@
 package com.haulmont.cuba.cli.cubaplugin.installcomponent
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.Messages
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
@@ -25,6 +24,7 @@ import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.generation.xpath
 import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
@@ -33,7 +33,7 @@ import java.nio.file.Paths
 @Parameters(commandDescription = "Installs CUBA platform component")
 class ComponentInstallCommand : GeneratorCommand<ComponentModel>() {
 
-    private val messages = Messages(javaClass)
+    private val messages by localMessages()
 
     private val printHelper: PrintHelper by kodein.instance()
 

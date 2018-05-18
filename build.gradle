@@ -115,12 +115,6 @@ artifacts {
     archives sourceJar
 }
 
-jar {
-    from("src/main/kotlin") {
-        include "**/*.properties"
-    }
-}
-
 mainClassName = "com.haulmont.cuba.cli.EntryPointKt"
 
 startScripts {

@@ -16,14 +16,13 @@
 
 package com.haulmont.cuba.cli.cubaplugin.service
 
-import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.prompting.Answers
 
 class ServiceModel(answers: Answers) {
-    val interfaceName: String by nameFrom(answers)
-    val beanName: String by nameFrom(answers)
-    val packageName: String by nameFrom(answers)
-    val serviceName: String by nameFrom(answers)
+    val interfaceName: String by answers
+    val beanName: String by answers
+    val packageName: String by answers
+    val serviceName: String by answers
 
     companion object {
         const val MODEL_NAME = "service"

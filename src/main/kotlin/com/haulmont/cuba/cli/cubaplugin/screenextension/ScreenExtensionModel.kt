@@ -16,12 +16,11 @@
 
 package com.haulmont.cuba.cli.cubaplugin.screenextension
 
-import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.prompting.Answers
 
 class ScreenExtensionModel(answers: Answers) {
-    val screen: String by nameFrom(answers)
-    val packageName: String by nameFrom(answers)
+    val screen: String by answers
+    val packageName: String by answers
 
     companion object {
         const val MODEL_NAME = "screen"

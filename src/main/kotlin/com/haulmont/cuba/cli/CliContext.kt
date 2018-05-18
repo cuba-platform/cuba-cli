@@ -23,10 +23,10 @@ import org.kodein.di.generic.instance
 /**
  * [CliContext] stores models, that are used for artifact generation.
  *
- * In common case, models are added to context by plugins, during [com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent],
+ * In common case, models are added to the context by plugins, during [com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent],
  * and by commands, during execution, before generation is started.
  *
- * After every command context is cleared.
+ * After every command execution the context is cleared.
  */
 class CliContext {
     private val bus: EventBus by kodein.instance()
@@ -35,7 +35,7 @@ class CliContext {
 
     /**
      * Retrieves model by [key].
-     * Method can produce exception, if model doesn't exist,
+     * The method produces exception, if the model doesn't exist,
      * so if there is no assurance of model existence, firstly check it with [hasModel].
      */
     @Suppress("UNCHECKED_CAST")
@@ -44,7 +44,7 @@ class CliContext {
     fun hasModel(key: String): Boolean = models.containsKey(key)
 
     /**
-     * Saves model in context and fires [ModelRegisteredEvent].
+     * Saves model in the context and fires [ModelRegisteredEvent].
      */
     fun <T : Any> addModel(key: String, model: T) {
         models[key] = model

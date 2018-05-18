@@ -17,12 +17,12 @@
 package com.haulmont.cuba.cli.cubaplugin.project
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.Messages
 import com.haulmont.cuba.cli.PlatformVersion
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
@@ -34,7 +34,7 @@ import java.nio.file.attribute.PosixFilePermission
 
 @Parameters(commandDescription = "Creates new project")
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
-    private val messages = Messages(javaClass)
+    private val messages by localMessages()
 
     private val platformVersions = messages["platformVersions"].split(',')
     private val databases = messages["databases"].split(',')

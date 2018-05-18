@@ -17,20 +17,25 @@
 package com.haulmont.cuba.cli
 
 import java.util.*
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
+/**
+ * Class to read .properties files.
+ */
 class Messages(clazz: Class<*>, messagesFileName: String = "messages.properties") {
 
-    private val properties: Properties = Properties()
-
-    init {
+    private val properties: Properties by lazy {
         messagesFileName.run {
             if (!endsWith(".properties")) {
                 this + ".properties"
             } else this
         }.let {
-            clazz.getResource(it).openStream()
-        }.let {
-            properties.load(it)
+            clazz.getResource(it).openStream().reader()
+        }.let { reader ->
+            Properties().apply {
+                load(reader)
+            }
         }
     }
 
@@ -41,4 +46,8 @@ class Messages(clazz: Class<*>, messagesFileName: String = "messages.properties"
     operator fun get(name: String): String = getMessage(name)
 
     operator fun get(name: String, vararg args: Any): String = getMessage(name, *args)
+}
+
+fun localMessages(): ReadOnlyProperty<Any, Messages> = object : ReadOnlyProperty<Any, Messages> {
+    override fun getValue(thisRef: Any, property: KProperty<*>) = Messages(thisRef.javaClass)
 }

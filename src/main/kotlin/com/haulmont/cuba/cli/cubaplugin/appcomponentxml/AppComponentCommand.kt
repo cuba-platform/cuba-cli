@@ -17,7 +17,6 @@
 package com.haulmont.cuba.cli.cubaplugin.appcomponentxml
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.Messages
 import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.PrintHelper
@@ -27,6 +26,7 @@ import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
@@ -35,7 +35,7 @@ import java.nio.file.Paths
 
 @Parameters(commandDescription = "Generates app-component.xml")
 class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
-    private val messages = Messages(javaClass)
+    private val messages by localMessages()
 
     private val printHelper: PrintHelper by kodein.instance()
 

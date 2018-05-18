@@ -42,6 +42,8 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
 
     private val bus: EventBus by kodein.instance()
 
+    private val messages by localMessages()
+
     private val completer: Completer
 
     private val lineParser: Parser by lazy { reader.parser }
@@ -116,16 +118,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
     }
 
     private fun printWelcome() {
-        writer.println("""
-              |
-       |@|blue  ██████╗██╗   ██╗██████╗  █████╗      ██████╗██╗     ██╗
-              |██╔════╝██║   ██║██╔══██╗██╔══██╗    ██╔════╝██║     ██║
-              |██║     ██║   ██║██████╔╝███████║    ██║     ██║     ██║
-              |██║     ██║   ██║██╔══██╗██╔══██║    ██║     ██║     ██║
-              |╚██████╗╚██████╔╝██████╔╝██║  ██║    ╚██████╗███████╗██║
-              | ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝     ╚═════╝╚══════╝╚═╝
-              |
-              ||@""".trimMargin())
+        writer.println(messages["welcomeMessage"].trimMargin())
     }
 
     companion object {

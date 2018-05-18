@@ -17,14 +17,13 @@
 package com.haulmont.cuba.cli.cubaplugin.screen
 
 import com.google.common.base.CaseFormat
-import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.prompting.Answers
 
 class ScreenModel(answers: Answers) {
-    val screenName: String by nameFrom(answers)
+    val screenName: String by answers
     val controllerName: String = CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, screenName)
-    val packageName: String by nameFrom(answers)
-    val addToMenu: Boolean by nameFrom(answers)
+    val packageName: String by answers
+    val addToMenu: Boolean by answers
 
     companion object {
         const val MODEL_NAME = "screen"

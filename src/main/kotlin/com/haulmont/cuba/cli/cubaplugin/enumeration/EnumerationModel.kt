@@ -16,20 +16,19 @@
 
 package com.haulmont.cuba.cli.cubaplugin.enumeration
 
-import com.haulmont.cuba.cli.commands.nameFrom
 import com.haulmont.cuba.cli.prompting.Answers
 
 class EnumerationModel(answers: Answers) {
-    val className: String by nameFrom(answers)
-    val packageName: String by nameFrom(answers)
-    val idType: String by nameFrom(answers)
+    val className: String by answers
+    val packageName: String by answers
+    val idType: String by answers
 
     @Suppress("UNCHECKED_CAST")
     val values: List<EnumValue> = (answers["values"] as List<Answers>).map(::EnumValue)
 
     class EnumValue(mapRepresentation: Answers) {
-        val name: String by nameFrom(mapRepresentation)
-        val id: String by nameFrom(mapRepresentation)
+        val name: String by mapRepresentation
+        val id: String by mapRepresentation
     }
 
     companion object {

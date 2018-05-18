@@ -17,7 +17,6 @@
 package com.haulmont.cuba.cli.cubaplugin.theme
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.Messages
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
@@ -26,6 +25,7 @@ import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
@@ -36,7 +36,7 @@ import java.util.stream.Collectors
 
 @Parameters(commandDescription = "Generates halo theme extension")
 class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
-    private val messages = Messages(javaClass)
+    private val messages by localMessages()
 
     private val snippets: Snippets by lazy {
         Snippets(
