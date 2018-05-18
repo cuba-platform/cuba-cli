@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli
 
+import com.beust.jcommander.ParameterException
 import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.commands.CommonParameters
 import org.kodein.di.generic.instance
@@ -30,8 +31,8 @@ class PrintHelper : GenerationProgressPrinter {
 
     private var lastStacktrace: String = ""
 
-    fun unrecognizedParameters() {
-        writer.println("@|red Unrecognized parameters|@")
+    fun unrecognizedParameters(e: ParameterException) {
+        writer.println("@|red Unrecognized parameters\n${e.message}|@")
     }
 
     fun unrecognizedCommand() {

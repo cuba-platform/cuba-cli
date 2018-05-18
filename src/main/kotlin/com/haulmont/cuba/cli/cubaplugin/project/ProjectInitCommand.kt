@@ -36,8 +36,13 @@ import java.nio.file.attribute.PosixFilePermission
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     private val messages by localMessages()
 
-    private val platformVersions = messages["platformVersions"].split(',')
-    private val databases = messages["databases"].split(',')
+    private val platformVersions by lazy {
+        messages["platformVersions"].split(',')
+    }
+
+    private val databases by lazy {
+        messages["databases"].split(',')
+    }
 
     private val writer: PrintWriter by kodein.instance()
 

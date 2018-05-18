@@ -43,7 +43,7 @@ class SingleCommandCli(private val args: Array<String>, commandsRegistry: Comman
             printHelper.unrecognizedCommand()
             return
         } catch (e: ParameterException) {
-            printHelper.unrecognizedParameters()
+            printHelper.unrecognizedParameters(e)
             return
         }
 

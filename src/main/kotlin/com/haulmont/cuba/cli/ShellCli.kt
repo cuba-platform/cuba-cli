@@ -83,7 +83,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
                 printHelper.unrecognizedCommand()
                 continue
             } catch (e: ParameterException) {
-                printHelper.unrecognizedParameters()
+                printHelper.unrecognizedParameters(e)
                 continue
             } catch (e: EndOfFileException) {
                 return

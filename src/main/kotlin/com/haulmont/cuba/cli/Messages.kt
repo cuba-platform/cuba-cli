@@ -31,7 +31,8 @@ class Messages(clazz: Class<*>, messagesFileName: String = "messages.properties"
                 this + ".properties"
             } else this
         }.let {
-            clazz.getResource(it).openStream().reader()
+            clazz.getResource(it)?.openStream()?.reader()
+                    ?: throw RuntimeException("Unable to find messages file $messagesFileName for $clazz")
         }.let { reader ->
             Properties().apply {
                 load(reader)

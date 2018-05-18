@@ -34,12 +34,18 @@ import com.haulmont.cuba.cli.cubaplugin.theme.ThemeExtensionCommand
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
 import org.kodein.di.generic.instance
+import java.io.PrintWriter
+import java.io.StringWriter
 
 @Suppress("UNUSED_PARAMETER")
 class CubaPlugin : CliPlugin {
     private val context: CliContext by kodein.instance()
 
+    private val writer: PrintWriter by kodein.instance()
+
     private val namesUtils: NamesUtils by kodein.instance()
+
+    private val messages by localMessages()
 
     @Subscribe
     fun onInit(event: InitPluginEvent) {
@@ -74,7 +80,14 @@ class CubaPlugin : CliPlugin {
         try {
             context.addModel(ProjectModel.MODEL_NAME, ProjectModel(projectStructure))
         } catch (e: ProjectScanException) {
-            println(e.message)
+            writer.println("@|red ${messages["projectParsingError"]}|@")
+
+            StringWriter().also {
+                @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
+                (e as java.lang.Throwable).printStackTrace(PrintWriter(it))
+            }.toString().let {
+                writer.println("@|red $it|@")
+            }
         }
     }
 
