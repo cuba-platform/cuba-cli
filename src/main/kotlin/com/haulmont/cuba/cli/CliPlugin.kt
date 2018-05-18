@@ -36,7 +36,7 @@ package com.haulmont.cuba.cli
  * * [com.haulmont.cuba.cli.event.AfterCommandExecutionEvent]
  * * [com.haulmont.cuba.cli.event.ModelRegisteredEvent]
  * * [com.haulmont.cuba.cli.event.DestroyPluginEvent]
- * * [com.haulmont.cuba.cli.event.FailEvent]
+ * * [com.haulmont.cuba.cli.event.ErrorEvent]
  *
  * After CLI is launched it fires [InitPluginEvent], and all subscribed plugins may register their commands.
  * Before CLI is closed it fires [DestroyEvent].

@@ -17,44 +17,44 @@
 package com.haulmont.cuba.cli
 
 import com.google.common.eventbus.EventBus
-import com.haulmont.cuba.cli.event.CliEvent
-import com.haulmont.cuba.cli.event.FailEvent
 import com.haulmont.cuba.cli.event.ModelRegisteredEvent
 import org.kodein.di.generic.instance
-import java.io.PrintWriter
 
+/**
+ * [CliContext] stores models, that are used for artifact generation.
+ *
+ * In common case, models are added to context by plugins, during [com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent],
+ * and by commands, during execution, before generation is started.
+ *
+ * After every command context is cleared.
+ */
 class CliContext {
-    private val writer: PrintWriter by kodein.instance()
+    private val bus: EventBus by kodein.instance()
 
     private val models: MutableMap<String, Any> = mutableMapOf()
 
-    private val eventBus: EventBus = EventBus { throwable: Throwable, _ ->
-        fail(throwable)
-    }
-
+    /**
+     * Retrieves model by [key].
+     * Method can produce exception, if model doesn't exist,
+     * so if there is no assurance of model existence, firstly check it with [hasModel].
+     */
     @Suppress("UNCHECKED_CAST")
-    fun <T : Any> getModel(key: String): T = (models[key] as T)
+    fun <T : Any> getModel(key: String): T = (models[key]!! as T)
 
     fun hasModel(key: String): Boolean = models.containsKey(key)
 
+    /**
+     * Saves model in context and fires [ModelRegisteredEvent].
+     */
     fun <T : Any> addModel(key: String, model: T) {
         models[key] = model
-        postEvent(ModelRegisteredEvent(key))
+        bus.post(ModelRegisteredEvent(key))
     }
 
     internal fun clearModels() = models.clear()
 
-    fun registerListener(listener: Any) = eventBus.register(listener)
-    fun unregisterListener(listener: Any) = eventBus.unregister(listener)
-
+    /**
+     * Returns all containing models.
+     */
     fun getModels(): Map<String, Any> = models.toMap()
-
-    fun postEvent(event: CliEvent) = eventBus.post(event)
-
-    private fun fail(cause: Throwable) {
-        postEvent(FailEvent(cause))
-        @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
-        (cause as java.lang.Throwable).printStackTrace(writer)
-        System.exit(1)
-    }
 }

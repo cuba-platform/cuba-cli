@@ -16,6 +16,13 @@
 
 package com.haulmont.cuba.cli
 
+/**
+ * Cli may be started in two modes.
+ *
+ * [SHELL] is an interactive mode, when cli takes user command, evaluate it and waiting for next command.
+ *
+ * [SINGLE_COMMAND] is mode, that runs only one command, that user specified in command line parameters.
+ */
 enum class CliMode {
     SHELL,
     SINGLE_COMMAND

@@ -91,8 +91,7 @@ class ProjectModel(projectStructure: ProjectStructure) {
 
         return parse(webXml).documentElement
                 .xpath("//context-param[param-name[text()='appComponents']]/param-value")
-                .first()
-                .textContent.split(Regex(" +"))
+                .firstOrNull()?.textContent?.split(Regex(" +")) ?: emptyList()
     }
 
     companion object {

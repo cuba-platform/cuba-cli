@@ -18,9 +18,11 @@ package com.haulmont.cuba.cli
 
 import com.beust.jcommander.MissingCommandException
 import com.beust.jcommander.ParameterException
+import com.google.common.eventbus.EventBus
 import com.haulmont.cuba.cli.commands.*
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
+import com.haulmont.cuba.cli.event.ErrorEvent
 import org.jline.builtins.Completers
 import org.jline.builtins.Completers.TreeCompleter.Node
 import org.jline.builtins.Completers.TreeCompleter.node
@@ -32,11 +34,13 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
 
     private val commandParser: CommandParser
 
-    private val context: CliContext by kodein.instance()
+    private val cliContext: CliContext by kodein.instance()
 
     private val writer: PrintWriter by kodein.instance()
 
     private val printHelper: PrintHelper by kodein.instance()
+
+    private val bus: EventBus by kodein.instance()
 
     private val completer: Completer
 
@@ -98,16 +102,17 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
     }
 
     private fun evalCommand(command: CliCommand) {
-        context.postEvent(BeforeCommandExecutionEvent(command))
+        bus.post(BeforeCommandExecutionEvent(command))
         try {
             command.execute()
         } catch (e: EndOfFileException) {
         } catch (e: UserInterruptException) {
         } catch (e: Exception) {
             printHelper.handleCommandException(e)
+            bus.post(ErrorEvent(e))
         }
-        context.postEvent(AfterCommandExecutionEvent(command))
-        context.clearModels()
+        bus.post(AfterCommandExecutionEvent(command))
+        cliContext.clearModels()
     }
 
     private fun printWelcome() {

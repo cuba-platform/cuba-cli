@@ -21,6 +21,9 @@ import com.haulmont.cuba.cli.kodein
 import org.kodein.di.generic.instance
 
 abstract class AbstractCommand : CliCommand {
+    /**
+     * Is used to generation model saving and retrieving.
+     */
     val context: CliContext by kodein.instance()
 
     final override fun execute() {
@@ -31,12 +34,26 @@ abstract class AbstractCommand : CliCommand {
         postExecute()
     }
 
+    /**
+     * Main command logic.
+     */
     protected abstract fun run()
 
+    /**
+     * Invokes before [run].
+     */
     protected open fun preExecute() {}
 
+    /**
+     * Invokes after [run].
+     */
     protected open fun postExecute() {}
 
+    /**
+     * It is implied, that method invokes in [preExecute] to fail fast, if command is started outside of CUBA Platform project.
+     *
+     * @throws CommandExecutionException - if command is started outside of CUBA Platform project.
+     */
     @Throws(CommandExecutionException::class)
     protected fun checkProjectExistence() {
         if (!context.hasModel("project")) {
@@ -44,6 +61,10 @@ abstract class AbstractCommand : CliCommand {
         }
     }
 
+    /**
+     * Throws CommandExecutionException with [cause] message.
+     * If [silent] user will not see the error.
+     */
     @Throws(CommandExecutionException::class)
     protected fun fail(cause: String, silent: Boolean = false): Nothing =
             throw CommandExecutionException(cause, silent = silent)

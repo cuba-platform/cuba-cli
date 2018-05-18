@@ -21,14 +21,16 @@ package com.haulmont.cuba.cli.commands
  *
  * To create your own command do as following:
  *
- * Firstly, create new command class and implement this interface.
+ * First of all, create new command class and implement this interface.
  * Most probably, you need extend [com.haulmont.cuba.cli.commands.GeneratorCommand].
- * Secondly, register your command with your plugin class, by subscribing to [com.haulmont.cuba.cli.event.InitPluginEvent]
- * Thirdly, open commands package in your module-info.java.
+ * Than, register your command with your plugin class, by subscribing to [com.haulmont.cuba.cli.event.InitPluginEvent]
+ * After that, open commands package in your module-info.java.
  *
  * You can add parameters to command that will be input after command name.
- * To add them simply create corresponding field and mark them with [Parameter] annotation.
- * You can get more information about command parameters in [JCommander documentation](http://jcommander.org/)
+ * To add them simply create corresponding field and mark them with [com.beust.jcommander.Parameter] annotation.
+ * You can get more information about command parameters in [JCommander documentation](http://jcommander.org/).
+ * To add command description, mark it with [com.beust.jcommander.Parameters] annotation and
+ * specify [com.beust.jcommander.Parameters.commandDescription] value.
  */
 interface CliCommand {
 

@@ -18,17 +18,19 @@ package com.haulmont.cuba.cli
 
 import com.beust.jcommander.MissingCommandException
 import com.beust.jcommander.ParameterException
+import com.google.common.eventbus.EventBus
 import com.haulmont.cuba.cli.commands.CliCommand
 import com.haulmont.cuba.cli.commands.CommandParser
 import com.haulmont.cuba.cli.commands.CommandsRegistry
 import com.haulmont.cuba.cli.commands.CommonParameters
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
+import com.haulmont.cuba.cli.event.ErrorEvent
 import org.kodein.di.generic.instance
 
 class SingleCommandCli(private val args: Array<String>, commandsRegistry: CommandsRegistry) : Cli {
 
-    private val context: CliContext by kodein.instance()
+    private val bus: EventBus by kodein.instance()
 
     private val printHelper: PrintHelper by kodein.instance()
 
@@ -54,12 +56,13 @@ class SingleCommandCli(private val args: Array<String>, commandsRegistry: Comman
             return
         }
 
-        context.postEvent(BeforeCommandExecutionEvent(command))
+        bus.post(BeforeCommandExecutionEvent(command))
         try {
             command.execute()
         } catch (e: Exception) {
             printHelper.handleCommandException(e)
+            bus.post(ErrorEvent(e))
         }
-        context.postEvent(AfterCommandExecutionEvent(command))
+        bus.post(AfterCommandExecutionEvent(command))
     }
 }

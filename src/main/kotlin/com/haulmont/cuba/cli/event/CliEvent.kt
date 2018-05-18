@@ -44,4 +44,4 @@ class ModelRegisteredEvent(val modelName: String) : CliEvent
  */
 class DestroyPluginEvent : CliEvent
 
-class FailEvent(val cause: Throwable? = null) : CliEvent
+class ErrorEvent(val cause: Throwable? = null) : CliEvent
