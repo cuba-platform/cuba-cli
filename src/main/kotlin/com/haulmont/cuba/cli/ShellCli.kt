@@ -99,12 +99,18 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
             }
 
             when (command) {
-                is HelpCommand -> commandParser.printHelp()
+                is HelpCommand -> printHelp()
                 is Stacktrace -> printHelper.printLastStacktrace()
                 is ExitCommand -> return
                 else -> evalCommand(command)
             }
         }
+    }
+
+    private fun printHelp() {
+        writer.println("See Quick start tutorial on https://github.com/cuba-platform/cuba-cli/wiki/Quick-Start\n")
+
+        commandParser.printHelp()
     }
 
     private fun evalCommand(command: CliCommand) {
