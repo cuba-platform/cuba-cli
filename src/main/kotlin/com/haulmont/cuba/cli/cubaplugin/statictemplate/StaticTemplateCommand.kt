@@ -21,18 +21,43 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.LatestVersion
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.generation.TemplateProcessor
+import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import org.kodein.di.generic.instance
+import java.io.PrintWriter
+import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.stream.Collectors
 
 @Parameters(commandDescription = "Generates artifacts from custom template")
 class StaticTemplateCommand : GeneratorCommand<Answers>() {
 
-    @Parameter(required = true, description = "Template name")
-    private lateinit var templateName: String
+    private val writer: PrintWriter by kodein.instance()
+
+    @Parameter(description = "Template name")
+    private var templateName: String? = null
 
     private val template: Template by lazy {
-        parseTemplate(templateName)
+        parseTemplate(templateName!!)
+    }
+
+    override fun run() {
+        if (templateName != null) {
+            super.run()
+        } else {
+            Files.walk(TemplateProcessor.CUSTOM_TEMPLATES_PATH, 1).filter {
+                it != TemplateProcessor.CUSTOM_TEMPLATES_PATH &&
+                        Files.isDirectory(it) &&
+                        Files.exists(it.resolve("template.xml"))
+            }.map {
+                it.fileName.toString()
+            }.collect(Collectors.toList())
+                    .joinTo(StringBuilder(), prefix = "These templates are available: ", postfix = ".")
+                    .let {
+                        writer.println(it)
+                    }
+        }
     }
 
     override fun getModelName(): String = template.modelName

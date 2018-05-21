@@ -192,7 +192,7 @@ class TemplateProcessor {
 
         private val resources: Resources by kodein.instance()
 
-        private val CUSTOM_TEMPLATES_PATH = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "templates")
+        val CUSTOM_TEMPLATES_PATH = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "templates")
                 .also {
                     if (!Files.exists(it)) {
                         Files.createDirectories(it)
