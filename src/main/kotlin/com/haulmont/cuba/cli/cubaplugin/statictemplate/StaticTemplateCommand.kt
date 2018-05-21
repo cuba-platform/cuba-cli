@@ -46,13 +46,16 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
         if (templateName != null) {
             super.run()
         } else {
-            Files.walk(TemplateProcessor.CUSTOM_TEMPLATES_PATH, 1).filter {
-                it != TemplateProcessor.CUSTOM_TEMPLATES_PATH &&
-                        Files.isDirectory(it) &&
-                        Files.exists(it.resolve("template.xml"))
-            }.map {
-                it.fileName.toString()
-            }.collect(Collectors.toList())
+            Files.walk(TemplateProcessor.CUSTOM_TEMPLATES_PATH, 1)
+                    .filter {
+                        it != TemplateProcessor.CUSTOM_TEMPLATES_PATH &&
+                                Files.isDirectory(it) &&
+                                Files.exists(it.resolve("template.xml"))
+                    }
+                    .map {
+                        it.fileName.toString()
+                    }
+                    .collect(Collectors.toList())
                     .joinTo(StringBuilder(), prefix = "These templates are available: ", postfix = ".")
                     .let {
                         writer.println(it)

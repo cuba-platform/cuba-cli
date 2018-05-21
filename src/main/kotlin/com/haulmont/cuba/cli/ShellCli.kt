@@ -27,6 +27,8 @@ import org.jline.builtins.Completers
 import org.jline.builtins.Completers.TreeCompleter.Node
 import org.jline.builtins.Completers.TreeCompleter.node
 import org.jline.reader.*
+import org.jline.terminal.Terminal
+import org.jline.terminal.impl.DumbTerminal
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
@@ -39,6 +41,8 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
     private val writer: PrintWriter by kodein.instance()
 
     private val printHelper: PrintHelper by kodein.instance()
+
+    private val terminal: Terminal by kodein.instance()
 
     private val bus: EventBus by kodein.instance()
 
@@ -118,7 +122,9 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
     }
 
     private fun printWelcome() {
-        writer.println(messages["welcomeMessage"].trimMargin())
+        if (terminal !is DumbTerminal) {
+            writer.println(messages["welcomeMessage"].trimMargin())
+        }
     }
 
     companion object {

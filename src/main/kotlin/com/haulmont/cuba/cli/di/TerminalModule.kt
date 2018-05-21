@@ -31,8 +31,14 @@ import org.kodein.di.generic.factory
 import org.kodein.di.generic.instance
 import org.kodein.di.generic.singleton
 import java.io.PrintWriter
+import java.util.logging.Level
+import java.util.logging.Logger
 
 val terminalModule = Kodein.Module {
+    Logger.getLogger("org.jline").run {
+        level = Level.OFF
+    }
+
     bind<LineReader>() with factory { completer: Completer ->
         LineReaderBuilder.builder()
                 .terminal(instance())
