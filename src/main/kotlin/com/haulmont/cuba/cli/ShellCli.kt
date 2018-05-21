@@ -124,6 +124,8 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
     private fun printWelcome() {
         if (terminal !is DumbTerminal) {
             writer.println(messages["welcomeMessage"].trimMargin())
+        } else {
+            writer.println(messages["welcomeMessageDump"].trimMargin())
         }
     }
 
