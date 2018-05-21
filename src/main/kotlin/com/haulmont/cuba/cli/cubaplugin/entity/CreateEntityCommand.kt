@@ -79,6 +79,21 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
         checkProjectExistence()
     }
 
+    override fun beforeGeneration() {
+        val metadataXml = projectStructure.getModule(GLOBAL_MODULE).metadataXml
+        val persistenceXml = projectStructure.getModule(GLOBAL_MODULE).persistenceXml
+
+        listOf(metadataXml, persistenceXml).forEach {
+            val entityFullName = model.packageName + "." + model.name
+
+            parse(it).documentElement
+                    .xpath("//class[text()=\"$entityFullName\"]")
+                    .firstOrNull()?.let {
+                        fail("Entity $entityFullName already exists")
+                    }
+        }
+    }
+
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "entity", bindings) {
             transformWhole()

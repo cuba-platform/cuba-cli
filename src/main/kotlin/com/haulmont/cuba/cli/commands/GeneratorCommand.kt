@@ -17,14 +17,12 @@
 package com.haulmont.cuba.cli.commands
 
 import com.haulmont.cuba.cli.LatestVersion
+import com.haulmont.cuba.cli.ProjectModel
 import com.haulmont.cuba.cli.ProjectStructure
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.ProjectModel
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.Prompts
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
 
 /**
  * Base command for all commands, that generate any artifact.
@@ -64,7 +62,14 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
         val model = createModel(answers)
         context.addModel(getModelName(), model)
 
+        beforeGeneration()
+
         generate(context.getModels())
+    }
+
+    @Throws(CommandExecutionException::class)
+    open fun beforeGeneration() {
+
     }
 
     abstract fun getModelName(): String
