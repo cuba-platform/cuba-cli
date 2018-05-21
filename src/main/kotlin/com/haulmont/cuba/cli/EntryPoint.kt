@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli
 
 import com.google.common.eventbus.EventBus
 import com.haulmont.cuba.cli.commands.CommandsRegistry
+import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.di.terminalModule
 import com.haulmont.cuba.cli.event.DestroyPluginEvent
@@ -109,7 +110,12 @@ private fun loadPlugins(commandsRegistry: CommandsRegistry, mode: CliMode) {
             ClassLoader.getSystemClassLoader()
     ).layer()
 
-    ServiceLoader.load(pluginsLayer, CliPlugin::class.java).forEach(bus::register)
+    ServiceLoader.load(pluginsLayer, CliPlugin::class.java).forEach {
+        if (it !is CubaPlugin) {
+            writer.println("Loaded plugin @|green ${it.javaClass.name}|@.")
+        }
+        bus.register(it)
+    }
 
     bus.post(InitPluginEvent(commandsRegistry, mode))
 }

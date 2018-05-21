@@ -68,6 +68,10 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         return@lazy restThemes
     }
 
+    override fun preExecute() {
+        checkProjectExistence()
+    }
+
     override fun getModelName(): String = ThemeExtensionModel.MODEL_NAME
 
     override fun QuestionsList.prompting() {
