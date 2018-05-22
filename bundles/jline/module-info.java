@@ -11,4 +11,5 @@ module jline {
     exports org.jline.reader.impl;
     exports org.jline.reader.impl.history;
     exports org.jline.reader.impl.completer;
+    exports org.jline.terminal.impl;
 }
