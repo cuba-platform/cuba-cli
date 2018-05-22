@@ -17,7 +17,6 @@
         spacing="true">
     <fieldGroup id="fieldGroup"
                 datasource="${entity}Ds">
-        <column width="250px"/>
         <!--Specify fields to edit here-->
     </fieldGroup>
     <frame id="windowActions"

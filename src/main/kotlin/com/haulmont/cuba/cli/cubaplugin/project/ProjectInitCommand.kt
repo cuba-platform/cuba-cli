@@ -17,12 +17,10 @@
 package com.haulmont.cuba.cli.cubaplugin.project
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.PlatformVersion
+import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
@@ -45,6 +43,8 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     }
 
     private val writer: PrintWriter by kodein.instance()
+
+    private val printHelper: PrintHelper by kodein.instance()
 
     override fun getModelName(): String = "project"
 
@@ -102,7 +102,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     override fun generate(bindings: Map<String, Any>) {
         val cwd = Paths.get("")
 
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "project", bindings, PlatformVersion(model.platformVersion)) {
+        val templateTips = TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "project", bindings, PlatformVersion(model.platformVersion)) {
             listOf("modules", "build.gradle", "settings.gradle").forEach {
                 transform(it)
             }
@@ -119,7 +119,22 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
             }
         }
 
-        writer.println(messages["createProjectTips", cwd.toAbsolutePath()])
+        val scriptsDirectory = projectStructure.getModule(ModuleStructure.CORE_MODULE).path
+                .resolve("db")
+                .resolve("init")
+                .resolve(model.database.driverDependencyName)
+
+        Files.createDirectories(scriptsDirectory)
+
+        listOf("10", "20", "30")
+                .map { "$it.create-db.sql" }
+                .forEach { name ->
+                    val scriptPath = scriptsDirectory.resolve(name)
+                    Files.createFile(scriptPath)
+                    printHelper.fileCreated(scriptPath)
+                }
+
+        templateTips?.let { writer.println(it.format(cwd.toAbsolutePath())) }
 
         val dpTipsMessageName = when (model.database.database) {
             databases[5] -> "oracleDbTips"

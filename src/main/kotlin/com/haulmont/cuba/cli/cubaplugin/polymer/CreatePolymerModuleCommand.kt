@@ -66,7 +66,7 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
 
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "polymer", bindings) {
             templatePath.walk(1).filter {
-                it.fileName.toString() != "images"
+                it.fileName.toString() != "images" && it != templatePath
             }.forEach {
                 transform(it, to = destinationDir)
             }

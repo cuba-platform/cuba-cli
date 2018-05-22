@@ -76,7 +76,8 @@ class TemplateProcessor {
         val baseTemplatePath = templatePath.toAbsolutePath().toString()
         val targetDirectoryPath = targetAbsolutePath.toString()
 
-        Files.walk(from)
+        from.walk()
+                .filter { !isTemplateMetadata(it) }
                 .filter { Files.isRegularFile(it) }
                 .forEach { inputPath ->
                     val outputFile = inputPath.toAbsolutePath().toString()
@@ -92,9 +93,12 @@ class TemplateProcessor {
                     } else {
                         copyInternal(inputPath, outputFile)
                     }
-
                 }
     }
+
+    private fun isTemplateMetadata(path: Path): Boolean =
+            path.fileName.toString() in listOf("template.xml", "tips.txt")
+
 
     private fun transformInternal(inputPath: Path, outputFile: Path, vc: VelocityContext) {
         val template = Template()
@@ -185,7 +189,9 @@ class TemplateProcessor {
         copy("", to)
     }
 
-    fun Path.walk(depth: Int) = Files.walk(this, depth).filter { it != this }.collect(Collectors.toList())
+    fun Path.walk(depth: Int = Int.MAX_VALUE) =
+            Files.walk(this, depth)
+                    .collect(Collectors.toList())!!
 
     companion object {
         val projectRoot: Path = Paths.get("").toAbsolutePath()
@@ -203,13 +209,36 @@ class TemplateProcessor {
             Velocity.init()
         }
 
-        operator fun invoke(templateName: String, bindings: Map<String, Any>, platformVersion: PlatformVersion = LatestVersion, block: TemplateProcessor.() -> Unit) {
-            TemplateProcessor(findTemplate(templateName), bindings, platformVersion).block()
+        operator fun invoke(
+                templateName: String,
+                bindings: Map<String, Any>,
+                platformVersion: PlatformVersion = LatestVersion,
+                block: TemplateProcessor.() -> Unit): String? {
+            val templateBasePath = findTemplate(templateName)
+            TemplateProcessor(templateBasePath, bindings, platformVersion).block()
+
+            return maybeTips(templateBasePath)
         }
 
-        operator fun invoke(templateBasePath: Path, bindings: Map<String, Any>, platformVersion: PlatformVersion = LatestVersion, block: TemplateProcessor.() -> Unit) {
+        operator fun invoke(
+                templateBasePath: Path,
+                bindings: Map<String, Any>,
+                platformVersion: PlatformVersion = LatestVersion,
+                block: TemplateProcessor.() -> Unit): String? {
             TemplateProcessor(templateBasePath, bindings, platformVersion).block()
+
+            return maybeTips(templateBasePath)
         }
+
+        private fun maybeTips(templateBasePath: Path): String? =
+                templateBasePath.resolve("tips.txt")
+                        .takeIf { Files.exists(it) }
+                        ?.let {
+                            Files.newInputStream(it)
+                                    .bufferedReader()
+                                    .readText()
+                        }
+
 
         fun findTemplate(templateBasePath: String): Path =
                 resources.getResourcePath(templateBasePath, javaClass)

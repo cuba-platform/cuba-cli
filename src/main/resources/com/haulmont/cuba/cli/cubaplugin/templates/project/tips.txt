@@ -1,0 +1,6 @@
+
+@|white Project generated at %s directory.
+The project's CUBA Platform version requires Java 8.
+To build project execute `gradlew assemble`
+To import project into IDE execute `gradlew ide` and open generated *.iml file.
+|@
