@@ -33,7 +33,7 @@ class Snippets(snippetPath: Path) {
                 .xpath("//snippet")
                 .filterIsInstance(Element::class.java)
                 .associateBy({
-                    it.getAttribute("name")
+                    it["name"]
                 }, {
                     it.textContent
                             .replaceFirst(borderRegex, "")

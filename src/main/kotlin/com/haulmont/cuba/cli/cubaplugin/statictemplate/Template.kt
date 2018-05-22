@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.statictemplate
 
 import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.generation.TemplateProcessor
+import com.haulmont.cuba.cli.generation.get
 import com.haulmont.cuba.cli.generation.getChildElements
 import com.haulmont.cuba.cli.generation.parse
 import net.sf.practicalxml.DomUtil
@@ -48,14 +49,14 @@ fun parseTemplate(templateName: String): Template {
     val instructions: List<GenerationInstruction> = DomUtil.getChild(templateDocument, "operations").let {
         parseGenerationInstructions(it)
     }
-    return Template(templateBasePath, templateDocument.getAttribute("modelName"), questions, instructions)
+    return Template(templateBasePath, templateDocument["modelName"], questions, instructions)
 }
 
 private fun parseQuestions(questionsListElement: Element): List<TemplateQuestion> =
         questionsListElement.getChildElements()
                 .map {
-                    val name = it.getAttribute("name")
-                    val caption = it.getAttribute("caption")
+                    val name = it["name"]
+                    val caption = it["caption"]
 
                     when (it.tagName) {
                         "plain" -> PlainQuestion(name, caption)
@@ -78,8 +79,8 @@ private fun parseOptions(optionsQuestion: Element): List<String> =
 private fun parseGenerationInstructions(instructionsListElement: Element): List<GenerationInstruction> =
         instructionsListElement.getChildElements()
                 .map {
-                    val src = it.getAttribute("src")
-                    val dst = it.getAttribute("dst")
+                    val src = it["src"]
+                    val dst = it["dst"]
                     when (it.tagName) {
                         "transform" -> GenerationInstruction(src, dst, true)
                         "copy" -> GenerationInstruction(src, dst, false)

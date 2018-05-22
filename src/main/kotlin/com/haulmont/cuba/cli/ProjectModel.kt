@@ -16,10 +16,13 @@
 
 package com.haulmont.cuba.cli
 
+import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
+import com.haulmont.cuba.cli.generation.get
 import com.haulmont.cuba.cli.generation.parse
 import com.haulmont.cuba.cli.generation.xpath
 import net.sf.practicalxml.DomUtil
+import org.w3c.dom.Element
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -46,6 +49,8 @@ class ProjectModel(projectStructure: ProjectStructure) {
 
     val appComponents: List<String>
 
+    val database: Database
+
     init {
         try {
             val global = projectStructure.getModule(GLOBAL_MODULE)
@@ -55,7 +60,8 @@ class ProjectModel(projectStructure: ProjectStructure) {
             rootPackage = rootPackageDirectory.replace(File.separatorChar, '.')
 
             name = projectStructure.settingsGradle.toFile().readText().let {
-                Regex("rootProject.name *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]").findAll(it) groupNOrNull 1 ?: artifactParseError()
+                Regex("rootProject.name *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]").findAll(it) groupNOrNull 1
+                        ?: artifactParseError()
             }
 
             namespace = parseNamespace(global.persistenceXml)
@@ -80,6 +86,8 @@ class ProjectModel(projectStructure: ProjectStructure) {
             modulePrefix = modulePrefixRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
 
             appComponents = parseAppComponents(projectStructure)
+
+            database = parseDatabase(projectStructure)
         } catch (e: ProjectFileNotFoundException) {
             throw ProjectScanException(e.message!!, e)
         }
@@ -111,7 +119,32 @@ private fun parseNamespace(persistenceXml: Path): String {
             .nodeValue
 }
 
+private fun parseDatabase(projectStructure: ProjectStructure): Database {
+    val contextXml = projectStructure.getModule(CORE_MODULE)
+            .path
+            .resolve("web")
+            .resolve("META-INF")
+            .resolve("context.xml")
+
+    val contextXmlRoot = parse(contextXml).documentElement
+    val resourceElement = contextXmlRoot.xpath("//Resource[@name=\"jdbc/CubaDS\"]").first() as Element
+
+    return Database(getDbTypeByDriver(resourceElement["driverClassName"]), resourceElement["url"], resourceElement["driverClassName"])
+}
+
+private fun getDbTypeByDriver(driverClass: String): String = when {
+    "hsql" in driverClass -> "hsql"
+    "postgres" in driverClass -> "postgres"
+    "sqlserver" in driverClass -> "mssql"
+    "oracle" in driverClass -> "mssql"
+    "mysql" in driverClass -> "mysql"
+    else -> throw ProjectScanException("Unrecognized jdbc driver class $driverClass")
+}
+
+
 private infix fun Sequence<MatchResult>.groupNOrNull(groupIndex: Int): String? =
         firstOrNull()?.groupValues?.get(groupIndex)
 
 class ProjectScanException(message: String, cause: Throwable? = null) : Exception(message, cause)
+
+data class Database(val type: String, val connectionString: String, val driverClassName: String)
