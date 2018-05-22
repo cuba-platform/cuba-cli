@@ -16,7 +16,6 @@
 
 package com.haulmont.cuba.cli.cubaplugin.entitylistener
 
-import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.prompting.Answers
 
 class EntityListenerModel(answers: Answers) {
@@ -37,10 +36,10 @@ class EntityListenerModel(answers: Answers) {
     val entityPackageName: String
 
     init {
-        val entity: String = "entityType" from answers
-        val lastDotIndex = entity.lastIndexOf('.')
-        entityName = if (lastDotIndex == -1) entity else entity.substring(lastDotIndex + 1)
-        entityPackageName = entity.removeSuffix(".$entityName")
+        val entityType: String by answers
+        val lastDotIndex = entityType.lastIndexOf('.')
+        entityName = if (lastDotIndex == -1) entityType else entityType.substring(lastDotIndex + 1)
+        entityPackageName = entityType.removeSuffix(".$entityName")
     }
 
     companion object {

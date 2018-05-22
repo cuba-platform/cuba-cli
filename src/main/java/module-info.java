@@ -61,6 +61,8 @@ module com.haulmont.cuba.cli {
     opens com.haulmont.cuba.cli.cubaplugin.theme;
     opens com.haulmont.cuba.cli.cubaplugin.installcomponent;
     opens com.haulmont.cuba.cli.cubaplugin.polymer;
+    opens com.haulmont.cuba.cli.cubaplugin.browsescreen;
+    opens com.haulmont.cuba.cli.cubaplugin.editscreen;
 
     exports com.haulmont.cuba.cli;
     exports com.haulmont.cuba.cli.event;

@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin.componentbean
+package com.haulmont.cuba.cli.cubaplugin.editscreen
 
 import com.haulmont.cuba.cli.prompting.Answers
 
-class ComponentBeanModel(answers: Answers) {
-    val name: String by answers
-    val module: String by answers
+class EditScreenModel(answers: Answers) {
+    val screenName: String by answers
     val packageName: String by answers
+    val fullEntityName: String = answers["entityName"] as String
+    val entityName: String = fullEntityName.split('.').last()
+    val controllerName: String = "${entityName}Edit"
+    val entityPackageName: String = fullEntityName.split('.').let {
+        it.take(it.size - 1).joinToString(".")
+    }
 
     companion object {
-        const val MODEL_NAME = "component"
+        const val MODEL_NAME = "screen"
     }
 }

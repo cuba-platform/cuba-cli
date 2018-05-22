@@ -17,7 +17,9 @@
 package com.haulmont.cuba.cli
 
 import com.haulmont.cuba.cli.generation.parse
+import com.haulmont.cuba.cli.generation.xpath
 import net.sf.practicalxml.DomUtil
+import org.w3c.dom.Element
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -98,9 +100,7 @@ private fun findRootPackage(): String? {
 
     globalModuleSrc.takeIf { Files.exists(it) }
             ?.findFile("metadata.xml")?.let {
-                parse(it).documentElement
-            }?.let {
-                DomUtil.getChild(it, "metadata-model")
+                parse(it).documentElement.xpath("//metadata-model").firstOrNull() as Element
             }?.let {
                 return it.getAttribute("root-package")
             } ?: throw ProjectFileNotFoundException("Unable to find root package")

@@ -19,7 +19,9 @@ package com.haulmont.cuba.cli.cubaplugin
 import com.google.common.eventbus.Subscribe
 import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.cubaplugin.appcomponentxml.AppComponentCommand
+import com.haulmont.cuba.cli.cubaplugin.browsescreen.CreateBrowseScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.componentbean.CreateComponentBeanCommand
+import com.haulmont.cuba.cli.cubaplugin.editscreen.CreateEditScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.entity.CreateEntityCommand
 import com.haulmont.cuba.cli.cubaplugin.entitylistener.CreateEntityListenerCommand
 import com.haulmont.cuba.cli.cubaplugin.enumeration.CreateEnumerationCommand
@@ -54,6 +56,8 @@ class CubaPlugin : CliPlugin {
             command("entity", CreateEntityCommand())
             command("screen", CreateScreenCommand()) {
                 command("extend", ExtendDefaultScreenCommand())
+                command("browse", CreateBrowseScreenCommand())
+                command("edit", CreateEditScreenCommand())
             }
             command("service", CreateServiceCommand())
             command("template", StaticTemplateCommand())

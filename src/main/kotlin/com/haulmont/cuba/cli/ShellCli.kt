@@ -131,7 +131,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
         if (terminal !is DumbTerminal) {
             writer.println(messages["welcomeMessage"].trimMargin())
         } else {
-            writer.println(messages["welcomeMessageDump"].trimMargin())
+            writer.println(messages["welcomeMessageDumb"].trimMargin())
         }
     }
 

@@ -1,0 +1,50 @@
+#set( $entities = "${screen.entityName.toLowerCase()}s")
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://browseCaption"
+        class="${screen.packageName}.${screen.controllerName}"
+        focusComponent="${entities}Table"
+        lookupComponent="${entities}Table"
+        messagesPack="${screen.packageName}">
+    <dsContext>
+        <groupDatasource id="${entities}Ds"
+                         class="${screen.entityPackageName}.${screen.entityName}"
+                         view="_local">
+            <query>
+                <![CDATA[select e from ${project.namespace}$${screen.entityName} e]]>
+            </query>
+        </groupDatasource>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="${entities}Table"
+            spacing="true">
+        <filter id="filter"
+                applyTo="${entities}Table"
+                datasource="${entities}Ds">
+            <properties include=".*"/>
+        </filter>
+        <groupTable id="${entities}Table"
+                    width="100%">
+            <actions>
+                <action id="create"/>
+                <action id="edit"/>
+                <action id="remove"/>
+            </actions>
+            <columns>
+                <!--Specify columns here-->
+            </columns>
+            <rows datasource="${entities}Ds"/>
+            <rowsCount/>
+            <buttonsPanel id="buttonsPanel"
+                          alwaysVisible="true">
+                <button id="createBtn"
+                        action="${entities}Table.create"/>
+                <button id="editBtn"
+                        action="${entities}Table.edit"/>
+                <button id="removeBtn"
+                        action="${entities}Table.remove"/>
+            </buttonsPanel>
+        </groupTable>
+    </layout>
+</window>

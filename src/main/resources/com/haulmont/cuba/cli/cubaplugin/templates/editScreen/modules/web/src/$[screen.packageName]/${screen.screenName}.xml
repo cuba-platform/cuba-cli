@@ -1,0 +1,27 @@
+#set( $entity = "${screen.entityName.toLowerCase()}s")
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://editorCaption"
+        class="${screen.packageName}.${screen.controllerName}"
+        datasource="${entity}Ds"
+        focusComponent="fieldGroup"
+        messagesPack="${screen.packageName}">
+<dsContext>
+    <datasource id="${entity}Ds"
+                class="${screen.fullEntityName}"
+                view="_local"/>
+</dsContext>
+<dialogMode height="600"
+            width="800"/>
+<layout expand="windowActions"
+        spacing="true">
+    <fieldGroup id="fieldGroup"
+                datasource="${entity}Ds">
+        <column width="250px"/>
+        <!--Specify fields to edit here-->
+    </fieldGroup>
+    <frame id="windowActions"
+           screen="editWindowActions"/>
+</layout>
+</window>
+

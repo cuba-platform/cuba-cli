@@ -18,7 +18,6 @@ package com.haulmont.cuba.cli.cubaplugin.componentbean
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
@@ -37,7 +36,7 @@ class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>() {
                 checkIsClass()
             }
         }
-        question("package", "Package name") {
+        question("packageName", "Package name") {
             validate {
                 checkIsPackage()
             }
@@ -49,11 +48,7 @@ class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>() {
         options("module", "Target module", listOf("web", "core"))
     }
 
-    override fun createModel(answers: Answers): ComponentBeanModel =
-            ComponentBeanModel(
-                    "name" from answers,
-                    "module" from answers,
-                    "package" from answers)
+    override fun createModel(answers: Answers): ComponentBeanModel = ComponentBeanModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "componentBean", bindings, projectModel.platformVersion) {

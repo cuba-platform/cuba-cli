@@ -17,7 +17,6 @@
 package com.haulmont.cuba.cli.cubaplugin.project
 
 import com.haulmont.cuba.cli.commands.CommandExecutionException
-import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import java.io.File
@@ -28,10 +27,12 @@ class ProjectInitModel(answers: Answers) {
     val rootPackage: String by answers
     val platformVersion: String by answers
     val rootPackageDirectory: String = rootPackage.replace('.', File.separatorChar)
-    val database: DatabaseModel = DatabaseModel("database" from answers)
+    val database: DatabaseModel = DatabaseModel(answers)
 }
 
-class DatabaseModel(val database: String) {
+class DatabaseModel(answers: Answers) {
+    val database: String by answers
+
     private val messages by localMessages()
 
     private val DATABASES = messages["databases"].split(',')

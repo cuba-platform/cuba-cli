@@ -40,12 +40,20 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
 abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
     protected val projectStructure: ProjectStructure by lazy { ProjectStructure() }
 
+    /**
+     * Returns project model if it already generated. Otherwise, it will raise an exception,
+     * so call it only after [checkProjectExistence].
+     */
     protected val projectModel: ProjectModel by lazy {
         if (context.hasModel(ProjectModel.MODEL_NAME)) {
             context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
         } else fail("No project module found")
     }
 
+    /**
+     * Returns current model if it already generated. Otherwise, it will raise an exception,
+     * so don't call it before [createModel] method.
+     */
     protected val model: Model by lazy {
         if (context.hasModel(getModelName())) {
             context.getModel<Model>(getModelName())
@@ -67,6 +75,10 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
         generate(context.getModels())
     }
 
+    /**
+     * Special method to make additional validations before generating artifact from model.
+     * If generation is impossible for some reasons, call [fail] method.
+     */
     @Throws(CommandExecutionException::class)
     open fun beforeGeneration() {
 

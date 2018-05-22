@@ -18,7 +18,6 @@ package com.haulmont.cuba.cli.cubaplugin.enumeration
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
@@ -52,9 +51,9 @@ class CreateEnumerationCommand : GeneratorCommand<EnumerationModel>() {
                     if (it["idType"] == "String")
                         ""
                     else {
-                        val filledValues: List<Answers> = "values" from it
-                        if (filledValues.size > 1) {
-                            val lastValue = filledValues[filledValues.lastIndex - 1]
+                        val values: List<Answers> by it
+                        if (values.size > 1) {
+                            val lastValue = values[values.lastIndex - 1]
                             val prevId = (lastValue["id"] as String).toInt()
                             (prevId + 10).toString()
                         } else 10.toString()
