@@ -26,7 +26,6 @@ import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
-import java.io.File
 import java.nio.file.Path
 
 @Parameters(commandDescription = "Extends login and main screens")
@@ -68,10 +67,10 @@ class ExtendDefaultScreenCommand : GeneratorCommand<ScreenExtensionModel>() {
             appendChild("screen") {
                 if (model.screen == "login") {
                     this["id"] = "loginWindow"
-                    this["template"] = (namesUtils.packageToDirectory(model.packageName) + File.separatorChar + "ext-loginWindow.xml")
+                    this["template"] = (namesUtils.packageToDirectory(model.packageName) + '/' + "ext-loginWindow.xml")
                 } else {
                     this["id"] = "mainWindow"
-                    this["template"] = (namesUtils.packageToDirectory(model.packageName) + File.separatorChar + "ext-mainwindow.xml")
+                    this["template"] = (namesUtils.packageToDirectory(model.packageName) + '/' + "ext-mainwindow.xml")
                 }
             }
         }

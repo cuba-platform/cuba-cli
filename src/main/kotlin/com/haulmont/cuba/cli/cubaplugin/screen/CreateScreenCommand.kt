@@ -26,7 +26,6 @@ import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
-import java.io.File
 import java.nio.file.Path
 
 @Parameters(commandDescription = "Creates new screen")
@@ -88,7 +87,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         updateXml(screensXml) {
             appendChild("screen") {
                 this["id"] = screenModel.screenName
-                val template = namesUtils.packageToDirectory(screenModel.packageName) + File.separatorChar + screenModel.screenName + ".xml"
+                val template = namesUtils.packageToDirectory(screenModel.packageName) + '/' + screenModel.screenName + ".xml"
                 this["template"] = template
             }
         }

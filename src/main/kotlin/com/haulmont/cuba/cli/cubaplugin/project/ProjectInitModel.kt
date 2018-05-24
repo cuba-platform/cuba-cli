@@ -19,14 +19,13 @@ package com.haulmont.cuba.cli.cubaplugin.project
 import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
-import java.io.File
 
 class ProjectInitModel(answers: Answers) {
     val projectName: String by answers
     val namespace: String by answers
     val rootPackage: String by answers
     val platformVersion: String by answers
-    val rootPackageDirectory: String = rootPackage.replace('.', File.separatorChar)
+    val rootPackageDirectory: String = rootPackage.replace('.', '/')
     val database: DatabaseModel = DatabaseModel(answers)
 }
 

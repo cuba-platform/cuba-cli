@@ -20,7 +20,6 @@ import com.haulmont.cuba.cli.generation.get
 import com.haulmont.cuba.cli.generation.parse
 import com.haulmont.cuba.cli.generation.xpath
 import org.w3c.dom.Element
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -40,7 +39,7 @@ class ProjectStructure {
     }
 
     val rootPackageDirectory: Path by lazy {
-        rootPackage.replace('.', File.separatorChar).let { Paths.get(it) }
+        rootPackage.replace('.', '/').let { Paths.get(it) }
     }
 
     fun getModule(name: String): ModuleStructure = ModuleStructure(name, rootPackage)
@@ -54,7 +53,7 @@ class ModuleStructure(val name: String, val rootPackage: String) {
     }
 
     val rootPackageDirectory: Path by lazy {
-        src.resolve(rootPackage.replace('.', File.separatorChar))
+        src.resolve(rootPackage.replace('.', '/'))
     }
 
     val metadataXml: Path by lazy {

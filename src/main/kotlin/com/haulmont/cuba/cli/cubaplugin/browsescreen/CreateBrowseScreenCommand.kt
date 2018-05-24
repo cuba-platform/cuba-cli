@@ -27,7 +27,6 @@ import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import net.sf.practicalxml.DomUtil
 import org.kodein.di.generic.instance
-import java.io.File
 
 @Parameters(commandDescription = "Creates new browse screen")
 class CreateBrowseScreenCommand : GeneratorCommand<BrowseScreenModel>() {
@@ -98,7 +97,7 @@ class CreateBrowseScreenCommand : GeneratorCommand<BrowseScreenModel>() {
         updateXml(screensXml) {
             appendChild("screen") {
                 this["id"] = model.screenName
-                val template = namesUtils.packageToDirectory(model.packageName) + File.separatorChar + model.screenName + ".xml"
+                val template = namesUtils.packageToDirectory(model.packageName) + '/' + model.screenName + ".xml"
                 this["template"] = template
             }
         }
@@ -119,7 +118,7 @@ class CreateBrowseScreenCommand : GeneratorCommand<BrowseScreenModel>() {
 
         val menuMessages = webModule.src.resolve(namesUtils.packageToDirectory(projectModel.rootPackage)).resolve("messages.properties")
         PropertiesHelper(menuMessages) {
-            set("menu-config.${model.screenName}",  "${model.entityName}s")
+            set("menu-config.${model.screenName}", "${model.entityName}s")
         }
     }
 

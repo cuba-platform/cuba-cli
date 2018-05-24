@@ -57,7 +57,7 @@ class ProjectModel(projectStructure: ProjectStructure) {
 
             rootPackageDirectory = projectStructure.rootPackageDirectory.toString()
 
-            rootPackage = rootPackageDirectory.replace(File.separatorChar, '.')
+            rootPackage = projectStructure.rootPackage
 
             name = projectStructure.settingsGradle.toFile().readText().let {
                 Regex("rootProject.name *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]").findAll(it) groupNOrNull 1

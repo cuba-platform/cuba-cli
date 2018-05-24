@@ -27,7 +27,6 @@ import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import net.sf.practicalxml.DomUtil
 import org.kodein.di.generic.instance
-import java.io.File
 
 @Parameters(commandDescription = "Creates new edit screen")
 class CreateEditScreenCommand : GeneratorCommand<EditScreenModel>() {
@@ -98,7 +97,7 @@ class CreateEditScreenCommand : GeneratorCommand<EditScreenModel>() {
         updateXml(screensXml) {
             appendChild("screen") {
                 this["id"] = model.screenName
-                val template = namesUtils.packageToDirectory(model.packageName) + File.separatorChar + model.screenName + ".xml"
+                val template = namesUtils.packageToDirectory(model.packageName) + '/' + model.screenName + ".xml"
                 this["template"] = template
             }
         }

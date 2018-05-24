@@ -28,7 +28,6 @@ import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
-import java.io.File
 import java.nio.file.Path
 
 @Parameters(commandDescription = "Create new entity")
@@ -122,7 +121,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     private fun addToMessages(projectStructure: ProjectStructure) {
         val packageDirectory = projectStructure.getModule(GLOBAL_MODULE)
                 .src
-                .resolve(model.packageName.replace('.', File.separatorChar))
+                .resolve(model.packageName.replace('.', '/'))
 
         val entityPrintableName = Regex("([A-Z][a-z0-9]*)")
                 .findAll(model.name)
