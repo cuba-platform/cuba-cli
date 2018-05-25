@@ -294,16 +294,23 @@ task bundle(dependsOn: jarPatch,
         def launchFile = new File(bundleOutput, "bin/launch")
         def launchBatFile = new File(bundleOutput, "bin/launch.bat")
 
+        def cubacliFile = new File(bundleOutput, "cuba-cli")
+        if (launchBatFile.exists()) {
+            cubacliFile = new File(bundleOutput, "cuba-cli.bat")
+        }
+
         if (launchFile.exists()) {
             if (launchBatFile.exists()) {
                 launchFile.delete()
             } else {
-                launchFile.renameTo(new File(bundleOutput, "bin/cuba-cli"))
+                launchFile.renameTo(cubacliFile)
+                cubacliFile.text = cubacliFile.text.replace('$DIR/java', '$DIR/bin/java')
             }
         }
 
         if (launchBatFile.exists()) {
-            launchBatFile.renameTo(new File(bundleOutput, "bin/cuba-cli.bat"))
+            launchBatFile.renameTo(cubacliFile)
+            cubacliFile.text = cubacliFile.text.replace('"%DIR%\\java"', '"%DIR%\\bin\\java"')
         }
 
         logger.info("Fix permissions")
