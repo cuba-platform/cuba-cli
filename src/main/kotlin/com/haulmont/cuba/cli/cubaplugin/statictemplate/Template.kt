@@ -43,7 +43,7 @@ fun parseTemplate(templateName: String): Template {
     }
 
     val templateDocument = parse(templateXml).documentElement
-    val questions: List<TemplateQuestion> = DomUtil.getChild(templateDocument, "quesitons").let {
+    val questions: List<TemplateQuestion> = DomUtil.getChild(templateDocument, "questions").let {
         parseQuestions(it)
     }
     val instructions: List<GenerationInstruction> = DomUtil.getChild(templateDocument, "operations").let {

@@ -5,7 +5,7 @@
     <xs:element name="template">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="quesitons">
+                <xs:element name="questions">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="plain" maxOccurs="unbounded" minOccurs="0">
