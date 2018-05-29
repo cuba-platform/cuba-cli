@@ -27,11 +27,14 @@ import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
+import java.io.PrintWriter
 import java.nio.file.Paths
 
 @Parameters(commandDescription = "Creates empty polymer module")
 class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
     private val messages by localMessages()
+
+    private val writer: PrintWriter by kodein.instance()
 
     private val snippets: Snippets by lazy {
         Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "polymer", "polymerGradleSnippets.xml", javaClass, projectModel.platformVersion)
@@ -64,7 +67,7 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
     override fun generate(bindings: Map<String, Any>) {
         val destinationDir = Paths.get("modules/polymer-client")
 
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "polymer", bindings) {
+        val maybeHints = TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "polymer", bindings) {
             templatePath.walk(1).filter {
                 it.fileName.toString() != "images" && it != templatePath
             }.forEach {
@@ -97,5 +100,7 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
             writeText(lines.joinToString("\n"))
         }
         printHelper.fileModified(projectStructure.settingsGradle)
+
+        maybeHints?.let { writer.println(it) }
     }
 }

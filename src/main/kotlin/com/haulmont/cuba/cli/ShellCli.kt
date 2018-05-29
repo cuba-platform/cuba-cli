@@ -108,9 +108,9 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
     }
 
     private fun printHelp() {
-        writer.println("See Quick start tutorial on https://github.com/cuba-platform/cuba-cli/wiki/Quick-Start\n")
-
         commandParser.printHelp()
+
+        writer.println("See Quick start tutorial on https://github.com/cuba-platform/cuba-cli/wiki/Quick-Start\n")
     }
 
     private fun evalCommand(command: CliCommand) {

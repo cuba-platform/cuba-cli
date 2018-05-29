@@ -19,11 +19,13 @@ package com.haulmont.cuba.cli.di
 import com.haulmont.cuba.cli.ColoredWriter
 import com.haulmont.cuba.cli.GenerationProgressPrinter
 import com.haulmont.cuba.cli.PrintHelper
+import org.fusesource.jansi.Ansi
 import org.jline.reader.Completer
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
 import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
+import org.jline.terminal.impl.DumbTerminal
 import org.kodein.di.Kodein
 import org.kodein.di.direct
 import org.kodein.di.generic.bind
@@ -46,7 +48,12 @@ val terminalModule = Kodein.Module {
                 .build()
     }
 
-    bind<Terminal>() with instance(TerminalBuilder.builder().build())
+    bind<Terminal>() with instance(TerminalBuilder.builder().build().also {
+        val osName = System.getProperty("os.name")
+        if (osName.startsWith("Windows") && it is DumbTerminal) {
+            Ansi.setEnabled(false)
+        }
+    })
 
     bind<PrintWriter>() with singleton {
         ColoredWriter(instance<Terminal>().writer())

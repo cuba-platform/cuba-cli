@@ -83,7 +83,7 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
             LatestVersion
         }
 
-        TemplateProcessor(template.path, bindings, platformVersion) {
+        val maybeHints = TemplateProcessor(template.path, bindings, platformVersion) {
             for (instruction in template.instructions) {
                 if (instruction.transform) {
                     transform(instruction.from, Paths.get(instruction.to))
@@ -92,5 +92,7 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
                 }
             }
         }
+
+        maybeHints?.let { writer.print(it) }
     }
 }
