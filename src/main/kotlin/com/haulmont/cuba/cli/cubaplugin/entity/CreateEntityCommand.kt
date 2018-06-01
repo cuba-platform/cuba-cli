@@ -17,24 +17,40 @@
 package com.haulmont.cuba.cli.cubaplugin.entity
 
 import com.beust.jcommander.Parameters
+import com.haulmont.cuba.cli.*
+import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
-import com.haulmont.cuba.cli.ProjectStructure
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.generation.*
-import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
+import java.io.PrintWriter
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.*
 
 @Parameters(commandDescription = "Create new entity")
 class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     private val entityTypes = listOf("Persistent", "Persistent embedded", "Not persistent")
 
     private val namesUtils: NamesUtils by kodein.instance()
+
+    private val printHelper: PrintHelper by kodein.instance()
+
+    private val printWriter: PrintWriter by kodein.instance()
+
+    private val messages: Messages by localMessages()
+
+    private val snippets by lazy {
+        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "entity", "sqlSnippets.xml", javaClass, projectModel.platformVersion)
+    }
+
+    private val calendar = Calendar.getInstance()
 
     override fun getModelName(): String = EntityModel.MODEL_NAME
 
@@ -100,16 +116,20 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
 
         if (model.type == "Not persistent") {
             val metadataXml = projectStructure.getModule(GLOBAL_MODULE).metadataXml
-            addEntityToConfig(metadataXml, "metadata-model", model)
+            addEntityToConfig(metadataXml, "metadata-model")
         } else {
             val persistenceXml = projectStructure.getModule(GLOBAL_MODULE).persistenceXml
-            addEntityToConfig(persistenceXml, "persistence-unit", model)
+            addEntityToConfig(persistenceXml, "persistence-unit")
         }
 
         addToMessages(projectStructure)
+
+        if (model.type == "Persistent") {
+            createSqlScripts()
+        }
     }
 
-    private fun addEntityToConfig(configPath: Path, elementName: String, model: EntityModel) {
+    private fun addEntityToConfig(configPath: Path, elementName: String) {
         updateXml(configPath) {
             val configElement = findFirstChild(elementName) ?: appendChild(elementName)
             configElement.appendChild("class") {
@@ -118,7 +138,44 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
         }
     }
 
-    private fun addToMessages(projectStructure: ProjectStructure) {
+    private fun createSqlScripts() {
+        val script = snippets.get("createTable").format(model.tableName)
+
+        val dbPath = projectStructure.getModule(CORE_MODULE).path.resolve("db")
+
+        val createDbPath = dbPath.resolve(Paths.get("init", projectModel.database.type, "10.create-db.sql"))
+
+        if (Files.exists(createDbPath)) {
+            createDbPath.toFile().appendText(script)
+            printHelper.fileModified(createDbPath)
+        } else {
+            printWriter.println(messages["createDbNotFound"])
+        }
+
+        val currentYearUpdateDir = dbPath.resolve(Paths.get("update", projectModel.database.type, getYear()))
+        if (!Files.exists(currentYearUpdateDir)) {
+            Files.createDirectories(currentYearUpdateDir)
+        }
+
+        val todayPrefix = getTodayPrefix()
+
+        val todayScriptsCount = Files.walk(currentYearUpdateDir, 1)
+                .filter { Files.isRegularFile(it) && it.fileName.toString().endsWith(".sql") && it.fileName.toString().startsWith(todayPrefix) }
+                .count()
+
+        val scriptName = "$todayPrefix${1 + todayScriptsCount}-update${model.name}.sql"
+
+        val updateScriptPath = currentYearUpdateDir.resolve(scriptName)
+        updateScriptPath.toFile().also { it.createNewFile() }.writeText(script)
+        printHelper.fileCreated(updateScriptPath)
+    }
+
+    private fun getYear() = (calendar[Calendar.YEAR] - 2000).toString()
+
+    private fun getTodayPrefix() = "%s%02d%02d-".format(getYear(), calendar[Calendar.MONTH], calendar[Calendar.DAY_OF_MONTH])
+
+
+    fun addToMessages(projectStructure: ProjectStructure) {
         val packageDirectory = projectStructure.getModule(GLOBAL_MODULE)
                 .src
                 .resolve(model.packageName.replace('.', '/'))

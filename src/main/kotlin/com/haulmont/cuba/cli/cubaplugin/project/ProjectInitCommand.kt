@@ -37,7 +37,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     private val messages by localMessages()
 
     private val platformVersions by lazy {
-        messages["platformVersions"].split(',')
+        messages["platformVersions"].split(',').map { it.trim() }
     }
 
     private val databases by lazy {
@@ -54,9 +54,9 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
     override fun QuestionsList.prompting() {
         question("projectName", "Project Name") {
-            default {
+            default (
                 ADJECTIVES.random() + "_" + ANIMALS.random()
-            }
+            )
 
             validate {
                 val invalidNameRegex = Regex("[^\\w\\-]")
@@ -138,6 +138,4 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
         private fun <E> List<E>.random(): E = get(Random().nextInt(size))
     }
-
-
 }
