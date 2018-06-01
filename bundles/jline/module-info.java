@@ -12,4 +12,9 @@ module jline {
     exports org.jline.reader.impl.history;
     exports org.jline.reader.impl.completer;
     exports org.jline.terminal.impl;
+
+    exports org.jline.terminal.spi;
+    exports org.jline.terminal.impl.jansi.win;
+
+    uses org.jline.terminal.spi.JansiSupport;
 }

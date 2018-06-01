@@ -15,7 +15,9 @@
  */
 
 import com.haulmont.cuba.cli.CliPlugin;
+import com.haulmont.cuba.cli.JansiSupportWorkAround;
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin;
+import org.jline.terminal.spi.JansiSupport;
 
 module com.haulmont.cuba.cli {
     requires kotlin.stdlib.jdk8;
@@ -74,4 +76,7 @@ module com.haulmont.cuba.cli {
 
 //    may be needed by plugins
     requires java.sql;
+
+//    jansi support workaround
+    provides JansiSupport with JansiSupportWorkAround;
 }
