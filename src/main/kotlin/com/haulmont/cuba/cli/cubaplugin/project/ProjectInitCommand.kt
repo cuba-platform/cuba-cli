@@ -26,11 +26,11 @@ import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
-import java.io.File
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.attribute.PosixFilePermission
+import java.util.*
 
 @Parameters(commandDescription = "Creates new project")
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
@@ -54,7 +54,9 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
     override fun QuestionsList.prompting() {
         question("projectName", "Project Name") {
-            default { System.getProperty("user.dir").split(File.separatorChar).last() }
+            default {
+                ADJECTIVES.random() + "_" + ANIMALS.random()
+            }
 
             validate {
                 val invalidNameRegex = Regex("[^\\w\\-]")
@@ -129,4 +131,13 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
         writer.println(messages[dpTipsMessageName])
     }
+
+    companion object {
+        private val ANIMALS: List<String> = listOf("phoenix", "centaur", "mermaid", "leviathan", "dragon", "pegasus", "siren", "hydra", "sphinx", "unicorn", "wyvern", "behemoth", "griffon", "dodo", "mammoth")
+        private val ADJECTIVES: List<String> = listOf("great", "cool", "ambitious", "generous", "cute", "dear", "nice", "reliable", "solid", "trusty", "simple", "pure", "brave", "manly", "fearless", "artful", "vivid", "utopic", "lucid", "radiant")
+
+        private fun <E> List<E>.random(): E = get(Random().nextInt(size))
+    }
+
+
 }
