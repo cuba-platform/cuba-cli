@@ -40,10 +40,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
     private val printHelper: PrintHelper by kodein.instance()
 
     private val snippets: Snippets by lazy {
-        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "appcomponentxml/",
-                "appComponetGradleSnippets.xml",
-                javaClass,
-                projectModel.platformVersion)
+        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "appcomponentxml", javaClass, projectModel.platformVersion)
     }
 
     override fun preExecute() {
@@ -92,10 +89,10 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
         val buildGradle = Paths.get("build.gradle").toFile()
         val buildGradleText = buildGradle.readText()
 
-        if (Regex(snippets["addToManifest.attributePattern"]).find(buildGradleText) == null) {
+        if (Regex(snippets["attributePattern"]).find(buildGradleText) == null) {
             buildGradleText.replace(
-                    snippets["addToManifest.searchString"],
-                    snippets["addToManifest.replaceString"]
+                    snippets["searchString"],
+                    snippets["replaceString"]
             ).let {
                 buildGradle.writeText(it)
             }

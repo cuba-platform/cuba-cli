@@ -1,0 +1,1 @@
+    delete("$cuba.tomcat.dir/webapps/${modulePrefix}")

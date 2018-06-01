@@ -1,0 +1,46 @@
+configure(polymerClientModule) {
+    apply(plugin: 'cuba')
+    apply(plugin: 'idea')
+
+    apply(plugin: 'war')
+    apply(plugin: 'maven')
+
+    def frontAppDir = "${modulePrefix}-front"
+    def mainBuildDir = 'build/es6-unbundled'
+
+    task installBowerPackages(type: NodeTask, dependsOn: npmInstall) {
+        script = file("node_modules/bower/bin/bower")
+        args = ['install','-F']
+        inputs.file "bower.json"
+        outputs.dir "bower_components"
+    }
+
+    task buildPolymer(type: NodeTask, dependsOn: installBowerPackages) {
+        script = file("node_modules/polymer-cli/bin/polymer")
+        args = ['build']
+        inputs.files fileTree('./') {
+        exclude 'build'
+    }
+    outputs.dir "build"
+    }
+
+    assemble.dependsOn buildPolymer
+
+    task deployUnbundled(type: Copy) {
+        from file('./')
+        include 'bower_components/**'
+        include 'src/**'
+        into "$cuba.tomcat.dir/webapps/$frontAppDir"
+    }
+
+    task deploy(type: Copy, dependsOn: [assemble, deployUnbundled]) {
+        from file(mainBuildDir)
+        into "$cuba.tomcat.dir/webapps/$frontAppDir"
+    }
+
+    war {
+        from file(mainBuildDir)
+    }
+}
+
+task undeploy(type: Delete, dependsOn: ":${modulePrefix}-web:cleanConf") {

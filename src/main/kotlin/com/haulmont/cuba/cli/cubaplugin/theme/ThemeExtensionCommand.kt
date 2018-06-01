@@ -39,11 +39,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
     private val messages by localMessages()
 
     private val snippets: Snippets by lazy {
-        Snippets(
-                CubaPlugin.SNIPPETS_BASE_PATH + "theme/",
-                "themeExtensionGradleSnippets.xml",
-                javaClass,
-                projectModel.platformVersion)
+        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "theme", javaClass, projectModel.platformVersion)
     }
 
     private val writer: PrintWriter by kodein.instance()
@@ -111,7 +107,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         val moduleRegistered = projectStructure.settingsGradle
                 .toFile()
                 .readLines()
-                .contains(snippets["settingsGradle.moduleRegistration"])
+                .contains(snippets["moduleRegistration"])
 
         if (!moduleRegistered) {
             registerModule()
@@ -128,7 +124,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
                     (modules + "\":\${modulePrefix}-web-themes\"").joinToString(" ,", "include(", ")")
                 }
             } else it
-        } + snippets["settingsGradle.moduleRegistration"]
+        } + snippets["moduleRegistration"]
 
         settingsGradle.toFile().writeText(lines.joinToString("\n"))
 
@@ -138,11 +134,11 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         val buildGradle = projectStructure.buildGradle
         buildGradle.toFile()
                 .readText()
-                .replace(snippets["buildGradle.webModuleSearch"],
-                        snippets["buildGradle.webModuleReplace"])
+                .replace(snippets["webModuleSearch"],
+                        snippets["webModuleReplace"])
                 .replace(
-                        snippets["buildGradle.configureWebModuleSearch"],
-                        snippets["buildGradle.configureWebModuleReplace"])
+                        snippets["configureWebModuleSearch"],
+                        snippets["configureWebModuleReplace"])
                 .let {
                     buildGradle.toFile().writeText(it)
                 }

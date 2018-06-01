@@ -136,7 +136,7 @@ private fun getDbTypeByDriver(driverClass: String): String = when {
     "hsql" in driverClass -> "hsql"
     "postgres" in driverClass -> "postgres"
     "sqlserver" in driverClass -> "mssql"
-    "oracle" in driverClass -> "mssql"
+    "oracle" in driverClass -> "oracle"
     "mysql" in driverClass -> "mysql"
     else -> throw ProjectScanException("Unrecognized jdbc driver class $driverClass")
 }

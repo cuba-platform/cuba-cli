@@ -1,0 +1,15 @@
+create table %s (
+    ID uniqueidentifier not null,
+    CREATE_TS datetime,
+    CREATED_BY varchar(50),
+    VERSION integer,
+    UPDATE_TS datetime,
+    UPDATED_BY varchar(50),
+    DELETE_TS datetime,
+    DELETED_BY varchar(50),
+
+    -- add your columns here
+
+    primary key nonclustered (ID)
+)^
+

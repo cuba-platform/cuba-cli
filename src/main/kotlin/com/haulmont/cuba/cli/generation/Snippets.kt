@@ -21,38 +21,26 @@ import com.haulmont.cuba.cli.PlatformVersion
 import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.kodein
 import org.kodein.di.generic.instance
-import org.w3c.dom.Element
+import java.nio.file.Files
 import java.nio.file.Path
 
-class Snippets(snippetPath: Path) {
-    private val snippets: Map<String, String>
+class Snippets(private val snippetsPath: Path) {
+    private val snippets: MutableMap<String, String> = mutableMapOf()
 
-    init {
-        val borderRegex = Regex("[\n \r]*\\|")
-        snippets = parse(snippetPath).documentElement
-                .xpath("//snippet")
-                .filterIsInstance(Element::class.java)
-                .associateBy({
-                    it["name"]
-                }, {
-                    it.textContent
-                            .replaceFirst(borderRegex, "")
-                            .reversed()
-                            .replaceFirst(borderRegex, "")
-                            .reversed()
-                })
+    operator fun get(name: String): String {
+        if (name !in snippets) {
+            snippets[name] = Files.newInputStream(snippetsPath.resolve(name)).reader().readText()
+        }
+        return snippets[name]!!
     }
-
-    operator fun get(name: String): String = snippets[name]!!
 
     companion object {
         private val resources: Resources by kodein.instance()
 
-        operator fun invoke(basePath: String, snippetName: String, clazz: Class<Any>, platformVersion: PlatformVersion = LatestVersion): Snippets {
+        operator fun invoke(basePath: String, clazz: Class<Any>, platformVersion: PlatformVersion = LatestVersion): Snippets {
             val baseDirectory = resources.getResourcePath(basePath, clazz)!!
 
             return platformVersion.findMostSuitableVersionDirectory(baseDirectory)
-                    .resolve(snippetName)
                     .let(::Snippets)
         }
     }

@@ -1,0 +1,2 @@
+def webModule = project(":${modulePrefix}-web")
+def webThemesModule = project(":${modulePrefix}-web-themes")

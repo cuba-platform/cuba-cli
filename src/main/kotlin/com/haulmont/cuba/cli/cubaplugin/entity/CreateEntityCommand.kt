@@ -47,7 +47,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     private val messages: Messages by localMessages()
 
     private val snippets by lazy {
-        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "entity", "sqlSnippets.xml", javaClass, projectModel.platformVersion)
+        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "entity", javaClass, projectModel.platformVersion)
     }
 
     private val calendar = Calendar.getInstance()
@@ -139,7 +139,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     }
 
     private fun createSqlScripts() {
-        val script = snippets.get("createTable").format(model.tableName)
+        val script = snippets.get("${projectModel.database.type}CreateTable").format(model.tableName)
 
         val dbPath = projectStructure.getModule(CORE_MODULE).path.resolve("db")
 
@@ -163,7 +163,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
                 .filter { Files.isRegularFile(it) && it.fileName.toString().endsWith(".sql") && it.fileName.toString().startsWith(todayPrefix) }
                 .count()
 
-        val scriptName = "$todayPrefix${1 + todayScriptsCount}-update${model.name}.sql"
+        val scriptName = "$todayPrefix${1 + todayScriptsCount}-create${model.name}.sql"
 
         val updateScriptPath = currentYearUpdateDir.resolve(scriptName)
         updateScriptPath.toFile().also { it.createNewFile() }.writeText(script)

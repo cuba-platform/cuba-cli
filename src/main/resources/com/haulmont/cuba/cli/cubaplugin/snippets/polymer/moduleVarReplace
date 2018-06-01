@@ -1,0 +1,2 @@
+def webModule = project(":${modulePrefix}-web")
+def polymerClientModule = project(":${modulePrefix}-polymer-client")
