@@ -55,7 +55,7 @@ class ProjectModel(projectStructure: ProjectStructure) {
         try {
             val global = projectStructure.getModule(GLOBAL_MODULE)
 
-            rootPackageDirectory = projectStructure.rootPackageDirectory.toString()
+            rootPackageDirectory = projectStructure.rootPackageDirectory
 
             rootPackage = projectStructure.rootPackage
 
@@ -66,7 +66,7 @@ class ProjectModel(projectStructure: ProjectStructure) {
 
             namespace = parseNamespace(global.persistenceXml)
 
-            val buildGradle = File("build.gradle").readText()
+            val buildGradle = projectStructure.buildGradle.toFile().readText()
 
             val groupRegex = Regex("group *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]")
             group = groupRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
@@ -95,7 +95,7 @@ class ProjectModel(projectStructure: ProjectStructure) {
 
     private fun parseAppComponents(projectStructure: ProjectStructure): List<String> {
         val webXml = projectStructure.getModule(ModuleStructure.WEB_MODULE).path
-                .resolve(Paths.get("web", "WEB-INF", "web.xml"))
+                .resolve("web", "WEB-INF", "web.xml")
 
         return parse(webXml).documentElement
                 .xpath("//context-param[param-name[text()='appComponents']]/param-value")

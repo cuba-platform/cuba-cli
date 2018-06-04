@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.project
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.PlatformVersion
+import com.haulmont.cuba.cli.WorkingDirectoryManager
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
@@ -35,6 +36,8 @@ import java.util.*
 @Parameters(commandDescription = "Creates new project")
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     private val messages by localMessages()
+
+    private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
 
     private val platformVersions by lazy {
         messages["platformVersions"].split(',').map { it.trim() }
@@ -54,8 +57,8 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
     override fun QuestionsList.prompting() {
         question("projectName", "Project Name") {
-            default (
-                ADJECTIVES.random() + "_" + ANIMALS.random()
+            default(
+                    ADJECTIVES.random() + "-" + ANIMALS.random()
             )
 
             validate {
@@ -67,6 +70,10 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
                 if (value.isBlank()) {
                     fail("Empty names not allowed")
+                }
+
+                if (Paths.get(value).let { Files.exists(it) && Files.isDirectory(it) }) {
+                    fail("Directory with such name $value already exists")
                 }
             }
         }
@@ -102,26 +109,29 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     override fun createModel(answers: Answers): ProjectInitModel = ProjectInitModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
-        val cwd = Paths.get("")
+        workingDirectoryManager.workingDirectory = Paths.get(model.projectName)
+        val cwd = workingDirectoryManager.workingDirectory
+
+        Files.createDirectories(cwd)
 
         val templateTips = TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "project", bindings, PlatformVersion(model.platformVersion)) {
             listOf("modules", "build.gradle", "settings.gradle").forEach {
                 transform(it)
             }
             copy("gitignore")
-            Files.move(Paths.get("gitignore"), Paths.get(".gitignore"))
+            Files.move(cwd.resolve("gitignore"), cwd.resolve(".gitignore"))
 
             listOf("gradle", "gradlew", "gradlew.bat").forEach {
                 copy(it)
             }
             try {
-                Files.setPosixFilePermissions(Paths.get("gradlew"), setOf(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ))
+                Files.setPosixFilePermissions(cwd.resolve("gradlew"), setOf(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ))
             } catch (e: Exception) {
                 //todo warn if current system is *nix
             }
         }
 
-        templateTips?.let { writer.println(it.format(cwd.toAbsolutePath())) }
+        templateTips?.let { writer.println(it.format(cwd.toAbsolutePath().toString())) }
 
         val dpTipsMessageName = when (model.database.database) {
             databases[5] -> "oracleDbTips"

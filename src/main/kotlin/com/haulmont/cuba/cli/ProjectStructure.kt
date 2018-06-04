@@ -19,34 +19,39 @@ package com.haulmont.cuba.cli
 import com.haulmont.cuba.cli.generation.get
 import com.haulmont.cuba.cli.generation.parse
 import com.haulmont.cuba.cli.generation.xpath
+import org.kodein.di.direct
+import org.kodein.di.generic.instance
 import org.w3c.dom.Element
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * Provides access for important project files. All paths are calculated lazily.
  * If file represented by path absents, rises [ProjectFileNotFoundException] on access.
  */
 class ProjectStructure {
+    val path: Path = run {
+        val directoryManager = kodein.direct.instance<WorkingDirectoryManager>()
+        directoryManager.workingDirectory
+    }
     //    fail first if no build.gradle found
-    val buildGradle: Path = Paths.get("build.gradle") orFail "No build.gradle found"
+    val buildGradle: Path = path.resolve("build.gradle") orFail "No build.gradle found"
 
-    val settingsGradle: Path = Paths.get("settings.gradle") orFail "No settings.gradle found"
+    val settingsGradle: Path = path.resolve("settings.gradle") orFail "No settings.gradle found"
 
     val rootPackage: String by lazy {
-        findRootPackage() ?: throw ProjectFileNotFoundException("Unable to find root package")
+        findRootPackage(path) ?: throw ProjectFileNotFoundException("Unable to find root package")
     }
 
-    val rootPackageDirectory: Path by lazy {
-        rootPackage.replace('.', '/').let { Paths.get(it) }
+    val rootPackageDirectory: String by lazy {
+        rootPackage.replace('.', '/')
     }
 
-    fun getModule(name: String): ModuleStructure = ModuleStructure(name, rootPackage)
+    fun getModule(name: String): ModuleStructure = ModuleStructure(name, rootPackage, path)
 }
 
-class ModuleStructure(val name: String, val rootPackage: String) {
-    val path: Path = Paths.get("modules", name) orFail "Module $name not found"
+class ModuleStructure(val name: String, val rootPackage: String, projectRoot: Path) {
+    val path: Path = projectRoot.resolve("modules", name) orFail "Module $name not found"
 
     val src: Path by lazy {
         path.resolve("src") orFail "Module's $name src directory not found"
@@ -94,8 +99,8 @@ private infix fun Path?.orFail(message: String): Path =
         this?.takeIf { Files.exists(this) } ?: throw ProjectFileNotFoundException(message)
 
 
-private fun findRootPackage(): String? {
-    val globalModuleSrc = Paths.get("modules/global/src")
+private fun findRootPackage(projectRoot: Path): String? {
+    val globalModuleSrc = projectRoot.resolve("modules/global/src")
 
     globalModuleSrc.takeIf { Files.exists(it) }
             ?.findFile("metadata.xml")?.let {

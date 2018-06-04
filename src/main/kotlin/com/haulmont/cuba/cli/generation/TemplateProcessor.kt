@@ -84,7 +84,6 @@ class TemplateProcessor {
                             .replace(baseTemplatePath, targetDirectoryPath)
                             .let { applyPathTransform(it, bindings) }
                             .let { Paths.get(it) }
-                            .let { projectRoot.relativize(it) }
 
                     ensureFolders(outputFile)
 
@@ -189,12 +188,11 @@ class TemplateProcessor {
         copy("", to)
     }
 
-    fun Path.walk(depth: Int = Int.MAX_VALUE) =
-            Files.walk(this, depth)
-                    .collect(Collectors.toList())!!
-
     companion object {
-        val projectRoot: Path = Paths.get("").toAbsolutePath()
+        private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
+
+        val projectRoot: Path
+            get() = workingDirectoryManager.workingDirectory.toAbsolutePath()
 
         private val resources: Resources by kodein.instance()
 

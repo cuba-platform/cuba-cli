@@ -26,6 +26,7 @@ import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.walk
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.nio.file.Paths
@@ -65,7 +66,7 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
 
 
     override fun generate(bindings: Map<String, Any>) {
-        val destinationDir = Paths.get("modules/polymer-client")
+        val destinationDir = projectStructure.path.resolve("modules/polymer-client")
 
         val maybeHints = TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "polymer", bindings) {
             templatePath.walk(1).filter {

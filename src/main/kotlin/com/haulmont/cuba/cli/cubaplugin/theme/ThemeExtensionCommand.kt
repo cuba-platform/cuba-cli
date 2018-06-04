@@ -28,10 +28,10 @@ import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.resolve
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.stream.Collectors
 
 @Parameters(commandDescription = "Generates halo theme extension")
@@ -93,7 +93,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
 
     override fun generate(bindings: Map<String, Any>) {
         val targetDirectory = projectStructure.getModule(WEB_MODULE).path
-                .resolve(Paths.get("themes", model.themeName))
+                .resolve("themes", model.themeName)
 
         TemplateProcessor(
                 CubaPlugin.TEMPLATES_BASE_PATH + "themes/" + model.themeName,

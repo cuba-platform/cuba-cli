@@ -19,6 +19,7 @@ package com.haulmont.cuba.cli.cubaplugin.statictemplate
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.LatestVersion
+import com.haulmont.cuba.cli.WorkingDirectoryManager
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
@@ -27,13 +28,14 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.stream.Collectors
 
 @Parameters(commandDescription = "Generates artifacts from custom template")
 class StaticTemplateCommand : GeneratorCommand<Answers>() {
 
     private val writer: PrintWriter by kodein.instance()
+
+    private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
 
     @Parameter(description = "Template name")
     private var templateName: String? = null
@@ -83,12 +85,14 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
             LatestVersion
         }
 
+        val cwd = workingDirectoryManager.workingDirectory
+
         val maybeHints = TemplateProcessor(template.path, bindings, platformVersion) {
             for (instruction in template.instructions) {
                 if (instruction.transform) {
-                    transform(instruction.from, Paths.get(instruction.to))
+                    transform(instruction.from, cwd.resolve(instruction.to))
                 } else {
-                    copy(instruction.from, Paths.get(instruction.to))
+                    copy(instruction.from, cwd.resolve(instruction.to))
                 }
             }
         }

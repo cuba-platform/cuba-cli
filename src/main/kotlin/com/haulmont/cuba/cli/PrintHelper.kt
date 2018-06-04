@@ -27,6 +27,8 @@ import java.nio.file.Path
 class PrintHelper : GenerationProgressPrinter {
     private val writer: PrintWriter by kodein.instance()
 
+    private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
+
     private val messages by localMessages()
 
     private var lastStacktrace: String = ""
@@ -56,11 +58,11 @@ class PrintHelper : GenerationProgressPrinter {
     }
 
     override fun fileCreated(path: Path) {
-        writer.println("\t@|green created|@  $path")
+        writer.println("\t@|green created|@  ${relativize(path)}")
     }
 
     override fun fileModified(path: Path) {
-        writer.println("\t@|green modified|@ $path")
+        writer.println("\t@|green modified|@ ${relativize(path)}")
     }
 
     private fun printFailMessage(e: Exception) {
@@ -68,6 +70,8 @@ class PrintHelper : GenerationProgressPrinter {
 
         writer.println(messages["errorMessage", message])
     }
+
+    private fun relativize(path: Path) = workingDirectoryManager.absolutePath.relativize(path.toAbsolutePath())
 
     private fun saveStacktrace(e: Exception) {
         lastStacktrace = StringWriter().also {

@@ -59,6 +59,8 @@ val kodein = Kodein {
     bind<NamesUtils>() with instance(NamesUtils())
 
     bind<Resources>() with instance(Resources())
+
+    bind<WorkingDirectoryManager>() with instance(WorkingDirectoryManager())
 }
 
 private val context: CliContext by kodein.instance()

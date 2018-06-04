@@ -31,7 +31,6 @@ import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.*
 
 @Parameters(commandDescription = "Create new entity")
@@ -139,11 +138,11 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     }
 
     private fun createSqlScripts() {
-        val script = snippets.get("${projectModel.database.type}CreateTable").format(model.tableName)
+        val script = snippets["${projectModel.database.type}CreateTable"].format(model.tableName)
 
         val dbPath = projectStructure.getModule(CORE_MODULE).path.resolve("db")
 
-        val createDbPath = dbPath.resolve(Paths.get("init", projectModel.database.type, "10.create-db.sql"))
+        val createDbPath = dbPath.resolve("init", projectModel.database.type, "10.create-db.sql")
 
         if (Files.exists(createDbPath)) {
             createDbPath.toFile().appendText(script)
@@ -152,7 +151,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
             printWriter.println(messages["createDbNotFound"])
         }
 
-        val currentYearUpdateDir = dbPath.resolve(Paths.get("update", projectModel.database.type, getYear()))
+        val currentYearUpdateDir = dbPath.resolve("update", projectModel.database.type, getYear())
         if (!Files.exists(currentYearUpdateDir)) {
             Files.createDirectories(currentYearUpdateDir)
         }

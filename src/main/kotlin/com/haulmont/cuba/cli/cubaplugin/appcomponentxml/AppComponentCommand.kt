@@ -31,7 +31,6 @@ import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
 import java.nio.file.Path
-import java.nio.file.Paths
 
 @Parameters(commandDescription = "Generates app-component.xml")
 class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
@@ -86,7 +85,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
     }
 
     private fun addToManifest() {
-        val buildGradle = Paths.get("build.gradle").toFile()
+        val buildGradle = projectStructure.buildGradle.toFile()
         val buildGradleText = buildGradle.readText()
 
         if (Regex(snippets["attributePattern"]).find(buildGradleText) == null) {
@@ -100,8 +99,8 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
     }
 
     private fun changePrefix(prefix: String) {
-        replacePrefix(Paths.get("build.gradle"), prefix)
-        replacePrefix(Paths.get("settings.gradle"), prefix)
+        replacePrefix(projectStructure.buildGradle, prefix)
+        replacePrefix(projectStructure.settingsGradle, prefix)
 
         val webAppProperties = projectStructure.getModule(WEB_MODULE)
                 .rootPackageDirectory
