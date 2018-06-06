@@ -154,6 +154,7 @@ class OptionsQuestion(name: String, caption: String, val options: List<String>) 
             options.forEachIndexed { index, option ->
                 append("\n${index + 1}. $option ")
             }
+            append('\n')
         }
     }
 }
