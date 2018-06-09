@@ -89,7 +89,7 @@ class CubaPlugin : CliPlugin {
         try {
             context.addModel(ProjectModel.MODEL_NAME, ProjectModel(projectStructure))
         } catch (e: ProjectScanException) {
-            writer.println("@|red ${messages["projectParsingError"]}|@")
+            writer.println(messages["projectParsingError"].bgRed())
 
             printHelper.saveStacktrace(e)
         }

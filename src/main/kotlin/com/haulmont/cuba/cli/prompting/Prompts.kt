@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.prompting
 
+import com.haulmont.cuba.cli.bgRed
 import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.commands.CommonParameters
 import com.haulmont.cuba.cli.kodein
@@ -66,7 +67,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
                 validation(localAnswers, rootAnswers(localAnswers))
             }
         } catch (e: ValidationException) {
-            writer.println("@|red ${e.message}|@")
+            writer.println(e.message.bgRed())
         }
         return this.ask(rootAnswers)
     }
@@ -110,7 +111,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
             }
         } catch (e: Exception) {
             when (e) {
-                is ValidationException, is ReadException -> writer.println("@|red ${e.message}|@")
+                is ValidationException, is ReadException -> e.message?.let { writer.println(it.bgRed()) }
                 else -> throw e
             }
         }

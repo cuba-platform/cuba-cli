@@ -34,11 +34,11 @@ class PrintHelper : GenerationProgressPrinter {
     private var lastStacktrace: String = ""
 
     fun unrecognizedParameters(e: ParameterException) {
-        writer.println("@|red Unrecognized parameters\n${e.message}|@")
+        writer.println("Unrecognized parameters\n${e.message}".bgRed())
     }
 
     fun unrecognizedCommand() {
-        writer.println("@|red Unrecognized command|@")
+        writer.println("Unrecognized command".bgRed())
     }
 
     fun handleCommandException(e: Exception) {
@@ -54,15 +54,15 @@ class PrintHelper : GenerationProgressPrinter {
     }
 
     fun printLastStacktrace() {
-        writer.println("@|red $lastStacktrace|@")
+        writer.println(lastStacktrace.bgRed())
     }
 
     override fun fileCreated(path: Path) {
-        writer.println("\t@|green created|@  ${relativize(path)}")
+        writer.println("\tcreated  ".green() + relativize(path))
     }
 
     override fun fileModified(path: Path) {
-        writer.println("\t@|green modified|@ ${relativize(path)}")
+        writer.println("\tmodified ".green() + relativize(path))
     }
 
     private fun printFailMessage(e: Exception) {

@@ -41,9 +41,9 @@ private val bus: EventBus = EventBus { throwable: Throwable, subscriberContext -
         (throwable as java.lang.Throwable).printStackTrace(writer)
 
         writer.println(
-                """@|red Exception during another exception handling.
+                """Exception during another exception handling.
                     Source ${subscriberContext.subscriber}#${subscriberContext.subscriberMethod}.
-                    Terminating...|@""".trimIndent())
+                    Terminating...""".bgRed().trimIndent())
 
         System.exit(1)
     }

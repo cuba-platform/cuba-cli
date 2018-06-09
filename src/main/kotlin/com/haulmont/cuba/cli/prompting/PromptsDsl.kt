@@ -16,6 +16,8 @@
 
 package com.haulmont.cuba.cli.prompting
 
+import com.haulmont.cuba.cli.bgRed
+
 sealed class Question(val name: String) : Conditional {
     override var askCondition: (Answers) -> Boolean = { true }
 
@@ -35,7 +37,7 @@ abstract class PlainQuestion<T : Any>(name: String, val caption: String) : Quest
             is CalculatedValue -> defaultValue.function(answers).print()
         }.let {
             if (it.isEmpty()) it
-            else "@|red ($it) |@"
+            else it.bgRed()
         }
     }
 }
