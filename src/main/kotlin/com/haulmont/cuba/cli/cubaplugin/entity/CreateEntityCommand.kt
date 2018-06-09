@@ -56,7 +56,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     override fun QuestionsList.prompting() {
         question("entityName", "Entity Name") {
             validate {
-                checkRegex("\\b[A-Z]+[\\w\\d_$]*", "Invalid entity name")
+                checkIsClass()
             }
         }
 

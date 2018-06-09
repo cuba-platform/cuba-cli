@@ -246,7 +246,7 @@ class ValidationHelper<T : Any>(val value: T, val answers: Answers) {
     fun checkIsPackage(failMessage: String = "Is not valid package name") =
             checkRegex("[a-zA-Z][0-9a-zA-Z]*(\\.[a-zA-Z][0-9a-zA-Z]*)*", failMessage)
 
-    fun checkIsClass(failMessage: String = "Invalid class name") =
+    fun checkIsClass(failMessage: String = "Invalid class name. Class name should match UpperCamelCase") =
             checkRegex("\\b[A-Z]+[\\w\\d]*", failMessage)
 
     fun fail(cause: String): Nothing = throw ValidationException(cause)
