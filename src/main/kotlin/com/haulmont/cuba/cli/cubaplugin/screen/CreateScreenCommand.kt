@@ -40,7 +40,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         question("screenName", "Screen name") {
             default("screen")
             validate {
-                checkRegex("([a-zA-Z]*[a-zA-Z0-9]+)(-[a-zA-Z]*[a-zA-Z0-9]+)*", "Invalid screen name. It should match hyphen-case.")
+                checkRegex("([a-zA-Z]*[a-zA-Z0-9]+)(-[a-zA-Z]*[a-zA-Z0-9]+)*", "Invalid screen name. It should match hyphen-case, for example person-edit.")
             }
         }
         question("packageName", "Package name") {

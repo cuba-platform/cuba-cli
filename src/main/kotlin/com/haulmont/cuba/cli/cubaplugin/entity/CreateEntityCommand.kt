@@ -56,7 +56,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     override fun QuestionsList.prompting() {
         question("entityName", "Entity Name") {
             validate {
-                checkIsClass()
+                checkIsClass("Invalid entity name. Entity name should match UpperCamelCase, for example NewEntity.")
             }
         }
 
