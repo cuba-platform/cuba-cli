@@ -47,6 +47,8 @@ class CubaPlugin : CliPlugin {
 
     private val namesUtils: NamesUtils by kodein.instance()
 
+    private val printHelper: PrintHelper by kodein.instance()
+
     private val messages by localMessages()
 
     @Subscribe
@@ -86,12 +88,7 @@ class CubaPlugin : CliPlugin {
         } catch (e: ProjectScanException) {
             writer.println("@|red ${messages["projectParsingError"]}|@")
 
-            StringWriter().also {
-                @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
-                (e as java.lang.Throwable).printStackTrace(PrintWriter(it))
-            }.toString().let {
-                writer.println("@|red $it|@")
-            }
+            printHelper.saveStacktrace(e)
         }
     }
 

@@ -58,6 +58,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
             command("stacktrace", Stacktrace)
             command("version", VersionCommand)
             command("exit", ExitCommand)
+            command("cd", CdCommand())
         }
 
         commandParser = CommandParser(commandsRegistry, shellMode = true)

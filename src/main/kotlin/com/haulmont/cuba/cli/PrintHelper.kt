@@ -73,7 +73,7 @@ class PrintHelper : GenerationProgressPrinter {
 
     private fun relativize(path: Path) = workingDirectoryManager.absolutePath.relativize(path.toAbsolutePath())
 
-    private fun saveStacktrace(e: Exception) {
+    fun saveStacktrace(e: Exception) {
         lastStacktrace = StringWriter().also {
             @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
             (e as java.lang.Throwable).printStackTrace(PrintWriter(it))
