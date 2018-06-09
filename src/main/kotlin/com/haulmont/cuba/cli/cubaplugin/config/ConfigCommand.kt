@@ -31,7 +31,7 @@ class ConfigCommand : GeneratorCommand<ConfigModel>() {
 
     override fun getModelName(): String = ConfigModel.NAME
 
-    override fun beforeGeneration() {
+    override fun preExecute() {
         checkProjectExistence()
     }
 

@@ -34,11 +34,11 @@ import com.haulmont.cuba.cli.cubaplugin.screenextension.ExtendDefaultScreenComma
 import com.haulmont.cuba.cli.cubaplugin.service.CreateServiceCommand
 import com.haulmont.cuba.cli.cubaplugin.statictemplate.StaticTemplateCommand
 import com.haulmont.cuba.cli.cubaplugin.theme.ThemeExtensionCommand
+import com.haulmont.cuba.cli.cubaplugin.updatescript.UpdateScript
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
-import java.io.StringWriter
 
 @Suppress("UNUSED_PARAMETER")
 class CubaPlugin : CliPlugin {
@@ -72,6 +72,7 @@ class CubaPlugin : CliPlugin {
             command("install-component", ComponentInstallCommand())
             command("polymer", CreatePolymerModuleCommand())
             command("config", ConfigCommand())
+            command("updateScript", UpdateScript())
         }
     }
 
