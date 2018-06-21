@@ -79,5 +79,5 @@ class UpdateScript : GeneratorCommand<String>() {
 
     private fun getYear() = (calendar[Calendar.YEAR] - 2000).toString()
 
-    private fun getTodayPrefix() = "%s%02d%02d-".format(getYear(), calendar[Calendar.MONTH], calendar[Calendar.DAY_OF_MONTH])
+    private fun getTodayPrefix() = "%s%02d%02d-".format(getYear(), calendar[Calendar.MONTH] + 1, calendar[Calendar.DAY_OF_MONTH])
 }
