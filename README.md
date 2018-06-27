@@ -1,6 +1,4 @@
-## CUBA CLI
-
-<h1 align="center"> <a href="https://www.cuba-platform.com/"><img src="https://github.com/cuba-platform/cuba-cli/blob/master/img/logo-title.png" alt="CUBA CLI" width="600" align="center"></a>
+<h1 align="center"> <a href="https://www.cuba-platform.com/"><img src="https://github.com/cuba-platform/cuba-cli/blob/master/img/logo-title.png" alt="CUBA CLI" width="300" align="center"></a>
 </h1>
 
 <h4 align="center">A command line interface for CUBA Platform</h4>

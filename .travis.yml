@@ -1,5 +1,5 @@
 language: java
-jdk: openjdk9
+jdk: openjdk10
 
 install:
   - ./gradlew --no-daemon assemble
@@ -12,7 +12,9 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-addons:
-  apt:
-    packages:
-      - openjdk-9-jdk
+matrix:
+  include:
+    - jdk: openjdk10
+      before_install:
+        - rm "${JAVA_HOME}/lib/security/cacerts"
+        - ln -s /etc/ssl/certs/java/cacerts "${JAVA_HOME}/lib/security/cacerts"
