@@ -31,8 +31,10 @@
   </h3>
 </div>
 
-The CUBA CLI makes it easy to create an application that already works, right out of the box.
+<div align="center">
+    The CUBA CLI makes it easy to create an application that already works, right out of the box.
 
-<img src="https://github.com/cuba-platform/cuba-cli/blob/master/img/cuba-cli-demo.gif" align="center">
+    <img src="https://github.com/cuba-platform/cuba-cli/blob/master/img/cuba-cli-demo.gif" align="center">
+</div>
 
 Check [Quick Start](https://github.com/cuba-platform/cuba-cli/wiki/Quick-Start) Guide for further detail.
