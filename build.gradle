@@ -104,8 +104,15 @@ jar {
     duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.FAIL
 }
 
+// disable automatic building of ZIP and TAR
+configurations.archives.artifacts.removeAll {
+    it.file =~ 'tar' || it.file =~ 'zip'
+}
+
 task sourceJar(type: Jar) {
-    from file('src')
+    from file('src/main/java')
+    from file('src/main/kotlin')
+    from file('src/main/resources')
     classifier = 'sources'
 }
 
