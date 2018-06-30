@@ -29,7 +29,6 @@ def guavaVersion = "25.0-cuba.0"
 def slf4jVersion = "1.7.25"
 def jlineVersion = "3.6.2"
 def kodeinVersion = "5.0.0"
-def coroutinesVersion = "0.22.5"
 def practicalxmlVersion = "1.1.0"
 
 apply plugin: 'kotlin'
