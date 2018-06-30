@@ -39,4 +39,16 @@ The CUBA CLI makes it easy to create an application that already works, right ou
 <img src="https://github.com/cuba-platform/cuba-cli/blob/master/img/cuba-cli-demo.gif" align="center">
 </h3>
 
+## What you can do with CUBA-CLI ?
+
+In a nutshell, cuba-cli is a command line utility that enables you to easily create projects based on CUBA Platform. Also, it provides the lightweight scaffolding of the main project artifacts: entities, screens, services, etc.
+
+With this tool, you can use CUBA Platform without any additional proprietary tools. Just command line, framework and you.
+
 Check [Quick Start](https://github.com/cuba-platform/cuba-cli/wiki/Quick-Start) Guide for further detail.
+
+## Contributing
+
+In case something is missing, you could implement this and create a PR. See our [Contributing guide](https://github.com/cuba-platform/cuba-cli/blob/master/CONTRIBUTING.md).
+
+Moreover, you can implement your own plugin for cuba-cli. Check [Custom templates](https://github.com/cuba-platform/cuba-cli/wiki/Custom-templates) and [Plugin development]() pages.
