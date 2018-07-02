@@ -40,7 +40,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
 
     private val platformVersions by lazy {
-        messages["platformVersions"].split(',').map { it.trim() }
+        messages["platformVersions"].split(',').map { it.trim() } + CUSTOM_VERSION
     }
 
     private val databases by lazy {
@@ -101,6 +101,17 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
             default(0)
         }
 
+        question("customPlatformVersion", "Platform version") {
+            askIf {
+                it["platformVersion"] == CUSTOM_VERSION
+            }
+
+            validate {
+                if (value.isBlank())
+                    fail("Type platform version")
+            }
+        }
+
         options("database", "Choose database", databases) {
             default(0)
         }
@@ -145,6 +156,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
     companion object {
         private val ANIMALS: List<String> = listOf("phoenix", "centaur", "mermaid", "leviathan", "dragon", "pegasus", "siren", "hydra", "sphinx", "unicorn", "wyvern", "behemoth", "griffon", "dodo", "mammoth")
         private val ADJECTIVES: List<String> = listOf("great", "cool", "ambitious", "generous", "cute", "dear", "nice", "reliable", "solid", "trusty", "simple", "pure", "brave", "manly", "fearless", "artful", "vivid", "utopic", "lucid", "radiant")
+        private const val CUSTOM_VERSION = "another version"
 
         private fun <E> List<E>.random(): E = get(Random().nextInt(size))
     }
