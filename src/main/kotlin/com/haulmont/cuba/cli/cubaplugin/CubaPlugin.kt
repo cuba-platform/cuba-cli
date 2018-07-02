@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin
 
 import com.google.common.eventbus.Subscribe
 import com.haulmont.cuba.cli.*
+import com.haulmont.cuba.cli.commands.PlaceholderCommand
 import com.haulmont.cuba.cli.cubaplugin.appcomponentxml.AppComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.browsescreen.CreateBrowseScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.componentbean.CreateComponentBeanCommand
@@ -57,7 +58,8 @@ class CubaPlugin : CliPlugin {
         event.commandsRegistry {
             command("create-app", ProjectInitCommand())
             command("entity", CreateEntityCommand())
-            command("screen", CreateScreenCommand()) {
+            command("screen", PlaceholderCommand()) {
+                command("custom", CreateScreenCommand())
                 command("extend", ExtendDefaultScreenCommand())
                 command("browse", CreateBrowseScreenCommand())
                 command("edit", CreateEditScreenCommand())
@@ -89,7 +91,7 @@ class CubaPlugin : CliPlugin {
         try {
             context.addModel(ProjectModel.MODEL_NAME, ProjectModel(projectStructure))
         } catch (e: ProjectScanException) {
-            writer.println(messages["projectParsingError"].bgRed())
+            writer.println(messages["projectParsingError"].attention())
 
             printHelper.saveStacktrace(e)
         }
