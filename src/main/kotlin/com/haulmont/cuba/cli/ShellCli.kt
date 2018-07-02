@@ -136,6 +136,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
         } else {
             writer.println(messages["welcomeMessageDumb"].trimMargin())
         }
+        writer.println(messages["interactiveModeHint"])
     }
 
     companion object {
