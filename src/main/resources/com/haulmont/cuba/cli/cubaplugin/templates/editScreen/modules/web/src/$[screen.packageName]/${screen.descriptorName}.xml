@@ -6,21 +6,21 @@
         datasource="${entity}Ds"
         focusComponent="fieldGroup"
         messagesPack="${screen.packageName}">
-<dsContext>
-    <datasource id="${entity}Ds"
-                class="${screen.fullEntityName}"
-                view="_local"/>
-</dsContext>
-<dialogMode height="600"
-            width="800"/>
-<layout expand="windowActions"
-        spacing="true">
-    <fieldGroup id="fieldGroup"
-                datasource="${entity}Ds">
-        <!--Specify fields to edit here-->
-    </fieldGroup>
-    <frame id="windowActions"
-           screen="editWindowActions"/>
-</layout>
+    <dsContext>
+        <datasource id="${entity}Ds"
+                    class="${screen.fullEntityName}"
+                    view="_local"/>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="windowActions"
+            spacing="true">
+        <fieldGroup id="fieldGroup"
+                    datasource="${entity}Ds">
+            <!--Specify fields to edit here-->
+        </fieldGroup>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
 </window>
 
