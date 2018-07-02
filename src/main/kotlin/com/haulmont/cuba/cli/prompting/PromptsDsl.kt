@@ -16,8 +16,6 @@
 
 package com.haulmont.cuba.cli.prompting
 
-import com.haulmont.cuba.cli.bgRed
-
 sealed class Question(val name: String) : Conditional {
     override var askCondition: (Answers) -> Boolean = { true }
 
@@ -26,7 +24,7 @@ sealed class Question(val name: String) : Conditional {
 
 abstract class PlainQuestion<T : Any>(name: String, val caption: String) : Question(name), Print<T>, Read<T>, WithValidation<T>, HasDefault<T> {
     open fun printPrompts(answers: Answers): String =
-            """> $caption ${printDefaultValue(answers)}"""
+            """> $caption ${printDefaultValue(answers)}> """
 
 
     open fun printDefaultValue(answers: Answers): String {
@@ -37,7 +35,7 @@ abstract class PlainQuestion<T : Any>(name: String, val caption: String) : Quest
             is CalculatedValue -> defaultValue.function(answers).print()
         }.let {
             if (it.isEmpty()) it
-            else it.bgRed()
+            else "($it) "
         }
     }
 }
@@ -154,9 +152,10 @@ class OptionsQuestion(name: String, caption: String, val options: List<String>) 
         return buildString {
             append(super.printPrompts(answers))
             options.forEachIndexed { index, option ->
-                append("\n${index + 1}. $option ")
+                append("\n${index + 1}. $option")
             }
             append('\n')
+            append("> ")
         }
     }
 }
@@ -250,6 +249,10 @@ class ValidationHelper<T : Any>(val value: T, val answers: Answers) {
 
     fun checkIsClass(failMessage: String = "Invalid class name. Class name should match UpperCamelCase.") =
             checkRegex("\\b[A-Z]+[\\w\\d]*", failMessage)
+
+    fun checkIsScreenDescriptor(failMessage: String = "Screen descriptor can contain alphanumerical characters, dashes, underscores and dollar signs.") {
+        checkRegex("[a-zA-Z0-9.$\\-_]+", failMessage)
+    }
 
     fun fail(cause: String): Nothing = throw ValidationException(cause)
 

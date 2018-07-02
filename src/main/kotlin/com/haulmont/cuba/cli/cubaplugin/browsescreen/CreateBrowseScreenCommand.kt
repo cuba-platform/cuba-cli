@@ -59,16 +59,36 @@ class CreateBrowseScreenCommand : GeneratorCommand<BrowseScreenModel>() {
             default { answers ->
                 val entityName: String by answers
 
-                val packageParts = entityName.split('.')
+                val packageParts = entityName.split('.').filter { it != "entity" }
                 packageParts.take(packageParts.lastIndex).joinToString(".") + ".web." + packageParts.last().toLowerCase()
             }
         }
 
-        question("screenName", "Screen name") {
+        question("screenId", "Screen id") {
             default { answers ->
                 val entityName: String by answers
 
                 projectModel.namespace + "$" + entityName.split('.').last() + ".browse"
+            }
+        }
+
+        question("descriptorName", "Descriptor name") {
+            default { answers ->
+                val entityName: String by answers
+
+                entityName.split('.').last().toLowerCase() + "-browse"
+            }
+
+            validate {
+                checkIsScreenDescriptor()
+            }
+        }
+
+        question("controllerName", "Controller name") {
+            default { answers -> (answers["entityName"] as String).split('.').last() + "Browse"}
+
+            validate {
+                checkIsClass()
             }
         }
     }
@@ -80,9 +100,9 @@ class CreateBrowseScreenCommand : GeneratorCommand<BrowseScreenModel>() {
         val screensXml = webModule.screensXml
 
         parse(screensXml).documentElement
-                .xpath("//screen[id=\"${model.screenName}\"]")
+                .xpath("//screen[id=\"${model.screenId}\"]")
                 .firstOrNull()?.let {
-                    fail("Screen with id ${model.screenName} already exists")
+                    fail("Screen with id ${model.screenId} already exists")
                 }
     }
 
@@ -96,8 +116,8 @@ class CreateBrowseScreenCommand : GeneratorCommand<BrowseScreenModel>() {
 
         updateXml(screensXml) {
             appendChild("screen") {
-                this["id"] = model.screenName
-                val template = namesUtils.packageToDirectory(model.packageName) + '/' + model.screenName + ".xml"
+                this["id"] = model.screenId
+                val template = namesUtils.packageToDirectory(model.packageName) + '/' + model.descriptorName + ".xml"
                 this["template"] = template
             }
         }
@@ -112,13 +132,13 @@ class CreateBrowseScreenCommand : GeneratorCommand<BrowseScreenModel>() {
             val menuItem = findFirstChild("menu") ?: appendChild("menu")
 
             menuItem.appendChild("item") {
-                this["screen"] = model.screenName
+                this["screen"] = model.screenId
             }
         }
 
         val menuMessages = webModule.src.resolve(namesUtils.packageToDirectory(projectModel.rootPackage)).resolve("messages.properties")
         PropertiesHelper(menuMessages) {
-            set("menu-config.${model.screenName}", "${model.entityName}s")
+            set("menu-config.${model.descriptorName}", "${model.entityName}s")
         }
     }
 

@@ -17,6 +17,7 @@
 package com.haulmont.cuba.cli.cubaplugin.screen
 
 import com.beust.jcommander.Parameters
+import com.google.common.base.CaseFormat
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
@@ -37,10 +38,18 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
     override fun preExecute() = checkProjectExistence()
 
     override fun QuestionsList.prompting() {
-        question("screenName", "Screen name") {
+        question("descriptorName", "Descriptor name") {
             default("screen")
             validate {
-                checkRegex("([a-zA-Z]*[a-zA-Z0-9]+)(-[a-zA-Z]*[a-zA-Z0-9]+)*", "Invalid screen name. It should match hyphen-case, for example person-edit.")
+                checkIsScreenDescriptor()
+            }
+        }
+        question("controllerName", "Controller name") {
+            default {
+                CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, it["descriptorName"] as String)
+            }
+            validate {
+                checkIsClass()
             }
         }
         question("packageName", "Package name") {
@@ -69,7 +78,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         val messages = webModule.src.resolve(namesUtils.packageToDirectory(model.packageName)).resolve("messages.properties")
 
         PropertiesHelper(messages) {
-            set("caption", model.screenName)
+            set("caption", model.descriptorName)
         }
 
         if (model.addToMenu) {
@@ -77,7 +86,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
                 val menuItem = findFirstChild("menu") ?: appendChild("menu")
 
                 menuItem.appendChild("item") {
-                    this["screen"] = model.screenName
+                    this["screen"] = model.descriptorName
                 }
             }
         }
@@ -86,8 +95,8 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
     private fun addToScreensXml(screensXml: Path, screenModel: ScreenModel) {
         updateXml(screensXml) {
             appendChild("screen") {
-                this["id"] = screenModel.screenName
-                val template = namesUtils.packageToDirectory(screenModel.packageName) + '/' + screenModel.screenName + ".xml"
+                this["id"] = screenModel.descriptorName
+                val template = namesUtils.packageToDirectory(screenModel.packageName) + '/' + screenModel.descriptorName + ".xml"
                 this["template"] = template
             }
         }

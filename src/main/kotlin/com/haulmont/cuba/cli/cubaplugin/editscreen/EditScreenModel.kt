@@ -19,11 +19,12 @@ package com.haulmont.cuba.cli.cubaplugin.editscreen
 import com.haulmont.cuba.cli.prompting.Answers
 
 class EditScreenModel(answers: Answers) {
-    val screenName: String by answers
+    val screenId: String by answers
+    val descriptorName: String by answers
     val packageName: String by answers
     val fullEntityName: String = answers["entityName"] as String
     val entityName: String = fullEntityName.split('.').last()
-    val controllerName: String = "${entityName}Edit"
+    val controllerName: String by answers
     val entityPackageName: String = fullEntityName.split('.').let {
         it.take(it.size - 1).joinToString(".")
     }

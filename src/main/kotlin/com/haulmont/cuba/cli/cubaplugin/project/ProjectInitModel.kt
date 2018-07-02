@@ -24,7 +24,12 @@ class ProjectInitModel(answers: Answers) {
     val projectName: String by answers
     val namespace: String by answers
     val rootPackage: String by answers
-    val platformVersion: String by answers
+    val platformVersion: String = run {
+        if ("customPlatformVersion" in answers)
+            answers["customPlatformVersion"]
+        else
+            answers["platformVersion"]
+    } as String
     val rootPackageDirectory: String = rootPackage.replace('.', '/')
     val database: DatabaseModel = DatabaseModel(answers)
 }

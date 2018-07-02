@@ -75,7 +75,9 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
             commandParser.reset()
 
             val command = try {
-                val line = reader.readLine(PROMPT).takeIf {
+                val line = reader.readLine(PROMPT).also {
+                    it != null || return
+                }.takeIf {
                     it.isNotBlank()
                 } ?: continue
 
