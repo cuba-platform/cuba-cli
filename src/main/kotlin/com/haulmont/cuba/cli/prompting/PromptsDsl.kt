@@ -16,6 +16,8 @@
 
 package com.haulmont.cuba.cli.prompting
 
+import com.haulmont.cuba.cli.green
+
 sealed class Question(val name: String) : Conditional {
     override var askCondition: (Answers) -> Boolean = { true }
 
@@ -24,7 +26,7 @@ sealed class Question(val name: String) : Conditional {
 
 abstract class PlainQuestion<T : Any>(name: String, val caption: String) : Question(name), Print<T>, Read<T>, WithValidation<T>, HasDefault<T> {
     open fun printPrompts(answers: Answers): String =
-            """> $caption ${printDefaultValue(answers)}> """
+            "?".green() + """ $caption ${printDefaultValue(answers)}> """
 
 
     open fun printDefaultValue(answers: Answers): String {
