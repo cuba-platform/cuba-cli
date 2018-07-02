@@ -46,7 +46,10 @@ val terminalModule = Kodein.Module {
                 .build()
     }
 
-    bind<Terminal>() with instance(TerminalBuilder.builder().build())
+    bind<Terminal>() with singleton {
+        System.setProperty("org.jline.terminal.conemu.disable-activate", "true")
+        TerminalBuilder.builder().build()
+    }
 
     bind<PrintWriter>() with singleton {
         ColoredWriter(instance<Terminal>().writer())
