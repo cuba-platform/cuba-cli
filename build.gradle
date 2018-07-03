@@ -90,7 +90,7 @@ configurations {
 }
 
 processResources.doLast {
-    def buildProperties = new File(project.buildDir, 'resources/main/com/haulmont/cuba/cli/build.properties')
+    def buildProperties = new File(project.buildDir, 'resources/main/com/haulmont/cuba/cli/application.properties')
     buildProperties.text = buildProperties.text.replace('version = DEVELOPMENT', 'version = ' + project.version)
 }
 
