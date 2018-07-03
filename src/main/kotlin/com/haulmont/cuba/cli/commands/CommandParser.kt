@@ -40,9 +40,15 @@ class CommandParser(private val commandsRegistry: CommandsRegistry, private val 
 
     fun printHelp(command: CliCommand) = findRoute(command)
             .let {
-                val commandName = it.last().programName
-                val commandParent = it[it.lastIndex - 1]
-                buildString { commandParent.usage(commandName, this) }
+                buildString {
+                    if (it.size > 1) {
+                        val commandName = it.last().programName
+                        val commandParent = it[it.lastIndex - 1]
+                        commandParent.usage(commandName, this)
+                    } else {
+                        it.first().usage(this)
+                    }
+                }
             }.let {
                 writer.println(it)
             }
