@@ -16,8 +16,11 @@
 
 package com.haulmont.cuba.cli.commands
 
-class PlaceholderCommand : AbstractCommand() {
-    override fun run() {
+import com.beust.jcommander.Parameters
+
+@Parameters(commandDescription = "")
+open class PlaceholderCommand : AbstractCommand() {
+    final override fun run() {
         fail("Command usage without arguments does not permit. Read help for more information.")
     }
 }

@@ -9,11 +9,11 @@
       maxWaitMillis="5000"
       driverClassName="${project.database.driver}"
       url="${project.database.schema}//localhost/${project.namespace}${project.database.connectionParams}"
-      username="sa"
+      username="${project.database.username}"
 #if( ${project.database.database} == "Microsoft SQL Server 2005" )
       validationQuery="select 1"
 #end
-      password=""/>
+      password="${project.database.password}"/>
 
     <!-- Switch off session serialization -->
     <Manager pathname=""/>
