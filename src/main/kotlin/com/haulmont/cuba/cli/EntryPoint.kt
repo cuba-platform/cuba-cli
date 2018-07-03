@@ -37,7 +37,7 @@ import java.util.*
 val CLI_VERSION : String by lazy {
     val properties = Properties()
 
-    val propertiesInputStream = Cli::class.java.getResourceAsStream("build.properties")
+    val propertiesInputStream = Cli::class.java.getResourceAsStream("application.properties")
     propertiesInputStream.use {
         val inputStreamReader = java.io.InputStreamReader(propertiesInputStream, StandardCharsets.UTF_8)
         properties.load(inputStreamReader)
