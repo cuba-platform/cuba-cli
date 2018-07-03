@@ -30,8 +30,21 @@ import org.kodein.di.generic.instance
 import org.kodein.di.generic.singleton
 import java.io.PrintWriter
 import java.lang.module.ModuleFinder
+import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import java.util.*
+
+val CLI_VERSION : String by lazy {
+    val properties = Properties()
+
+    val propertiesInputStream = Cli::class.java.getResourceAsStream("build.properties")
+    propertiesInputStream.use {
+        val inputStreamReader = java.io.InputStreamReader(propertiesInputStream, StandardCharsets.UTF_8)
+        properties.load(inputStreamReader)
+    }
+
+    "CUBA CLI " + properties["version"]!!
+}
 
 private val bus: EventBus = EventBus { throwable: Throwable, subscriberContext ->
     if (subscriberContext.event !is ErrorEvent) {
@@ -112,14 +125,12 @@ private fun loadPlugins(commandsRegistry: CommandsRegistry, mode: CliMode) {
             ClassLoader.getSystemClassLoader()
     ).layer()
 
-    ServiceLoader.load(pluginsLayer, CliPlugin::class.java).forEach {
-        if (it !is CubaPlugin) {
-            writer.println("Loaded plugin @|green ${it.javaClass.name}|@.")
+    for (plugin in ServiceLoader.load(pluginsLayer, CliPlugin::class.java)) {
+        if (plugin !is CubaPlugin) {
+            writer.println("Loaded plugin @|green ${plugin.javaClass.name}|@.")
         }
-        bus.register(it)
+        bus.register(plugin)
     }
 
     bus.post(InitPluginEvent(commandsRegistry, mode))
 }
-
-const val CLI_VERSION = "CUBA CLI 1.0-SNAPSHOT"

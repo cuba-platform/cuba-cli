@@ -89,6 +89,11 @@ configurations {
     it.kotlinOptions.jvmTarget = '1.8'
 }
 
+processResources.doLast {
+    def buildProperties = new File(project.buildDir, 'resources/main/com/haulmont/cuba/cli/build.properties')
+    buildProperties.text = buildProperties.text.replace('version = DEVELOPMENT', 'version = ' + project.version)
+}
+
 compileJava {
     inputs.property("moduleName", moduleName)
 
