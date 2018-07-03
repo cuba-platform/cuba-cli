@@ -19,20 +19,15 @@ package com.haulmont.cuba.cli.cubaplugin.screen
 import com.beust.jcommander.Parameters
 import com.google.common.base.CaseFormat
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
-import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
-import com.haulmont.cuba.cli.cubaplugin.NamesUtils
-import com.haulmont.cuba.cli.generation.*
-import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.cubaplugin.ScreenCommandBase
+import com.haulmont.cuba.cli.generation.PropertiesHelper
+import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import org.kodein.di.generic.instance
-import java.nio.file.Path
 
 @Parameters(commandDescription = "Creates new screen")
-class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
-    private val namesUtils: NamesUtils by kodein.instance()
-
+class CreateScreenCommand : ScreenCommandBase<ScreenModel>() {
     override fun getModelName(): String = ScreenModel.MODEL_NAME
 
     override fun preExecute() = checkProjectExistence()
@@ -73,7 +68,7 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         val webModule = projectStructure.getModule(WEB_MODULE)
         val screensXml = webModule.screensXml
 
-        addToScreensXml(screensXml, model)
+        addToScreensXml(screensXml, model.descriptorName, model.packageName, model.descriptorName)
 
         val messages = webModule.src.resolve(namesUtils.packageToDirectory(model.packageName)).resolve("messages.properties")
 
@@ -82,23 +77,8 @@ class CreateScreenCommand : GeneratorCommand<ScreenModel>() {
         }
 
         if (model.addToMenu) {
-            updateXml(webModule.rootPackageDirectory.resolve("web-menu.xml")) {
-                val menuItem = findFirstChild("menu") ?: appendChild("menu")
-
-                menuItem.appendChild("item") {
-                    this["screen"] = model.descriptorName
-                }
-            }
-        }
-    }
-
-    private fun addToScreensXml(screensXml: Path, screenModel: ScreenModel) {
-        updateXml(screensXml) {
-            appendChild("screen") {
-                this["id"] = screenModel.descriptorName
-                val template = namesUtils.packageToDirectory(screenModel.packageName) + '/' + screenModel.descriptorName + ".xml"
-                this["template"] = template
-            }
+            val caption = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, model.controllerName).replace('_', ' ')
+            addToMenu(webModule.rootPackageDirectory.resolve("web-menu.xml"), model.descriptorName, caption)
         }
     }
 }

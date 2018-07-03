@@ -18,20 +18,15 @@ package com.haulmont.cuba.cli.cubaplugin.browsescreen
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure
-import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
-import com.haulmont.cuba.cli.cubaplugin.NamesUtils
+import com.haulmont.cuba.cli.cubaplugin.ScreenCommandBase
 import com.haulmont.cuba.cli.generation.*
-import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import net.sf.practicalxml.DomUtil
-import org.kodein.di.generic.instance
 
 @Parameters(commandDescription = "Creates new browse screen")
-class CreateBrowseScreenCommand : GeneratorCommand<BrowseScreenModel>() {
-    private val namesUtils: NamesUtils by kodein.instance()
-
+class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
     override fun getModelName(): String = BrowseScreenModel.MODEL_NAME
 
     override fun preExecute() {
@@ -112,15 +107,8 @@ class CreateBrowseScreenCommand : GeneratorCommand<BrowseScreenModel>() {
         }
 
         val webModule = projectStructure.getModule(ModuleStructure.WEB_MODULE)
-        val screensXml = webModule.screensXml
 
-        updateXml(screensXml) {
-            appendChild("screen") {
-                this["id"] = model.screenId
-                val template = namesUtils.packageToDirectory(model.packageName) + '/' + model.descriptorName + ".xml"
-                this["template"] = template
-            }
-        }
+        addToScreensXml(webModule.screensXml, model.screenId, model.packageName, model.descriptorName)
 
         val messages = webModule.src.resolve(namesUtils.packageToDirectory(model.packageName)).resolve("messages.properties")
 
@@ -128,13 +116,7 @@ class CreateBrowseScreenCommand : GeneratorCommand<BrowseScreenModel>() {
             set("browseCaption", model.entityName + " browser")
         }
 
-        updateXml(webModule.rootPackageDirectory.resolve("web-menu.xml")) {
-            val menuItem = findFirstChild("menu") ?: appendChild("menu")
-
-            menuItem.appendChild("item") {
-                this["screen"] = model.screenId
-            }
-        }
+        addToMenu(webModule.rootPackageDirectory.resolve("web-menu.xml"), model.screenId, "${model.entityName} Browse")
 
         val menuMessages = webModule.src.resolve(namesUtils.packageToDirectory(projectModel.rootPackage)).resolve("messages.properties")
         PropertiesHelper(menuMessages) {
