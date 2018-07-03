@@ -36,7 +36,7 @@
 The CUBA CLI makes it easy to create an application that already works, right out of the box.
 </p>
 <h3 align="center">
-<img src="https://github.com/cuba-platform/cuba-cli/blob/master/img/cuba-cli-demo.gif" align="center">
+<img src="https://github.com/cuba-platform/cuba-cli/blob/master/img/cuba-cli-shell.gif" align="center">
 </h3>
 
 ## What you can do with CUBA-CLI ?
