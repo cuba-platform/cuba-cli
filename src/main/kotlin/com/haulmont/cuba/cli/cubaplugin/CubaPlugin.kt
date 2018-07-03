@@ -18,7 +18,6 @@ package com.haulmont.cuba.cli.cubaplugin
 
 import com.google.common.eventbus.Subscribe
 import com.haulmont.cuba.cli.*
-import com.haulmont.cuba.cli.commands.PlaceholderCommand
 import com.haulmont.cuba.cli.cubaplugin.appcomponentxml.AppComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.browsescreen.CreateBrowseScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.componentbean.CreateComponentBeanCommand
@@ -31,6 +30,7 @@ import com.haulmont.cuba.cli.cubaplugin.installcomponent.ComponentInstallCommand
 import com.haulmont.cuba.cli.cubaplugin.polymer.CreatePolymerModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
 import com.haulmont.cuba.cli.cubaplugin.screen.CreateScreenCommand
+import com.haulmont.cuba.cli.cubaplugin.screen.ScreenCommandsGroup
 import com.haulmont.cuba.cli.cubaplugin.screenextension.ExtendDefaultScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.service.CreateServiceCommand
 import com.haulmont.cuba.cli.cubaplugin.statictemplate.StaticTemplateCommand
@@ -58,7 +58,7 @@ class CubaPlugin : CliPlugin {
         event.commandsRegistry {
             command("create-app", ProjectInitCommand())
             command("entity", CreateEntityCommand())
-            command("screen", PlaceholderCommand()) {
+            command("screen", ScreenCommandsGroup) {
                 command("custom", CreateScreenCommand())
                 command("extend", ExtendDefaultScreenCommand())
                 command("browse", CreateBrowseScreenCommand())
