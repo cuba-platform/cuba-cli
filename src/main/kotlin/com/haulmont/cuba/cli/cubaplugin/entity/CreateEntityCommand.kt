@@ -64,6 +64,8 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
             default { "${projectModel.rootPackage}.entity" }
             validate {
                 checkIsPackage()
+
+                value.startsWith(projectModel.rootPackage) || fail("Package should be inside root package: ${projectModel.rootPackage}")
             }
         }
 
