@@ -91,14 +91,8 @@ class CreateEditScreenCommand : ScreenCommandBase<EditScreenModel>() {
     override fun createModel(answers: Answers): EditScreenModel = EditScreenModel(answers)
 
     override fun beforeGeneration() {
-        val webModule = projectStructure.getModule(ModuleStructure.WEB_MODULE)
-        val screensXml = webModule.screensXml
-
-        parse(screensXml).documentElement
-                .xpath("//screen[id=\"${model.screenId}\"]")
-                .firstOrNull()?.let {
-                    fail("Screen with id ${model.screenId} already exists")
-                }
+        checkScreenId(model.screenId)
+        checkExistence(model.packageName, descriptor = model.descriptorName, controller = model.controllerName)
     }
 
     override fun generate(bindings: Map<String, Any>) {
@@ -107,11 +101,10 @@ class CreateEditScreenCommand : ScreenCommandBase<EditScreenModel>() {
         }
 
         val webModule = projectStructure.getModule(ModuleStructure.WEB_MODULE)
-        val screensXml = webModule.screensXml
 
-        addToScreensXml(screensXml, model.screenId, model.packageName, model.descriptorName)
+        addToScreensXml(model.screenId, model.packageName, model.descriptorName)
 
-        val screenMessages = webModule.src.resolve(namesUtils.packageToDirectory(model.packageName)).resolve("messages.properties")
+        val screenMessages = webModule.resolvePackagePath(model.packageName).resolve("messages.properties")
         PropertiesHelper(screenMessages) {
             set("editorCaption", model.entityName + " editor")
         }

@@ -17,6 +17,8 @@
 package com.haulmont.cuba.cli.cubaplugin.service
 
 import com.beust.jcommander.Parameters
+import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
+import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
@@ -60,6 +62,19 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
     }
 
     override fun createModel(answers: Answers): ServiceModel = ServiceModel(answers)
+
+    override fun beforeGeneration() {
+        projectStructure.getModule(CORE_MODULE)
+                .resolvePackagePath(model.packageName)
+                .resolve(model.beanName + ".java").let {
+            ensureFileAbsence(it, "Bean \"${model.packageName}.${model.beanName}\" already exists")
+        }
+        projectStructure.getModule(GLOBAL_MODULE)
+                .resolvePackagePath(model.packageName)
+                .resolve(model.interfaceName + ".java").let {
+            ensureFileAbsence(it, "Service interface \"${model.packageName}.${model.interfaceName}\" already exists")
+        }
+    }
 
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "service", bindings, projectModel.platformVersion) {

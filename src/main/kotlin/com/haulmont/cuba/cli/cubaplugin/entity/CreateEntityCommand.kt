@@ -178,8 +178,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
 
     fun addToMessages(projectStructure: ProjectStructure) {
         val packageDirectory = projectStructure.getModule(GLOBAL_MODULE)
-                .src
-                .resolve(model.packageName.replace('.', '/'))
+                .resolvePackagePath(model.packageName)
 
         val entityPrintableName = Regex("([A-Z][a-z0-9]*)")
                 .findAll(model.name)

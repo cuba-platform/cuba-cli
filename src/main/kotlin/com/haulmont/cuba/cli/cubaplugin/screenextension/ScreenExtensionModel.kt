@@ -21,6 +21,18 @@ import com.haulmont.cuba.cli.prompting.Answers
 class ScreenExtensionModel(answers: Answers) {
     val screen: String by answers
     val packageName: String by answers
+    val id: String
+    val descriptor: String
+
+    init {
+        if (screen == "login") {
+            id = "loginWindow"
+            descriptor = "ext-loginWindow.xml"
+        } else {
+            id = "mainWindow"
+            descriptor = "ext-mainwindow.xml"
+        }
+    }
 
     companion object {
         const val MODEL_NAME = "screen"

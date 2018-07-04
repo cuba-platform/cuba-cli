@@ -19,6 +19,8 @@ package com.haulmont.cuba.cli.commands
 import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.kodein
 import org.kodein.di.generic.instance
+import java.nio.file.Files
+import java.nio.file.Path
 
 abstract class AbstractCommand : CliCommand {
     /**
@@ -68,4 +70,14 @@ abstract class AbstractCommand : CliCommand {
     @Throws(CommandExecutionException::class)
     protected fun fail(cause: String, silent: Boolean = false): Nothing =
             throw CommandExecutionException(cause, silent = silent)
+
+    /**
+     * If [file] exists throws CommandExecutionException with [cause] message.
+     * If [silent] user will not see the error.
+     */
+    @Throws(CommandExecutionException::class)
+    protected fun ensureFileAbsence(file: Path, cause: String, silent: Boolean = false) {
+        if(Files.exists(file))
+            fail(cause, silent)
+    }
 }

@@ -17,6 +17,7 @@
 package com.haulmont.cuba.cli.cubaplugin.enumeration
 
 import com.beust.jcommander.Parameters
+import com.haulmont.cuba.cli.ModuleStructure
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
@@ -72,6 +73,15 @@ class CreateEnumerationCommand : GeneratorCommand<EnumerationModel>() {
     }
 
     override fun createModel(answers: Answers): EnumerationModel = EnumerationModel(answers)
+
+    override fun beforeGeneration() {
+        projectStructure.getModule(ModuleStructure.GLOBAL_MODULE)
+                .resolvePackagePath(model.packageName)
+                .resolve(model.className + ".java")
+                .let {
+                    ensureFileAbsence(it, "Enumeration \"${model.packageName}.${model.className}\" already exists")
+                }
+    }
 
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "enumeration", bindings, projectModel.platformVersion) {

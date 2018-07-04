@@ -26,7 +26,12 @@ import java.nio.file.Path
 abstract class ScreenCommandBase<out Model : Any> : GeneratorCommand<Model>() {
     protected val namesUtils: NamesUtils by kodein.instance()
 
-    protected fun addToScreensXml(screensXml: Path, id: String, packageName: String, descriptorName: String) {
+    protected val screensXml: Path by lazy {
+        val webModule = projectStructure.getModule(ModuleStructure.WEB_MODULE)
+        webModule.screensXml
+    }
+
+    protected fun addToScreensXml(id: String, packageName: String, descriptorName: String) {
         updateXml(screensXml) {
             appendChild("screen") {
                 this["id"] = id
@@ -53,5 +58,26 @@ abstract class ScreenCommandBase<out Model : Any> : GeneratorCommand<Model>() {
         PropertiesHelper(mainMessages) {
             set("menu-config.$screenId", caption)
         }
+    }
+
+    protected fun checkExistence(packageName: String, descriptor: String? = null, controller: String? = null, module: String = ModuleStructure.WEB_MODULE) {
+        val packagePath = projectStructure.getModule(module).resolvePackagePath(packageName)
+
+        descriptor?.let {
+            ensureFileAbsence(packagePath.resolve("$descriptor.xml"),
+                    cause = "Screen descriptor $packageName.$descriptor.xml already exists")
+        }
+        controller?.let {
+            ensureFileAbsence(packagePath.resolve("$controller.java"),
+                    cause = "Screen controller $packageName.$controller already exists")
+        }
+    }
+
+    protected fun checkScreenId(screenId: String) {
+        parse(screensXml).documentElement
+                .xpath("//screen[@id=\"$screenId\"]")
+                .firstOrNull()?.let {
+                    fail("Screen with id \"$screenId\" already exists")
+                }
     }
 }

@@ -60,17 +60,21 @@ class CreateScreenCommand : ScreenCommandBase<ScreenModel>() {
 
     override fun createModel(answers: Answers): ScreenModel = ScreenModel(answers)
 
+    override fun beforeGeneration() {
+        checkScreenId(model.descriptorName)
+        checkExistence(model.packageName, model.descriptorName, model.controllerName)
+    }
+
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "screen", bindings, projectModel.platformVersion) {
             transformWhole()
         }
 
         val webModule = projectStructure.getModule(WEB_MODULE)
-        val screensXml = webModule.screensXml
 
-        addToScreensXml(screensXml, model.descriptorName, model.packageName, model.descriptorName)
+        addToScreensXml(model.descriptorName, model.packageName, model.descriptorName)
 
-        val messages = webModule.src.resolve(namesUtils.packageToDirectory(model.packageName)).resolve("messages.properties")
+        val messages = webModule.resolvePackagePath(model.packageName).resolve("messages.properties")
 
         PropertiesHelper(messages) {
             set("caption", model.descriptorName)

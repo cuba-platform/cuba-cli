@@ -17,6 +17,7 @@
 package com.haulmont.cuba.cli.cubaplugin.entitylistener
 
 import com.beust.jcommander.Parameters
+import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
@@ -38,7 +39,7 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
 
     override fun getModelName(): String = EntityListenerModel.MODEL_NAME
 
-    override fun preExecute()= checkProjectExistence()
+    override fun preExecute() = checkProjectExistence()
 
     override fun QuestionsList.prompting() {
         val persistenceXml = projectStructure.getModule(GLOBAL_MODULE).persistenceXml
@@ -88,6 +89,15 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
 
     override fun createModel(answers: Answers): EntityListenerModel = EntityListenerModel(answers)
 
+    override fun beforeGeneration() {
+        projectStructure.getModule(CORE_MODULE)
+                .resolvePackagePath(model.packageName)
+                .resolve(model.className + ".java")
+                .let {
+                    ensureFileAbsence(it, "Entity listener \"${model.packageName}.${model.className}\" already exists")
+                }
+    }
+
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "entityListener", bindings, projectModel.platformVersion) {
             transformWhole()
@@ -98,8 +108,7 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
 
     private fun registerListener() {
         val entityPath = projectStructure.getModule(GLOBAL_MODULE)
-                .src
-                .resolve(namesUtils.packageToDirectory(model.entityPackageName))
+                .resolvePackagePath(model.entityPackageName)
                 .resolve(model.entityName + ".java")
 
         val entityLines = entityPath.toFile()

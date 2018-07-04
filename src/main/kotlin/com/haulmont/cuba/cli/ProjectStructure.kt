@@ -58,7 +58,7 @@ class ModuleStructure(val name: String, val rootPackage: String, projectRoot: Pa
     }
 
     val rootPackageDirectory: Path by lazy {
-        src.resolve(rootPackage.replace('.', '/'))
+        resolvePackagePath(rootPackage)
     }
 
     val metadataXml: Path by lazy {
@@ -82,6 +82,9 @@ class ModuleStructure(val name: String, val rootPackage: String, projectRoot: Pa
         val fileName = if (name == "core") "spring.xml" else "web-spring.xml"
         src.findFile(fileName) orFail "Module $name spring.xml not found"
     }
+
+    fun resolvePackagePath(packageName: String) = src.resolve(packageName.replace('.', '/'))
+
 
     companion object {
         const val CORE_MODULE = "core"

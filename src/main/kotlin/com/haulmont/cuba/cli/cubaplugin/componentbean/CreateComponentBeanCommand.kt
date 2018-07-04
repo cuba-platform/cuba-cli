@@ -50,6 +50,15 @@ class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>() {
 
     override fun createModel(answers: Answers): ComponentBeanModel = ComponentBeanModel(answers)
 
+    override fun beforeGeneration() {
+        projectStructure.getModule(model.module)
+                .resolvePackagePath(model.packageName)
+                .resolve(model.name + ".java")
+                .let {
+                    ensureFileAbsence(it, "Bean \"${model.packageName}.${model.name}\" already exists in module ${model.module}")
+                }
+    }
+
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "componentBean", bindings, projectModel.platformVersion) {
             transformWhole()

@@ -20,7 +20,10 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.ScreenCommandBase
-import com.haulmont.cuba.cli.generation.*
+import com.haulmont.cuba.cli.generation.PropertiesHelper
+import com.haulmont.cuba.cli.generation.TemplateProcessor
+import com.haulmont.cuba.cli.generation.getChildElements
+import com.haulmont.cuba.cli.generation.parse
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import net.sf.practicalxml.DomUtil
@@ -80,7 +83,7 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
         }
 
         question("controllerName", "Controller name") {
-            default { answers -> (answers["entityName"] as String).split('.').last() + "Browse"}
+            default { answers -> (answers["entityName"] as String).split('.').last() + "Browse" }
 
             validate {
                 checkIsClass()
@@ -91,14 +94,8 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
     override fun createModel(answers: Answers): BrowseScreenModel = BrowseScreenModel(answers)
 
     override fun beforeGeneration() {
-        val webModule = projectStructure.getModule(ModuleStructure.WEB_MODULE)
-        val screensXml = webModule.screensXml
-
-        parse(screensXml).documentElement
-                .xpath("//screen[id=\"${model.screenId}\"]")
-                .firstOrNull()?.let {
-                    fail("Screen with id ${model.screenId} already exists")
-                }
+        checkScreenId(model.screenId)
+        checkExistence(model.packageName, descriptor = model.descriptorName, controller = model.controllerName)
     }
 
     override fun generate(bindings: Map<String, Any>) {
@@ -108,9 +105,9 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
 
         val webModule = projectStructure.getModule(ModuleStructure.WEB_MODULE)
 
-        addToScreensXml(webModule.screensXml, model.screenId, model.packageName, model.descriptorName)
+        addToScreensXml(model.screenId, model.packageName, model.descriptorName)
 
-        val messages = webModule.src.resolve(namesUtils.packageToDirectory(model.packageName)).resolve("messages.properties")
+        val messages = webModule.resolvePackagePath(model.packageName).resolve("messages.properties")
 
         PropertiesHelper(messages) {
             set("browseCaption", model.entityName + " browser")
@@ -118,7 +115,7 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
 
         addToMenu(webModule.rootPackageDirectory.resolve("web-menu.xml"), model.screenId, "${model.entityName} Browse")
 
-        val menuMessages = webModule.src.resolve(namesUtils.packageToDirectory(projectModel.rootPackage)).resolve("messages.properties")
+        val menuMessages = webModule.resolvePackagePath(projectModel.rootPackage).resolve("messages.properties")
         PropertiesHelper(menuMessages) {
             set("menu-config.${model.descriptorName}", "${model.entityName}s")
         }
