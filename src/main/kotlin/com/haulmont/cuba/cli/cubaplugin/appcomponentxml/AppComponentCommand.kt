@@ -56,6 +56,9 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
                 askIf("changePrefix")
 
                 validate {
+                    if (value.isBlank())
+                        fail("Empty project prefix is not allowed")
+
                     val invalidNameRegex = Regex("[^\\w\\-]")
 
                     if (invalidNameRegex.find(value) != null) {
