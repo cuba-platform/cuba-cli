@@ -31,7 +31,7 @@ import org.kodein.di.generic.instance
 import java.nio.file.Paths
 
 @Parameters(commandDescription = "Installs CUBA platform component")
-class ComponentInstallCommand : GeneratorCommand<ComponentModel>() {
+class AddComponentCommand : GeneratorCommand<ComponentModel>() {
 
     private val messages by localMessages()
 

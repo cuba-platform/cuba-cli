@@ -26,7 +26,7 @@ import com.haulmont.cuba.cli.cubaplugin.editscreen.CreateEditScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.entity.CreateEntityCommand
 import com.haulmont.cuba.cli.cubaplugin.entitylistener.CreateEntityListenerCommand
 import com.haulmont.cuba.cli.cubaplugin.enumeration.CreateEnumerationCommand
-import com.haulmont.cuba.cli.cubaplugin.installcomponent.ComponentInstallCommand
+import com.haulmont.cuba.cli.cubaplugin.installcomponent.AddComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.polymer.CreatePolymerModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
 import com.haulmont.cuba.cli.cubaplugin.screen.CreateScreenCommand
@@ -71,7 +71,7 @@ class CubaPlugin : CliPlugin {
             command("app-component", AppComponentCommand())
             command("enumeration", CreateEnumerationCommand())
             command("theme", ThemeExtensionCommand())
-            command("install-component", ComponentInstallCommand())
+            command("add-component", AddComponentCommand())
             command("polymer", CreatePolymerModuleCommand())
             command("config", ConfigCommand())
             command("updateScript", UpdateScript())
