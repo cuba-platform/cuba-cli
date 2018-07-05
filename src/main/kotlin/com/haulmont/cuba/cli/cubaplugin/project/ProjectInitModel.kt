@@ -56,7 +56,7 @@ class DatabaseModel(answers: Answers) {
             DATABASES[0] -> {
                 schema = "jdbc:hsqldb:hsql:"
                 driver = "org.hsqldb.jdbc.JDBCDriver"
-                driverDependency = "\"org.hsqldb:hsqldb:2.2.9\""
+                driverDependency = "'org.hsqldb:hsqldb:2.2.9'"
                 driverDependencyName = "hsql"
                 username = "sa"
                 password = ""
@@ -64,7 +64,7 @@ class DatabaseModel(answers: Answers) {
             DATABASES[1] -> {
                 schema = "jdbc:postgresql:"
                 driver = "org.postgresql.Driver"
-                driverDependency = "\"org.postgresql:postgresql:9.4.1212\""
+                driverDependency = "'org.postgresql:postgresql:9.4.1212'"
                 driverDependencyName = "postgres"
                 username = "cuba"
                 password = "cuba"
@@ -72,7 +72,7 @@ class DatabaseModel(answers: Answers) {
             DATABASES[2] -> {
                 schema = "jdbc:sqlserver:"
                 driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-                driverDependency = "\"com.microsoft.sqlserver:mssql-jdbc:6.4.0.jre8\""
+                driverDependency = "'com.microsoft.sqlserver:mssql-jdbc:6.4.0.jre8'"
                 driverDependencyName = "mssql"
                 username = "sa"
                 password = "saPass1"
@@ -80,7 +80,7 @@ class DatabaseModel(answers: Answers) {
             DATABASES[3] -> {
                 schema = "jdbc:jtds:sqlserver:"
                 driver = "net.sourceforge.jtds.jdbc.Driver"
-                driverDependency = "\"net.sourceforge.jtds:jtds:1.3.1\""
+                driverDependency = "'net.sourceforge.jtds:jtds:1.3.1'"
                 driverDependencyName = "mssql"
                 username = "sa"
                 password = "saPass1"
@@ -88,7 +88,7 @@ class DatabaseModel(answers: Answers) {
             DATABASES[4] -> {
                 schema = "jdbc:sqlserver:"
                 driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-                driverDependency = "\"com.microsoft.sqlserver:mssql-jdbc:6.4.0.jre8\""
+                driverDependency = "'com.microsoft.sqlserver:mssql-jdbc:6.4.0.jre8'"
                 driverDependencyName = "mssql"
                 username = "sa"
                 password = "saPass1"
@@ -96,7 +96,7 @@ class DatabaseModel(answers: Answers) {
             DATABASES[5] -> {
                 schema = "jdbc:oracle:thin:@"
                 driver = "oracle.jdbc.OracleDriver"
-                driverDependency = "files(\"\$cuba.tomcat.dir/lib/ojdbc6.jar\")"
+                driverDependency = "files('\$cuba.tomcat.dir/lib/ojdbc6.jar')"
                 driverDependencyName = "oracle"
                 username = answers["projectName"] as String
                 password = "cuba"
@@ -104,7 +104,7 @@ class DatabaseModel(answers: Answers) {
             DATABASES[6] -> {
                 schema = "jdbc:mysql:"
                 driver = "com.mysql.jdbc.Driver"
-                driverDependency = "\"mysql:mysql-connector-java:5.1.38\""
+                driverDependency = "'mysql:mysql-connector-java:5.1.38'"
                 driverDependencyName = "mysql"
                 username = "cuba"
                 password = "cuba"
