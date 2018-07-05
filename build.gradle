@@ -145,7 +145,7 @@ task generatePom(group: 'distribution', description: 'Generates POM file for upl
                     url 'https://www.cuba-platform.com'
                 }
             }
-        }.writeTo(new File(mavenPomDir, 'pom.xml'))
+        }.writeTo(new File(mavenPomDir, project.name + '-' + project.version + '.pom'))
     }
 }
 
