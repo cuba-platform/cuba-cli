@@ -96,9 +96,9 @@ class DatabaseModel(answers: Answers) {
             DATABASES[5] -> {
                 schema = "jdbc:oracle:thin:@"
                 driver = "oracle.jdbc.OracleDriver"
-                driverDependency = "files('\$cuba.tomcat.dir/lib/ojdbc6.jar')"
+                driverDependency = "files(\"\$cuba.tomcat.dir/lib/ojdbc6.jar\")"
                 driverDependencyName = "oracle"
-                username = answers["projectName"] as String
+                username = (answers["projectName"] as String).replace('-', '_')
                 password = "cuba"
             }
             DATABASES[6] -> {
