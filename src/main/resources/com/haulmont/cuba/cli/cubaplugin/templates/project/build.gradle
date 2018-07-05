@@ -69,6 +69,11 @@ configure(globalModule) {
     task enhance(type: CubaEnhancing)
 }
 
+#if( ${project.database.database} == "Microsoft SQL Server" || ${project.database.database} == "Microsoft SQL Server 2012+" )
+#set( $jdbcExclude = " { exclude(group: 'com.microsoft.azure', module: 'azure-keyvault') }" )
+#else
+#set( $jdbcExclude = "" )
+#end
 configure(coreModule) {
 
     configurations {
@@ -79,8 +84,8 @@ configure(coreModule) {
     dependencies {
         compile(globalModule)
         provided(servletApi)
-        jdbc(${project.database.driverDependencyName})
-        testRuntime(${project.database.driverDependencyName})
+        jdbc(${project.database.driverDependencyName})$jdbcExclude
+        testRuntime(${project.database.driverDependencyName})$jdbcExclude
 
     }
 
@@ -107,8 +112,8 @@ configure(coreModule) {
         dbms = '${project.database.driverDependencyName}'
         host = 'localhost'
         dbName = '${project.namespace}'
-        dbUser = 'sa'
-        dbPassword = ''
+        dbUser = '${project.database.username}'
+        dbPassword = '${project.database.password}'
     }
 
     task updateDb(dependsOn: assembleDbScripts, description: 'Updates local database', type: CubaDbUpdate) {
@@ -118,11 +123,11 @@ configure(coreModule) {
         dbms = '${project.database.driverDependencyName}'
         host = 'localhost'
         dbName = '${project.namespace}'
-        dbUser = 'sa'
-        dbPassword = ''
+        dbUser = '${project.database.username}'
+        dbPassword = '${project.database.password}'
     }
-
 #if (${project.database.driverDependencyName} == "hsql")
+
     task startDb(description: 'Starts local HSQLDB server', type: CubaHsqlStart) {
         dbPort = 9001
         dbName = '${project.namespace}'

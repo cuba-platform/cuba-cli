@@ -72,7 +72,7 @@ class DatabaseModel(answers: Answers) {
             DATABASES[2] -> {
                 schema = "jdbc:sqlserver:"
                 driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-                driverDependency = "\"com.microsoft.sqlserver:mssql-jdbc:6.2.1.jre8\""
+                driverDependency = "\"com.microsoft.sqlserver:mssql-jdbc:6.4.0.jre8\""
                 driverDependencyName = "mssql"
                 username = "sa"
                 password = "saPass1"
@@ -88,7 +88,7 @@ class DatabaseModel(answers: Answers) {
             DATABASES[4] -> {
                 schema = "jdbc:sqlserver:"
                 driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-                driverDependency = "\"com.microsoft.sqlserver:mssql-jdbc:6.2.1.jre8\""
+                driverDependency = "\"com.microsoft.sqlserver:mssql-jdbc:6.4.0.jre8\""
                 driverDependencyName = "mssql"
                 username = "sa"
                 password = "saPass1"
@@ -98,7 +98,7 @@ class DatabaseModel(answers: Answers) {
                 driver = "oracle.jdbc.OracleDriver"
                 driverDependency = "files(\"\$cuba.tomcat.dir/lib/ojdbc6.jar\")"
                 driverDependencyName = "oracle"
-                username = "cuba"
+                username = answers["projectName"] as String
                 password = "cuba"
             }
             DATABASES[6] -> {

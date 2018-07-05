@@ -8,7 +8,11 @@
       maxIdle="2"
       maxWaitMillis="5000"
       driverClassName="${project.database.driver}"
-      url="${project.database.schema}//localhost/${project.namespace}${project.database.connectionParams}"
+#if( ${project.database.database} == "Microsoft SQL Server" || ${project.database.database} == "Microsoft SQL Server 2012+" )
+      url="${project.database.schema}//localhost;databaseName=${project.namespace}"
+#else
+      url="${project.database.schema}//localhost;${project.namespace}${project.database.connectionParams}"
+#end
       username="${project.database.username}"
 #if( ${project.database.database} == "Microsoft SQL Server 2005" )
       validationQuery="select 1"
