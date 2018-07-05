@@ -124,6 +124,26 @@ artifacts {
     archives sourceJar
 }
 
+task generatePom(group: 'distribution', description: 'Generates POM file for uploading to repository') {
+    doLast {
+        def mavenPomDir = new File(project.buildDir, 'maven-pom')
+        mavenPomDir.mkdirs()
+
+        pom {
+            project {
+                inceptionYear '2018'
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+            }
+        }.writeTo(new File(mavenPomDir, 'pom.xml'))
+    }
+}
+
 mainClassName = "com.haulmont.cuba.cli.EntryPointKt"
 
 startScripts {
