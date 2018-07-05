@@ -131,13 +131,18 @@ task generatePom(group: 'distribution', description: 'Generates POM file for upl
 
         pom {
             project {
+                name 'cuba-cli'
+                description 'CUBA Platform Development Command-Line Interface'
                 inceptionYear '2018'
                 licenses {
                     license {
                         name 'The Apache Software License, Version 2.0'
                         url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
                     }
+                }
+                organization {
+                    name 'CUBA Platform'
+                    url 'https://www.cuba-platform.com'
                 }
             }
         }.writeTo(new File(mavenPomDir, 'pom.xml'))
