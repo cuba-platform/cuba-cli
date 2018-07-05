@@ -91,9 +91,12 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
         }
 
         question("rootPackage", "Root package") {
-            default { answers -> "com.company.${answers["namespace"]}" }
+            default { answers -> "com.company.${answers["namespace"]}".toLowerCase() }
             validate {
                 checkIsPackage()
+
+                if(value.toLowerCase() != value)
+                    fail("Root package is allowed in lower case")
             }
         }
 
