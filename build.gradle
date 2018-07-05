@@ -144,6 +144,8 @@ task generatePom(group: 'distribution', description: 'Generates POM file for upl
     }
 }
 
+assemble.dependsOn(generatePom)
+
 mainClassName = "com.haulmont.cuba.cli.EntryPointKt"
 
 startScripts {
