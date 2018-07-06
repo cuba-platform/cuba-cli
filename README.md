@@ -51,4 +51,4 @@ Check [Quick Start](https://github.com/cuba-platform/cuba-cli/wiki/Quick-Start) 
 
 In case something is missing, you could implement this and create a PR. See our [Contributing guide](https://github.com/cuba-platform/cuba-cli/blob/master/CONTRIBUTING.md).
 
-Moreover, you can implement your own plugin for cuba-cli. Check [Custom templates](https://github.com/cuba-platform/cuba-cli/wiki/Custom-templates) and [Plugin development]() pages.
+Moreover, you can implement your own plugin for cuba-cli. Check [Custom templates](https://github.com/cuba-platform/cuba-cli/wiki/Custom-templates) and [Plugin development](https://github.com/cuba-platform/cuba-cli/wiki/Plugin-Development) pages.
