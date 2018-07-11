@@ -23,7 +23,7 @@ object LaunchOptions {
     var shell: String = ""
 
     @Parameter(names = ["--versionsConfigUrl"], description = "Url of file with available cuba platform versions")
-    var versionsConfigUrl: String = "http://files.cuba-platform.com/cuba/studio/studio-config.json"
+    var versionsConfigUrl: String = "http://files.cuba-platform.com/cuba/studio/studio-config.json?source=cuba-cli"
         private set
 
     @Parameter(names = ["--skipVersionLoading"], description = "If is set, will skip available versions loading and uses default")
