@@ -27,6 +27,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.xml.sax.InputSource
 import java.io.PrintWriter
+import java.io.StringReader
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.xml.parsers.DocumentBuilder
@@ -37,6 +38,10 @@ private val writer: PrintWriter by kodein.instance()
 private val printHelper: PrintHelper by kodein.instance()
 
 fun parse(path: Path): Document = Files.newInputStream(path).let(::InputSource).let {
+    createDocumentBuilder().parse(it)
+}
+
+fun parse(xml: String): Document = xml.let(::StringReader).let(::InputSource).let {
     createDocumentBuilder().parse(it)
 }
 

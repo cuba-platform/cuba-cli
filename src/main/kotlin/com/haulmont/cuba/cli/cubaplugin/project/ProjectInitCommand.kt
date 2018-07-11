@@ -17,13 +17,10 @@
 package com.haulmont.cuba.cli.cubaplugin.project
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.PlatformVersion
-import com.haulmont.cuba.cli.WorkingDirectoryManager
+import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
@@ -39,9 +36,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
     private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
 
-    private val platformVersions by lazy {
-        messages["platformVersions"].split(',').map { it.trim() } + CUSTOM_VERSION
-    }
+    private val platformVersionsManager: PlatformVersionsManager by kodein.instance()
 
     private val databases by lazy {
         messages["databases"].split(',')
@@ -95,12 +90,12 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
             validate {
                 checkIsPackage()
 
-                if(value.toLowerCase() != value)
+                if (value.toLowerCase() != value)
                     fail("Root package is allowed in lower case")
             }
         }
 
-        options("platformVersion", "Platform version", platformVersions) {
+        options("platformVersion", "Platform version", platformVersionsManager.versions + CUSTOM_VERSION) {
             default(0)
         }
 

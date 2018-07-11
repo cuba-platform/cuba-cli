@@ -32,6 +32,7 @@ module com.haulmont.cuba.cli {
     requires velocity;
 
     requires com.google.common;
+    requires gson;
 
     requires slf4j.simple;
     requires slf4j.api;
@@ -49,6 +50,7 @@ module com.haulmont.cuba.cli {
 
     opens com.haulmont.cuba.cli.cubaplugin;
     opens com.haulmont.cuba.cli.commands;
+    opens com.haulmont.cuba.cli;
 
     opens com.haulmont.cuba.cli.cubaplugin.appcomponentxml;
     opens com.haulmont.cuba.cli.cubaplugin.componentbean;

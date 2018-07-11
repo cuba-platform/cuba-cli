@@ -30,6 +30,7 @@ def slf4jVersion = "1.7.25"
 def jlineVersion = "3.6.2"
 def kodeinVersion = "5.0.0"
 def practicalxmlVersion = "1.1.0"
+def gsonVersion = "2.3.1"
 
 apply plugin: 'kotlin'
 apply plugin: 'maven'
@@ -75,6 +76,8 @@ dependencies {
     implementation("net.sf.practicalxml:practicalxml:$practicalxmlVersion") {
         exclude(group: "junit", module: "junit")
     }
+
+    implementation("com.google.code.gson:gson:$gsonVersion")
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
@@ -196,7 +199,8 @@ def modulesConfig = [
         'kotlin.stdlib.jdk7'        : "kotlin-stdlib-jdk7-${kotlin_version}.jar",
         'kotlin.stdlib.jdk8'        : "kotlin-stdlib-jdk8-${kotlin_version}.jar",
         'kodein.di.core.jvm'        : "kodein-di-core-jvm-${kodeinVersion}.jar",
-        'kodein.di.generic.jvm'     : "kodein-di-generic-jvm-${kodeinVersion}.jar"
+        'kodein.di.generic.jvm'     : "kodein-di-generic-jvm-${kodeinVersion}.jar",
+        'gson'                      : "gson-${gsonVersion}.jar"
 ]
 
 task jarPatch(dependsOn: installDist, group: 'build',

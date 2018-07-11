@@ -16,8 +16,10 @@
 
 package com.haulmont.cuba.cli
 
+import com.beust.jcommander.JCommander
 import com.google.common.eventbus.EventBus
 import com.haulmont.cuba.cli.commands.CommandsRegistry
+import com.haulmont.cuba.cli.commands.LaunchOptions
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.di.terminalModule
@@ -25,6 +27,7 @@ import com.haulmont.cuba.cli.event.DestroyPluginEvent
 import com.haulmont.cuba.cli.event.ErrorEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
 import org.kodein.di.Kodein
+import org.kodein.di.direct
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
 import org.kodein.di.generic.singleton
@@ -34,7 +37,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import java.util.*
 
-val CLI_VERSION : String by lazy {
+val CLI_VERSION: String by lazy {
     val properties = Properties()
 
     val propertiesInputStream = Cli::class.java.getResourceAsStream("application.properties")
@@ -74,6 +77,8 @@ val kodein = Kodein {
     bind<Resources>() with instance(Resources())
 
     bind<WorkingDirectoryManager>() with instance(WorkingDirectoryManager())
+
+    bind<PlatformVersionsManager>() with singleton { PlatformVersionsManager() }
 }
 
 private val context: CliContext by kodein.instance()
@@ -83,6 +88,13 @@ private val writer: PrintWriter by kodein.instance()
 fun main(args: Array<String>) {
 
     val mode = getCliMode(args)
+
+    if (mode == CliMode.SHELL) {
+        parseLaunchOptions(args)
+
+        val versionManager = kodein.direct.instance<PlatformVersionsManager>()
+        versionManager.load()
+    }
 
     val commandsRegistry = CommandsRegistry()
 
@@ -98,13 +110,12 @@ fun main(args: Array<String>) {
     bus.post(DestroyPluginEvent())
 }
 
-fun getCliMode(args: Array<String>): CliMode =
-        if (args.isEmpty() || args.first() == "shell") {
+private fun getCliMode(args: Array<String>): CliMode =
+        if (args.isEmpty() || args.first() == "shell" || args.first().startsWith("-")) {
             CliMode.SHELL
         } else {
             CliMode.SINGLE_COMMAND
         }
-
 
 private fun loadPlugins(commandsRegistry: CommandsRegistry, mode: CliMode) {
 
@@ -133,4 +144,11 @@ private fun loadPlugins(commandsRegistry: CommandsRegistry, mode: CliMode) {
     }
 
     bus.post(InitPluginEvent(commandsRegistry, mode))
+}
+
+
+private fun parseLaunchOptions(args: Array<String>) {
+    JCommander(LaunchOptions).parseWithoutValidation(*args)
+
+    System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", if (LaunchOptions.debug) "debug" else "off")
 }
