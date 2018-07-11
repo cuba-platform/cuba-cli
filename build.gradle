@@ -361,3 +361,27 @@ task bundle(dependsOn: jarPatch,
         }
     }
 }
+
+task buildWinSetup(dependsOn: bundle,
+        group: 'distribution',
+        description: 'Builds Windows installer') {
+    doLast {
+        if (project.hasProperty('targetOsPlatform') && project['targetOsPlatform'] == 'windows') {
+            def setupScriptDir = "${rootProject.projectDir}"
+            def setupScriptFile = "${setupScriptDir}/win-setup.iss"
+
+            def cliBuildBundleDir = "${project.buildDir}/bundle-windows"
+            def cliBuildDistributionsDir = "${project.buildDir}/distributions"
+
+            exec {
+                commandLine "cmd", "/c", "iscc",
+                        "${setupScriptFile}",
+                        "/DAppVersion=${version}",
+                        "/DAppSrc=${cliBuildBundleDir}",
+                        "/O${cliBuildDistributionsDir}"
+            }
+        } else {
+            throw new GradleException('Only for Windows targetOsPlatform')
+        }
+    }
+}
