@@ -36,6 +36,9 @@ import java.lang.module.ModuleFinder
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import java.util.*
+import java.util.logging.ConsoleHandler
+import java.util.logging.Level
+import java.util.logging.Logger
 
 val CLI_VERSION: String by lazy {
     val properties = Properties()
@@ -91,6 +94,7 @@ fun main(args: Array<String>) {
 
     if (mode == CliMode.SHELL) {
         parseLaunchOptions(args)
+        setupLogger()
 
         val versionManager = kodein.direct.instance<PlatformVersionsManager>()
         versionManager.load()
@@ -147,8 +151,18 @@ private fun loadPlugins(commandsRegistry: CommandsRegistry, mode: CliMode) {
 }
 
 
-private fun parseLaunchOptions(args: Array<String>) {
-    JCommander(LaunchOptions).parseWithoutValidation(*args)
+private fun parseLaunchOptions(args: Array<String>) =
+        JCommander(LaunchOptions).parseWithoutValidation(*args)
 
-    System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", if (LaunchOptions.debug) "debug" else "off")
+private fun setupLogger() {
+    val root = Logger.getLogger("")
+    root.handlers.filterIsInstance<ConsoleHandler>()
+            .firstOrNull()
+            ?.let {
+                if (LaunchOptions.debug) {
+                    it.level = Level.ALL
+                } else {
+                    it.level = Level.OFF
+                }
+            }
 }

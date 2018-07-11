@@ -34,9 +34,6 @@ module com.haulmont.cuba.cli {
     requires com.google.common;
     requires gson;
 
-    requires slf4j.simple;
-    requires slf4j.api;
-
     requires jdk.zipfs;
     requires kodein.di.core.jvm;
     requires kodein.di.generic.jvm;

@@ -18,14 +18,15 @@ package com.haulmont.cuba.cli
 
 import com.google.gson.Gson
 import com.haulmont.cuba.cli.commands.LaunchOptions
-import org.slf4j.LoggerFactory
 import java.net.URL
+import java.util.logging.Level
+import java.util.logging.Logger
 import kotlin.concurrent.thread
 
 class PlatformVersionsManager {
     private val messages by localMessages()
 
-    private val logger = LoggerFactory.getLogger(PlatformVersionsManager::class.java)
+    private val logger = Logger.getLogger(PlatformVersionsManager::class.java.name)
 
     var versions: List<String> = messages["platformVersions"].split(",").map { it.trim() }
         private set
@@ -37,7 +38,7 @@ class PlatformVersionsManager {
                         .let(::extractVersions)
                         .let(::filterVersions)
             } catch (e: Throwable) {
-                logger.error("Error during platform versions retrieving", e)
+                logger.log(Level.SEVERE, "Error during platform versions retrieving", e)
             }
         }
     }

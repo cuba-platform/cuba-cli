@@ -26,7 +26,6 @@ def velocityVersion = "1.7"
 def jCommanderVersion = "1.72"
 def jansiVersion = "1.17"
 def guavaVersion = "25.0-cuba.0"
-def slf4jVersion = "1.7.25"
 def jlineVersion = "3.6.2"
 def kodeinVersion = "5.0.0"
 def practicalxmlVersion = "1.1.0"
@@ -68,8 +67,6 @@ dependencies {
     implementation("com.google.guava:guava:$guavaVersion") {
         exclude(group: 'com.google.code.findbugs', module: 'jsr305')
     }
-
-    implementation "org.slf4j:slf4j-simple:$slf4jVersion"
 
     implementation "org.kodein.di:kodein-di-generic-jvm:$kodeinVersion"
 
@@ -180,8 +177,6 @@ def installedLibsDir = file("${buildDir}/install/cuba-cli/lib")
 def patchLibsDir = file("${buildDir}/jar-patch")
 
 def modulesConfig = [
-        'slf4j.api'                 : "slf4j-api-${slf4jVersion}.jar",
-        'slf4j.simple'              : "slf4j-simple-${slf4jVersion}.jar",
         'commons.lang'              : "commons-lang-2.4-cuba.0.jar",
         'commons.collections'       : "commons-collections-3.2.1.jar",
         'velocity'                  : "velocity-${velocityVersion}.jar",
