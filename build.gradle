@@ -355,7 +355,8 @@ task bundle(dependsOn: jarPatch,
             }
         }
 
-        if (osName.contains('mac')) {
+        if (osName.contains('mac')
+                || project.hasProperty('targetOsPlatform') && project['targetOsPlatform'] == 'macos') {
             def cubacliMacOsFile = new File(project.rootDir, "etc/cuba-cli-macos")
             cubacliFile.text = cubacliMacOsFile.text
         }
