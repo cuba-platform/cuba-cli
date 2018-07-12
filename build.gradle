@@ -354,6 +354,11 @@ task bundle(dependsOn: jarPatch,
                 args = ['u+w', '-R', bundleOutput]
             }
         }
+
+        if (osName.contains('mac')) {
+            def cubacliMacOsFile = new File(project.rootDir, "etc/cuba-cli-macos")
+            cubacliFile.text = cubacliMacOsFile.text
+        }
     }
 }
 
