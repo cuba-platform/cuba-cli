@@ -36,10 +36,18 @@ class CdCommand : AbstractCommand() {
 
     private val printWriter: PrintWriter by kodein.instance()
 
+    private val isUnix = System.getProperty("os.name").toLowerCase().let {
+        it.contains("nux") || it.contains("mac")
+    }
+
     override fun run() {
         if (directory == null) {
             printWriter.println(workingDirectoryManager.absolutePath)
             return
+        }
+
+        if (isUnix) {
+            directory = directory!!.replaceFirst("^~".toRegex(), System.getProperty("user.home"))
         }
 
         val dst = if (directory!!.startsWith('/')) {
@@ -48,6 +56,6 @@ class CdCommand : AbstractCommand() {
 
         if (Files.exists(dst) && Files.isDirectory(dst)) {
             workingDirectoryManager.workingDirectory = dst.normalize()
-        } else fail("Directory not found")
+        } else printWriter.println("Directory not found")
     }
 }
