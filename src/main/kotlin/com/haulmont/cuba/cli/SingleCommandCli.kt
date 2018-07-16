@@ -19,10 +19,7 @@ package com.haulmont.cuba.cli
 import com.beust.jcommander.MissingCommandException
 import com.beust.jcommander.ParameterException
 import com.google.common.eventbus.EventBus
-import com.haulmont.cuba.cli.commands.CliCommand
-import com.haulmont.cuba.cli.commands.CommandParser
-import com.haulmont.cuba.cli.commands.CommandsRegistry
-import com.haulmont.cuba.cli.commands.CommonParameters
+import com.haulmont.cuba.cli.commands.*
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.ErrorEvent
@@ -34,7 +31,7 @@ class SingleCommandCli(private val args: Array<String>, commandsRegistry: Comman
 
     private val printHelper: PrintHelper by kodein.instance()
 
-    private val commandParser: CommandParser = CommandParser(commandsRegistry, false)
+    private val commandParser: CommandParser = CommandParser(commandsRegistry.apply(::registerBaseCommands), false)
 
     override fun run() {
         val command = try {
@@ -58,7 +55,10 @@ class SingleCommandCli(private val args: Array<String>, commandsRegistry: Comman
 
         bus.post(BeforeCommandExecutionEvent(command))
         try {
-            command.execute()
+            when (command) {
+                is HelpCommand -> commandParser.printHelp()
+                else -> command.execute()
+            }
         } catch (e: Exception) {
             printHelper.handleCommandException(e)
             bus.post(ErrorEvent(e))
@@ -66,3 +66,9 @@ class SingleCommandCli(private val args: Array<String>, commandsRegistry: Comman
         bus.post(AfterCommandExecutionEvent(command))
     }
 }
+
+private fun registerBaseCommands(commandsRegistry: CommandsRegistry) =
+        commandsRegistry {
+            command("help", HelpCommand)
+            command("version", VersionCommand)
+        }

@@ -17,7 +17,6 @@
 package com.haulmont.cuba.cli
 
 import com.beust.jcommander.MissingCommandException
-import com.beust.jcommander.Parameter
 import com.beust.jcommander.ParameterException
 import com.google.common.eventbus.EventBus
 import com.haulmont.cuba.cli.commands.*
@@ -32,8 +31,6 @@ import org.jline.terminal.Terminal
 import org.jline.terminal.impl.DumbTerminal
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.javaField
 
 class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
 
@@ -105,35 +102,12 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
             }
 
             when (command) {
-                is HelpCommand -> printHelp()
+                is HelpCommand -> commandParser.printHelp()
                 is Stacktrace -> printHelper.printLastStacktrace()
                 is ExitCommand -> return
                 else -> evalCommand(command)
             }
         }
-    }
-
-    private fun printHelp() {
-        launchOptionsHelp()
-
-        writer.println("CUBA CLI commands")
-        commandParser.printHelp()
-
-        writer.println("See Quick start tutorial on https://github.com/cuba-platform/cuba-cli/wiki/Quick-Start\n")
-    }
-
-    private fun launchOptionsHelp() {
-        writer.println("CUBA CLI launch options")
-
-        LaunchOptions::class.memberProperties.map {
-            it.javaField!!.getAnnotation(Parameter::class.java)
-        }.filter {
-            !it.hidden
-        }.forEach {
-            writer.println(it.names.first() + " ".repeat(6) + it.description)
-        }
-
-        writer.println()
     }
 
     private fun evalCommand(command: CliCommand) {

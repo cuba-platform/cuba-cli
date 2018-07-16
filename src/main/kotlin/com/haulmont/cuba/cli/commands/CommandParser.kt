@@ -17,9 +17,12 @@
 package com.haulmont.cuba.cli.commands
 
 import com.beust.jcommander.JCommander
+import com.beust.jcommander.Parameter
 import com.haulmont.cuba.cli.kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.javaField
 
 class CommandParser(private val commandsRegistry: CommandsRegistry, private val shellMode: Boolean = false) {
 
@@ -36,7 +39,28 @@ class CommandParser(private val commandsRegistry: CommandsRegistry, private val 
         return getParsedCommand(commander)
     }
 
-    fun printHelp() = printHelp(commander)
+    fun printHelp() {
+        launchOptionsHelp()
+
+        writer.println("CUBA CLI commands")
+        printHelp(commander)
+
+        writer.println("See Quick start tutorial on https://github.com/cuba-platform/cuba-cli/wiki/Quick-Start\n")
+    }
+
+    private fun launchOptionsHelp() {
+        writer.println("CUBA CLI launch options")
+
+        LaunchOptions::class.memberProperties.map {
+            it.javaField!!.getAnnotation(Parameter::class.java)
+        }.filter {
+            !it.hidden
+        }.forEach {
+            writer.println(it.names.first() + " ".repeat(6) + it.description)
+        }
+
+        writer.println()
+    }
 
     fun printHelp(command: CliCommand) = findRoute(command)
             .let {
