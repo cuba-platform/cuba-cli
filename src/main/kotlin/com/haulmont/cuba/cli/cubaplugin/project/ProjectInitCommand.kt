@@ -107,6 +107,14 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
             validate {
                 if (value.isBlank())
                     fail("Type platform version")
+
+                try {
+                    if (PlatformVersion("6.8.0") > PlatformVersion(value))
+                        fail("Only versions greater or equal 6.8.0 are allowed")
+                } catch (e: PlatformVersionParseException) {
+                    fail("Unable to parse \"$value\" as platform version")
+                }
+
             }
         }
 

@@ -84,16 +84,25 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
     }
 
     companion object {
-        fun parse(versionStr: String): PlatformVersion {
-            if (versionStr.isEmpty() || versionStr == "latest") {
-                return LatestVersion
-            }
+        private val specificVersionRegex = "([0-9]+\\.)*([0-9]+)(\\.[0-9\\w]+)*".toRegex()
 
-            return versionStr.replace(Regex("[^0-9.]"), "")
-                    .trim('.')
-                    .split('.')
-                    .map { it.toInt() }
-                    .let { SpecificVersion(it) }
+        fun parse(versionStr: String): PlatformVersion {
+            try {
+                if (versionStr.isEmpty() || versionStr == "latest") {
+                    return LatestVersion
+                }
+
+                if(!versionStr.matches(specificVersionRegex))
+                    throw PlatformVersionParseException()
+
+                return versionStr.replace(Regex("[^0-9.]"), "")
+                        .trim('.')
+                        .split('.')
+                        .map { it.toInt() }
+                        .let { SpecificVersion(it) }
+            } catch (e: Exception) {
+                throw PlatformVersionParseException(e)
+            }
         }
 
         operator fun invoke(versionStr: String): PlatformVersion = parse(versionStr)
@@ -102,3 +111,10 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
 
 object LatestVersion : PlatformVersion()
 class SpecificVersion(val versionNumbers: List<Int>) : PlatformVersion()
+
+class PlatformVersionParseException : Exception {
+    constructor() : super()
+
+    constructor(cause: Exception) : super(cause)
+
+}
