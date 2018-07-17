@@ -57,7 +57,7 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
                         return 1
                 }
 
-        return versionNumbers.size.compareTo(other.versionNumbers.size)
+        return versionNumbersWithoutTrailingZeros.size.compareTo(other.versionNumbersWithoutTrailingZeros.size)
     }
 
     fun findMostSuitableVersionDirectory(baseDirectory: Path): Path {
@@ -84,7 +84,7 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
     }
 
     companion object {
-        private val specificVersionRegex = "([0-9]+\\.)*([0-9]+)(\\.[0-9\\w]+)*".toRegex()
+        private val specificVersionRegex = "([0-9]+\\.)*([0-9]+)(\\.[0-9\\w-]+)?".toRegex()
 
         fun parse(versionStr: String): PlatformVersion {
             try {
@@ -92,7 +92,7 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
                     return LatestVersion
                 }
 
-                if(!versionStr.matches(specificVersionRegex))
+                if (!versionStr.matches(specificVersionRegex))
                     throw PlatformVersionParseException()
 
                 return versionStr.replace(Regex("[^0-9.]"), "")
@@ -110,7 +110,10 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
 }
 
 object LatestVersion : PlatformVersion()
-class SpecificVersion(val versionNumbers: List<Int>) : PlatformVersion()
+class SpecificVersion(val versionNumbers: List<Int>) : PlatformVersion() {
+    internal val versionNumbersWithoutTrailingZeros
+        get() = versionNumbers.dropLastWhile { it == 0 }
+}
 
 class PlatformVersionParseException : Exception {
     constructor() : super()
