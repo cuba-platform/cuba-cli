@@ -8,7 +8,7 @@ create table %s (
     DELETE_TS datetime(3),
     DELETED_BY varchar(50),
 
-    -- add your columns here
+    -- todo add your columns here
 
     primary key (ID)
 )^

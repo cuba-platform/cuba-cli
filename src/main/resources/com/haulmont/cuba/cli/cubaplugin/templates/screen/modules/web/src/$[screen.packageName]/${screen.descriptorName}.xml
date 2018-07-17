@@ -6,6 +6,6 @@
     <dialogMode height="600"
                 width="800"/>
     <layout>
-        <!--Add you UI components here-->
+        <!--todo Add you UI components here-->
     </layout>
 </window>
