@@ -86,7 +86,6 @@ class CommandParser(private val commandsRegistry: CommandsRegistry, private val 
         commander = JCommander().apply {
             programName = if (!shellMode) "cuba" else ""
             if (!shellMode) {
-                addObject(RootCommand())
                 addObject(CommonParameters)
             }
         }
