@@ -1,4 +1,4 @@
-#set( $entity = "${screen.entityName.toLowerCase()}s")
+#set( $entity = "${screen.entityName.toLowerCase()}")
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
         caption="msg://editorCaption"
