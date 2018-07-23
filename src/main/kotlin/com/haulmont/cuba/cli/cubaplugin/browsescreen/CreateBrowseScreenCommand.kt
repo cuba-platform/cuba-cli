@@ -113,12 +113,7 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
             set("browseCaption", model.entityName + " browser")
         }
 
-        addToMenu(webModule.rootPackageDirectory.resolve("web-menu.xml"), model.screenId, "${model.entityName} Browse")
-
-        val menuMessages = webModule.resolvePackagePath(projectModel.rootPackage).resolve("messages.properties")
-        PropertiesHelper(menuMessages) {
-            set("menu-config.${model.descriptorName}", "${model.entityName}s")
-        }
+        addToMenu(webModule.rootPackageDirectory.resolve("web-menu.xml"), model.screenId, "${model.entityName}s")
     }
 
 }
