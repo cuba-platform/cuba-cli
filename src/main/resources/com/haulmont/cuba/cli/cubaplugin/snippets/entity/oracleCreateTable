@@ -8,7 +8,7 @@ create table %s (
     DELETE_TS timestamp,
     DELETED_BY varchar2(50),
 
-    -- todo add your columns here
+    -- TODO add your columns here
 
     primary key (ID)
 )^

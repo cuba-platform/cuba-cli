@@ -32,7 +32,7 @@
                 <action id="remove"/>
             </actions>
             <columns>
-                <!--todo Specify columns here-->
+                <!--TODO specify columns here-->
             </columns>
             <rows datasource="${entities}Ds"/>
             <rowsCount/>
