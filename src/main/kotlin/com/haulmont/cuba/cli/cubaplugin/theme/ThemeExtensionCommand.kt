@@ -74,7 +74,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         if (themesToExtend.size > 1) {
             options("themeName", "Choose theme to extend", themesToExtend)
         } else {
-            writer.println("Only ${themesToExtend.first()} theme rest to extend.")
+            writer.println("Only ${themesToExtend.first()} theme can be extended.")
         }
 
         confirmation("confirmed", messages["confirmationMessage"])
