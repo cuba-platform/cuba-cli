@@ -17,18 +17,20 @@
 package com.haulmont.cuba.cli.cubaplugin.entity
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
+import com.haulmont.cuba.cli.PrintHelper
+import com.haulmont.cuba.cli.ProjectStructure
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.generation.*
+import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.resolve
 import org.kodein.di.generic.instance
-import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
@@ -40,10 +42,6 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     private val namesUtils: NamesUtils by kodein.instance()
 
     private val printHelper: PrintHelper by kodein.instance()
-
-    private val printWriter: PrintWriter by kodein.instance()
-
-    private val messages: Messages by localMessages()
 
     private val snippets by lazy {
         Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "entity", javaClass, projectModel.platformVersion)
@@ -146,12 +144,15 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
 
         val createDbPath = dbPath.resolve("init", projectModel.database.type, "10.create-db.sql")
 
-        if (Files.exists(createDbPath)) {
+        if (!Files.exists(createDbPath)) {
+            Files.createFile(createDbPath)
+            createDbPath.toFile().appendText(script)
+            printHelper.fileCreated(createDbPath)
+        } else {
             createDbPath.toFile().appendText(script)
             printHelper.fileModified(createDbPath)
-        } else {
-            printWriter.println(messages["createDbNotFound"])
         }
+
 
         val currentYearUpdateDir = dbPath.resolve("update", projectModel.database.type, getYear())
         if (!Files.exists(currentYearUpdateDir)) {
