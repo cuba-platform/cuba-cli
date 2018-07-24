@@ -65,8 +65,8 @@ class PlatformVersionsManager {
 
         val sortedVersions = fullList.sortedBy { PlatformVersion(it) }
 
-        val lastTwo68 = sortedVersions.filter { PlatformVersion(it).let { v -> v >= v68 && v < v69 } }.takeLast(2)
-        val lastTwo69 = sortedVersions.filter { PlatformVersion(it).let { v -> v >= v69 && v < v6_10 } }.takeLast(2)
+        val lastTwo68 = sortedVersions.filter { PlatformVersion(it).let { v -> v >= v68 && v < v69 } }.takeLast(1)
+        val lastTwo69 = sortedVersions.filter { PlatformVersion(it).let { v -> v >= v69 && v < v6_10 } }.takeLast(1)
 
         return lastTwo68 + lastTwo69
     }
