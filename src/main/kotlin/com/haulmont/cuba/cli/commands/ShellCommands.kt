@@ -29,7 +29,7 @@ object ExitCommand : CliCommand {
     }
 }
 
-@Parameters(commandDescription = "Print help")
+@Parameters(commandDescription = "Prints this help")
 object HelpCommand : CliCommand {
     override fun execute() {
 //        Command handled in ShellCli
@@ -43,7 +43,7 @@ object Stacktrace : CliCommand {
     }
 }
 
-@Parameters(commandDescription = "Print version")
+@Parameters(commandDescription = "Prints CUBA CLI version")
 object VersionCommand : CliCommand {
     private val writer: PrintWriter by kodein.instance()
 

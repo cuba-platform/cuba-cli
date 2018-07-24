@@ -31,7 +31,7 @@ import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.nio.file.Paths
 
-@Parameters(commandDescription = "Creates empty polymer module")
+@Parameters(commandDescription = "Creates Polymer module")
 class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
     private val messages by localMessages()
 

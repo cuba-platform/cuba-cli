@@ -29,7 +29,7 @@ import net.sf.practicalxml.DomUtil
 import net.sf.practicalxml.xpath.XPathWrapper
 import org.w3c.dom.Element
 
-@Parameters(commandDescription = "Create new CUBA service")
+@Parameters(commandDescription = "Creates new service")
 class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
     override fun getModelName(): String = ServiceModel.MODEL_NAME
 

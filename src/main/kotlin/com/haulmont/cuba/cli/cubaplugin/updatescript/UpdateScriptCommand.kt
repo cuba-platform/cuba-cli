@@ -28,8 +28,8 @@ import org.kodein.di.generic.instance
 import java.nio.file.Files
 import java.util.*
 
-@Parameters(commandDescription = "Creates new sql update script.")
-class UpdateScript : GeneratorCommand<String>() {
+@Parameters(commandDescription = "Creates new database update script")
+class UpdateScriptCommand : GeneratorCommand<String>() {
 
     private val calendar = Calendar.getInstance()
 

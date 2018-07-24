@@ -35,7 +35,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 
-@Parameters(commandDescription = "Create new entity")
+@Parameters(commandDescription = "Creates new entity")
 class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     private val entityTypes = listOf("Persistent", "Persistent embedded", "Not persistent")
 

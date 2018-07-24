@@ -24,7 +24,7 @@ import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
-@Parameters(commandDescription = "Creates new Enumeration")
+@Parameters(commandDescription = "Creates new enumeration")
 class CreateEnumerationCommand : GeneratorCommand<EnumerationModel>() {
     override fun getModelName(): String = EnumerationModel.MODEL_NAME
 

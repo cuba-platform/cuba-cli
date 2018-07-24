@@ -34,7 +34,7 @@ import java.io.PrintWriter
 import java.nio.file.Files
 import java.util.stream.Collectors
 
-@Parameters(commandDescription = "Generates halo theme extension")
+@Parameters(commandDescription = "Generates Halo theme extension")
 class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
     private val messages by localMessages()
 

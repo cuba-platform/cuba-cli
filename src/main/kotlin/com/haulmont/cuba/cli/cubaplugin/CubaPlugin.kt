@@ -35,7 +35,7 @@ import com.haulmont.cuba.cli.cubaplugin.screenextension.ExtendDefaultScreenComma
 import com.haulmont.cuba.cli.cubaplugin.service.CreateServiceCommand
 import com.haulmont.cuba.cli.cubaplugin.statictemplate.StaticTemplateCommand
 import com.haulmont.cuba.cli.cubaplugin.theme.ThemeExtensionCommand
-import com.haulmont.cuba.cli.cubaplugin.updatescript.UpdateScript
+import com.haulmont.cuba.cli.cubaplugin.updatescript.UpdateScriptCommand
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
 import org.kodein.di.generic.instance
@@ -74,7 +74,7 @@ class CubaPlugin : CliPlugin {
             command("add-component", AddComponentCommand())
             command("polymer", CreatePolymerModuleCommand())
             command("config", ConfigCommand())
-            command("updateScript", UpdateScript())
+            command("updateScript", UpdateScriptCommand())
         }
     }
 

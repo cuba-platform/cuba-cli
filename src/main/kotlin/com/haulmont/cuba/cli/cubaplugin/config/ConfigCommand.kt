@@ -26,7 +26,7 @@ import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
-@Parameters(commandDescription = "Creates new CUBA config interface")
+@Parameters(commandDescription = "Creates new configuration interface")
 class ConfigCommand : GeneratorCommand<ConfigModel>() {
 
     override fun getModelName(): String = ConfigModel.NAME

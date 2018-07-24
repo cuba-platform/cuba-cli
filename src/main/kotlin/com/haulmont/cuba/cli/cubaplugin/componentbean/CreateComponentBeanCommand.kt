@@ -23,7 +23,7 @@ import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
-@Parameters(commandDescription = "Creates @Component bean")
+@Parameters(commandDescription = "Creates new Spring bean")
 class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>() {
     override fun getModelName(): String = ComponentBeanModel.MODEL_NAME
 

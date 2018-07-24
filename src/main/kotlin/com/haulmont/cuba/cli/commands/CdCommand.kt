@@ -27,7 +27,7 @@ import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Paths
 
-@Parameters(commandDescription = "Changes current directory, if specified, prints current otherwise")
+@Parameters(commandDescription = "Changes current directory if specified, prints current one otherwise")
 class CdCommand : AbstractCommand() {
     @Parameter(description = "Target directory")
     private var directory: String? = null

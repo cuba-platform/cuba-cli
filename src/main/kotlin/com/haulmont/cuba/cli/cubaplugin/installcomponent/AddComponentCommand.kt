@@ -30,7 +30,7 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
 import java.nio.file.Paths
 
-@Parameters(commandDescription = "Installs CUBA platform component")
+@Parameters(commandDescription = "Adds CUBA application component to the project")
 class AddComponentCommand : GeneratorCommand<ComponentModel>() {
 
     private val messages by localMessages()
