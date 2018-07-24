@@ -22,6 +22,7 @@ class ComponentBeanModel(answers: Answers) {
     val name: String by answers
     val module: String by answers
     val packageName: String by answers
+    val beanName: String by answers
 
     companion object {
         const val MODEL_NAME = "component"
