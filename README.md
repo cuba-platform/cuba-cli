@@ -45,7 +45,7 @@ In a nutshell, cuba-cli is a command line utility that enables you to easily cre
 
 With this tool, you can use CUBA Platform without any additional proprietary tools. Just command line, framework and you.
 
-Check [Quick Start](https://github.com/cuba-platform/cuba-cli/wiki/Quick-Start) Guide for further detail.
+Check out [Installation](https://github.com/cuba-platform/cuba-cli/wiki/Installation) and [Quick Start](https://github.com/cuba-platform/cuba-cli/wiki/Quick-Start) guides for further details.
 
 ## Contributing
 
