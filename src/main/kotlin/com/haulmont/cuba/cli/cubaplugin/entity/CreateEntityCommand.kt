@@ -145,7 +145,12 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
         val createDbPath = dbPath.resolve("init", projectModel.database.type, "10.create-db.sql")
 
         if (!Files.exists(createDbPath)) {
+            createDbPath.parent.takeIf {
+                !Files.exists(it) || !Files.isDirectory(it)
+            }?.let { Files.createDirectories(it) }
+
             Files.createFile(createDbPath)
+
             createDbPath.toFile().appendText(script)
             printHelper.fileCreated(createDbPath)
         } else {
