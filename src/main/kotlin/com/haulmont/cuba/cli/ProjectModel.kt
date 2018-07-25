@@ -64,7 +64,7 @@ class ProjectModel(projectStructure: ProjectStructure) {
                         ?: artifactParseError()
             }
 
-            namespace = parseNamespace(global.persistenceXml)
+            namespace = parseNamespace(global.metadataXml)
 
             val buildGradle = projectStructure.buildGradle.toFile().readText()
 
@@ -111,12 +111,12 @@ class ProjectModel(projectStructure: ProjectStructure) {
     }
 }
 
-private fun parseNamespace(persistenceXml: Path): String {
-    val document = parse(persistenceXml)
-    return DomUtil.getChild(document.documentElement, "persistence-unit")
-            .attributes
-            .getNamedItem("name")
-            .nodeValue
+private fun parseNamespace(metadataXml: Path): String {
+    val document = parse(metadataXml)
+    return DomUtil.getChild(document.documentElement, "metadata-model")
+            ?.attributes
+            ?.getNamedItem("namespace")
+            ?.nodeValue ?: ""
 }
 
 private fun parseDatabase(projectStructure: ProjectStructure): Database {
