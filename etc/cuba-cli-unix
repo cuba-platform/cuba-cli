@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 JLINK_VM_OPTIONS=
 get_script_dir () {
   SOURCE="${BASH_SOURCE[0]}"

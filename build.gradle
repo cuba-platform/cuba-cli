@@ -324,8 +324,10 @@ task bundle(dependsOn: jarPatch,
         def launchFile = new File(bundleOutput, "bin/launch")
         def launchBatFile = new File(bundleOutput, "bin/launch.bat")
 
+        def isBat = launchBatFile.exists()
+
         def cubacliFile = new File(bundleOutput, "cuba-cli")
-        if (launchBatFile.exists()) {
+        if (isBat) {
             cubacliFile = new File(bundleOutput, "cuba-cli.bat")
         }
 
@@ -355,10 +357,12 @@ task bundle(dependsOn: jarPatch,
             }
         }
 
-        if (osName.contains('mac')
-                || project.hasProperty('targetOsPlatform') && project['targetOsPlatform'] == 'macos') {
-            def cubacliMacOsFile = new File(project.rootDir, "etc/cuba-cli-macos")
-            cubacliFile.text = cubacliMacOsFile.text
+        if (!isBat && (osName.contains('nux')
+                || osName.contains('mac')
+                || project.hasProperty('targetOsPlatform')
+                && (project['targetOsPlatform'] == 'macos' || project['targetOsPlatform'] == 'linux'))) {
+            def cubacliUnixFile = new File(project.rootDir, "etc/cuba-cli-unix")
+            cubacliFile.text = cubacliUnixFile.text
         }
     }
 }
