@@ -14,7 +14,10 @@ Getting in touch with us early will also help us coordinate efforts so that not 
 
 ## Building
 
-You can easily build and install project using Gradle Wrapper:
+**Java 10+ required**. 
+
+1. Set JAVA_HOME variable pointing to Java 10 installation.
+2. You can easily build and install project using Gradle Wrapper:
 
 > ./gradlew assemble bundle
 
