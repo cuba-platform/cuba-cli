@@ -20,6 +20,7 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
+import com.haulmont.cuba.cli.generation.PropertiesHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -86,6 +87,24 @@ class CreateEnumerationCommand : GeneratorCommand<EnumerationModel>() {
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "enumeration", bindings, projectModel.platformVersion) {
             transformWhole()
+        }
+
+        val packageDirectory = projectStructure.getModule(ModuleStructure.GLOBAL_MODULE)
+                .resolvePackagePath(model.packageName)
+
+        val enumerationPrintableName = Regex("([A-Z][a-z0-9]*)")
+                .findAll(model.className)
+                .map { it.value }
+                .joinToString(" ")
+
+
+        val messages = packageDirectory.resolve("messages.properties")
+
+        PropertiesHelper(messages) {
+            set(model.className, enumerationPrintableName)
+            model.values.forEach {
+                set("${model.className}.${it.name}", it.name.replace('_', ' ').toLowerCase().capitalize().trim())
+            }
         }
     }
 }
