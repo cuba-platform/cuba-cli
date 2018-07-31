@@ -65,7 +65,7 @@ class CubaPlugin : CliPlugin {
                 command("edit", CreateEditScreenCommand())
             }
             command("service", CreateServiceCommand())
-            command("template", StaticTemplateCommand())
+            command("custom-template", StaticTemplateCommand())
             command("bean", CreateComponentBeanCommand())
             command("entity-listener", CreateEntityListenerCommand())
             command("app-component", AppComponentCommand())
@@ -74,7 +74,7 @@ class CubaPlugin : CliPlugin {
             command("add-component", AddComponentCommand())
             command("polymer", CreatePolymerModuleCommand())
             command("config", ConfigCommand())
-            command("updateScript", UpdateScriptCommand())
+            command("update-script", UpdateScriptCommand())
         }
     }
 
