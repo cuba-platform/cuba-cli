@@ -65,7 +65,7 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
         }
     }
 
-    override fun getModelName(): String = template.modelName
+    override fun getModelName(): String = template.name
 
     override fun QuestionsList.prompting() {
         for (question in template.questions) {

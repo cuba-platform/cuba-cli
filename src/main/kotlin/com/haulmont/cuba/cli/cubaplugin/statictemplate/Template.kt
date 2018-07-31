@@ -21,17 +21,22 @@ import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.get
 import com.haulmont.cuba.cli.generation.getChildElements
 import com.haulmont.cuba.cli.generation.parse
+import com.haulmont.cuba.cli.kodein
 import net.sf.practicalxml.DomUtil
+import org.kodein.di.generic.instance
 import org.w3c.dom.Element
+import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
 
-data class Template(val path: Path, val modelName: String, val questions: List<TemplateQuestion>, val instructions: List<GenerationInstruction>)
+data class Template(val path: Path, val name: String, val questions: List<TemplateQuestion>, val instructions: List<GenerationInstruction>)
 data class GenerationInstruction(val from: String, val to: String, val transform: Boolean)
 
 sealed class TemplateQuestion(val name: String, val caption: String)
 class PlainQuestion(name: String, caption: String) : TemplateQuestion(name, caption)
 class OptionsQuestion(name: String, caption: String, val options: List<String>) : TemplateQuestion(name, caption)
+
+private val printWriter: PrintWriter by kodein.instance()
 
 fun parseTemplate(templateName: String): Template {
     val templateBasePath = TemplateProcessor.findTemplate(templateName)
@@ -39,7 +44,8 @@ fun parseTemplate(templateName: String): Template {
             .resolve("template.xml")
 
     if (!Files.exists(templateBasePath)) {
-        throw CommandExecutionException("Unable to find template.xml for template $templateName")
+        printWriter.println("Unable to find template.xml for template $templateName")
+        throw CommandExecutionException("Unable to find template.xml for template $templateName", silent = true)
     }
 
     val templateDocument = parse(templateXml).documentElement
@@ -49,7 +55,7 @@ fun parseTemplate(templateName: String): Template {
     val instructions: List<GenerationInstruction> = DomUtil.getChild(templateDocument, "operations").let {
         parseGenerationInstructions(it)
     }
-    return Template(templateBasePath, templateDocument["modelName"], questions, instructions)
+    return Template(templateBasePath, templateDocument["name"], questions, instructions)
 }
 
 private fun parseQuestions(questionsListElement: Element): List<TemplateQuestion> =
