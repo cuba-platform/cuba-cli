@@ -18,17 +18,14 @@ package com.haulmont.cuba.cli.generation
 
 import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.CommandExecutionException
-import org.apache.velocity.Template
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
-import org.apache.velocity.runtime.RuntimeSingleton
 import org.kodein.di.generic.instance
 import java.io.File
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.stream.Collectors
 import kotlin.reflect.full.memberProperties
 
 /**
@@ -59,6 +56,8 @@ class TemplateProcessor {
 
     private val variablePartPattern: Regex = Regex("[a-zA-Z][0-9a-zA-Z]*")
     private val velocityContext: VelocityContext
+
+    private val velocityHelper: VelocityHelper = VelocityHelper()
 
     val templatePath: Path
 
@@ -100,17 +99,7 @@ class TemplateProcessor {
 
 
     private fun transformInternal(inputPath: Path, outputFile: Path, vc: VelocityContext) {
-        val template = Template()
-        val runtimeServices = RuntimeSingleton.getRuntimeServices()
-        template.setRuntimeServices(runtimeServices)
-        template.data = Files.newInputStream(inputPath).bufferedReader().use {
-            runtimeServices.parse(it, inputPath.fileName.toString())
-        }
-        template.initDocument()
-
-        Files.newBufferedWriter(outputFile).use { writer ->
-            template.merge(vc, writer)
-        }
+        velocityHelper.generate(inputPath, outputFile, vc)
 
         printHelper.fileCreated(outputFile)
     }

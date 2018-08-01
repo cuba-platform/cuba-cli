@@ -91,8 +91,8 @@ class CreateEditScreenCommand : ScreenCommandBase<EditScreenModel>() {
     override fun createModel(answers: Answers): EditScreenModel = EditScreenModel(answers)
 
     override fun beforeGeneration() {
-        checkScreenId(model.screenId)
-        checkExistence(model.packageName, descriptor = model.descriptorName, controller = model.controllerName)
+        screenRegistrationHelper.checkScreenId(model.screenId)
+        screenRegistrationHelper.checkExistence(model.packageName, descriptor = model.descriptorName, controller = model.controllerName)
     }
 
     override fun generate(bindings: Map<String, Any>) {
@@ -102,7 +102,7 @@ class CreateEditScreenCommand : ScreenCommandBase<EditScreenModel>() {
 
         val webModule = projectStructure.getModule(ModuleStructure.WEB_MODULE)
 
-        addToScreensXml(model.screenId, model.packageName, model.descriptorName)
+        screenRegistrationHelper.addToScreensXml(model.screenId, model.packageName, model.descriptorName)
 
         val screenMessages = webModule.resolvePackagePath(model.packageName).resolve("messages.properties")
         PropertiesHelper(screenMessages) {

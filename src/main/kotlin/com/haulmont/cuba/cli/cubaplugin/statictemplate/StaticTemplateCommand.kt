@@ -22,9 +22,13 @@ import com.haulmont.cuba.cli.LatestVersion
 import com.haulmont.cuba.cli.WorkingDirectoryManager
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.generation.TemplateProcessor
+import com.haulmont.cuba.cli.generation.VelocityHelper
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.registration.EntityRegistrationHelper
+import com.haulmont.cuba.cli.registration.ScreenRegistrationHelper
+import com.haulmont.cuba.cli.registration.ServiceRegistrationHelper
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.nio.file.Files
@@ -36,6 +40,12 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
     private val writer: PrintWriter by kodein.instance()
 
     private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
+
+    private val screenRegistrationHelper: ScreenRegistrationHelper by kodein.instance()
+    private val serviceRegistrationHelper: ServiceRegistrationHelper by kodein.instance()
+    private val entityRegistrationHelper: EntityRegistrationHelper by kodein.instance()
+
+    private val velocityHelper = VelocityHelper()
 
     @Parameter(description = "Template name")
     private var templateName: String? = null
@@ -93,6 +103,32 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
                     transform(instruction.from, cwd.resolve(instruction.to))
                 } else {
                     copy(instruction.from, cwd.resolve(instruction.to))
+                }
+            }
+        }
+
+        for (registration in template.registrations) {
+            when (registration) {
+                is ScreenRegistration -> {
+                    val id = velocityHelper.generate(registration.id, "id", bindings)
+                    val packageName = velocityHelper.generate(registration.packageName, "packageName", bindings)
+                    val descriptorName = velocityHelper.generate(registration.descriptorName, "descriptorName", bindings)
+
+                    screenRegistrationHelper.checkScreenId(id)
+                    screenRegistrationHelper.addToScreensXml(id, packageName, descriptorName)
+                }
+                is ServiceRegistration -> {
+                    val name = velocityHelper.generate(registration.name, "name", bindings)
+                    val packageName = velocityHelper.generate(registration.packageName, "packageName", bindings)
+                    val interfaceName = velocityHelper.generate(registration.interfaceName, "interfaceName", bindings)
+
+                    serviceRegistrationHelper.registerService(name, packageName, interfaceName)
+                }
+                is EntityRegistration -> {
+                    val className = velocityHelper.generate(registration.className, "className", bindings)
+                    val persistent = velocityHelper.generate(registration.persistent, "persistent", bindings) == "true"
+
+                    entityRegistrationHelper.registerEntity(className, persistent)
                 }
             }
         }

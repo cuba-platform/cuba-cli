@@ -19,18 +19,20 @@ package com.haulmont.cuba.cli.cubaplugin.service
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
-import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
-import com.haulmont.cuba.cli.generation.*
+import com.haulmont.cuba.cli.registration.ServiceRegistrationHelper
+import com.haulmont.cuba.cli.generation.TemplateProcessor
+import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import net.sf.practicalxml.DomUtil
-import net.sf.practicalxml.xpath.XPathWrapper
-import org.w3c.dom.Element
+import org.kodein.di.generic.instance
 
 @Parameters(commandDescription = "Creates new service")
 class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
+
+    private val serviceRegistrationHelper: ServiceRegistrationHelper by kodein.instance()
+
     override fun getModelName(): String = ServiceModel.MODEL_NAME
 
     override fun preExecute() = checkProjectExistence()
@@ -67,41 +69,20 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
         projectStructure.getModule(CORE_MODULE)
                 .resolvePackagePath(model.packageName)
                 .resolve(model.beanName + ".java").let {
-            ensureFileAbsence(it, "Bean \"${model.packageName}.${model.beanName}\" already exists")
-        }
+                    ensureFileAbsence(it, "Bean \"${model.packageName}.${model.beanName}\" already exists")
+                }
         projectStructure.getModule(GLOBAL_MODULE)
                 .resolvePackagePath(model.packageName)
                 .resolve(model.interfaceName + ".java").let {
-            ensureFileAbsence(it, "Service interface \"${model.packageName}.${model.interfaceName}\" already exists")
-        }
+                    ensureFileAbsence(it, "Service interface \"${model.packageName}.${model.interfaceName}\" already exists")
+                }
     }
 
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "service", bindings, projectModel.platformVersion) {
             transformWhole()
         }
-
-        val springXml = projectStructure.getModule(WEB_MODULE).springXml
-        updateXml(springXml) {
-            val proxyCreator = xpath("//bean[@class='com.haulmont.cuba.web.sys.remoting.WebRemoteProxyBeanCreator']").firstOrNull() as Element?
-                    ?: appendChild("bean") {
-                        this["class"] = "com.haulmont.cuba.web.sys.remoting.WebRemoteProxyBeanCreator"
-                        appendChild("property") {
-                            this["name"] = "serverSelector"
-                            this["ref"] = "cuba_ServerSelector"
-                        }
-                        appendChild("property") {
-                            this["name"] = "remoteServices"
-                            appendChild("map")
-                        }
-                    }
-
-            val servicesMap = proxyCreator.xpath("//property[@name='remoteServices']/map").first() as Element
-            servicesMap.appendChild("entry") {
-                this["key"] = model.serviceName
-                this["value"] = "${model.packageName}.${model.interfaceName}"
-            }
-        }
+        serviceRegistrationHelper.registerService(model.serviceName, model.packageName, model.interfaceName)
     }
 }
 

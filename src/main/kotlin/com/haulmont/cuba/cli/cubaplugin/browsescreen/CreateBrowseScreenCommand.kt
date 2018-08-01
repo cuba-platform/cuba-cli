@@ -94,8 +94,8 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
     override fun createModel(answers: Answers): BrowseScreenModel = BrowseScreenModel(answers)
 
     override fun beforeGeneration() {
-        checkScreenId(model.screenId)
-        checkExistence(model.packageName, descriptor = model.descriptorName, controller = model.controllerName)
+        screenRegistrationHelper.checkScreenId(model.screenId)
+        screenRegistrationHelper.checkExistence(model.packageName, descriptor = model.descriptorName, controller = model.controllerName)
     }
 
     override fun generate(bindings: Map<String, Any>) {
@@ -105,7 +105,7 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
 
         val webModule = projectStructure.getModule(ModuleStructure.WEB_MODULE)
 
-        addToScreensXml(model.screenId, model.packageName, model.descriptorName)
+        screenRegistrationHelper.addToScreensXml(model.screenId, model.packageName, model.descriptorName)
 
         val messages = webModule.resolvePackagePath(model.packageName).resolve("messages.properties")
 

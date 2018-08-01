@@ -29,10 +29,10 @@ import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.registration.EntityRegistrationHelper
 import com.haulmont.cuba.cli.resolve
 import org.kodein.di.generic.instance
 import java.nio.file.Files
-import java.nio.file.Path
 import java.util.*
 
 @Parameters(commandDescription = "Creates new entity")
@@ -46,6 +46,8 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     private val snippets by lazy {
         Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "entity", javaClass, projectModel.platformVersion)
     }
+
+    private val entityRegistrationHelper: EntityRegistrationHelper by kodein.instance()
 
     private val calendar = Calendar.getInstance()
 
@@ -113,27 +115,12 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
             transformWhole()
         }
 
-        if (model.type == "Not persistent") {
-            val metadataXml = projectStructure.getModule(GLOBAL_MODULE).metadataXml
-            addEntityToConfig(metadataXml, "metadata-model")
-        } else {
-            val persistenceXml = projectStructure.getModule(GLOBAL_MODULE).persistenceXml
-            addEntityToConfig(persistenceXml, "persistence-unit")
-        }
+        entityRegistrationHelper.registerEntity(model.packageName + "." + model.name, model.type != "Not persistent")
 
         addToMessages(projectStructure)
 
         if (model.type == "Persistent") {
             createSqlScripts()
-        }
-    }
-
-    private fun addEntityToConfig(configPath: Path, elementName: String) {
-        updateXml(configPath) {
-            val configElement = findFirstChild(elementName) ?: appendChild(elementName)
-            configElement.appendChild("class") {
-                textContent = model.packageName + "." + model.name
-            }
         }
     }
 

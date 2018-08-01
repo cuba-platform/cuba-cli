@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <template xmlns="http://schemas.haulmont.com/cuba/cli/template.xsd"
-          modelName="project">
+          name="project">
     <questions>
         <plain name="projectName" caption="Project name"/>
         <plain name="namespace" caption="Project namespace"/>

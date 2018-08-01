@@ -72,6 +72,7 @@ module com.haulmont.cuba.cli {
     exports com.haulmont.cuba.cli.commands;
     exports com.haulmont.cuba.cli.prompting;
     exports com.haulmont.cuba.cli.generation;
+    exports com.haulmont.cuba.cli.registration;
 
 //    for debug
     requires jdk.jdwp.agent;

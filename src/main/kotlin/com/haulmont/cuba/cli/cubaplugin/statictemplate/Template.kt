@@ -17,10 +17,7 @@
 package com.haulmont.cuba.cli.cubaplugin.statictemplate
 
 import com.haulmont.cuba.cli.commands.CommandExecutionException
-import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.generation.get
-import com.haulmont.cuba.cli.generation.getChildElements
-import com.haulmont.cuba.cli.generation.parse
+import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.kodein
 import net.sf.practicalxml.DomUtil
 import org.kodein.di.generic.instance
@@ -29,8 +26,14 @@ import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
 
-data class Template(val path: Path, val name: String, val questions: List<TemplateQuestion>, val instructions: List<GenerationInstruction>)
+data class Template(val path: Path, val name: String, val questions: List<TemplateQuestion>, val instructions: List<GenerationInstruction>, val registrations: List<Registration>)
 data class GenerationInstruction(val from: String, val to: String, val transform: Boolean)
+
+sealed class Registration
+data class ScreenRegistration(val id: String, val packageName: String, val descriptorName: String) : Registration()
+data class ServiceRegistration(val name: String, val packageName: String, val interfaceName: String) : Registration()
+data class EntityRegistration(val className: String, val persistent: String): Registration()
+
 
 sealed class TemplateQuestion(val name: String, val caption: String)
 class PlainQuestion(name: String, caption: String) : TemplateQuestion(name, caption)
@@ -55,7 +58,11 @@ fun parseTemplate(templateName: String): Template {
     val instructions: List<GenerationInstruction> = DomUtil.getChild(templateDocument, "operations").let {
         parseGenerationInstructions(it)
     }
-    return Template(templateBasePath, templateDocument["name"], questions, instructions)
+    val registrations: List<Registration> = templateDocument.findFirstChild("register")?.let {
+        parseRegistrations(it)
+    } ?: emptyList()
+
+    return Template(templateBasePath, templateDocument["name"], questions, instructions, registrations)
 }
 
 private fun parseQuestions(questionsListElement: Element): List<TemplateQuestion> =
@@ -91,5 +98,28 @@ private fun parseGenerationInstructions(instructionsListElement: Element): List<
                         "transform" -> GenerationInstruction(src, dst, true)
                         "copy" -> GenerationInstruction(src, dst, false)
                         else -> throw CommandExecutionException("Invalid template")
+                    }
+                }.toList()
+
+
+private fun parseRegistrations(registrationsListElement: Element): List<Registration> =
+        registrationsListElement.getChildElements()
+                .map {
+                    when (it.tagName) {
+                        "screen" -> ScreenRegistration(
+                                it.findFirstChild("id")!!.textContent,
+                                it.findFirstChild("package")!!.textContent,
+                                it.findFirstChild("descriptor")!!.textContent)
+
+                        "service" -> ServiceRegistration(
+                                it.findFirstChild("name")!!.textContent,
+                                it.findFirstChild("package")!!.textContent,
+                                it.findFirstChild("interface")!!.textContent)
+
+                        "entity" -> EntityRegistration(
+                                it.findFirstChild("class")!!.textContent,
+                                it.findFirstChild("persistent")?.textContent ?: "true")
+
+                        else -> throw CommandExecutionException("Invalid registration type ${it.tagName}")
                     }
                 }.toList()
