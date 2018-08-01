@@ -61,8 +61,8 @@ class CreateScreenCommand : ScreenCommandBase<ScreenModel>() {
     override fun createModel(answers: Answers): ScreenModel = ScreenModel(answers)
 
     override fun beforeGeneration() {
-        screenRegistrationHelper.checkScreenId(model.descriptorName)
-        screenRegistrationHelper.checkExistence(model.packageName, model.descriptorName, model.controllerName)
+        checkScreenId(model.descriptorName)
+        checkExistence(model.packageName, model.descriptorName, model.controllerName)
     }
 
     override fun generate(bindings: Map<String, Any>) {
@@ -72,7 +72,7 @@ class CreateScreenCommand : ScreenCommandBase<ScreenModel>() {
 
         val webModule = projectStructure.getModule(WEB_MODULE)
 
-        screenRegistrationHelper.addToScreensXml(model.descriptorName, model.packageName, model.descriptorName)
+        addToScreensXml(model.descriptorName, model.packageName, model.descriptorName)
 
         val messages = webModule.resolvePackagePath(model.packageName).resolve("messages.properties")
 
@@ -82,7 +82,7 @@ class CreateScreenCommand : ScreenCommandBase<ScreenModel>() {
 
         if (model.addToMenu) {
             val caption = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, model.controllerName).replace('_', ' ')
-            addToMenu(webModule.rootPackageDirectory.resolve("web-menu.xml"), model.descriptorName, caption)
+            addToMenu(model.descriptorName, caption)
         }
     }
 }

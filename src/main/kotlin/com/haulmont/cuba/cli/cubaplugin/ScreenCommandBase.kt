@@ -18,7 +18,6 @@ package com.haulmont.cuba.cli.cubaplugin
 
 import com.haulmont.cuba.cli.ModuleStructure
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.registration.ScreenRegistrationHelper
 import org.kodein.di.generic.instance
@@ -32,24 +31,21 @@ abstract class ScreenCommandBase<out Model : Any> : GeneratorCommand<Model>() {
         webModule.screensXml
     }
 
-    protected val screenRegistrationHelper: ScreenRegistrationHelper by kodein.instance()
+    private val screenRegistrationHelper: ScreenRegistrationHelper by kodein.instance()
 
-    protected fun addToMenu(menuXml: Path, screenId: String, caption: String) {
-        updateXml(menuXml) {
-            val menuItem = findFirstChild("menu") ?: appendChild("menu")
+    protected fun addToMenu(screenId: String, caption: String) {
+        screenRegistrationHelper.addToMenu(screenId, caption)
+    }
 
-            menuItem.appendChild("item") {
-                this["id"] = screenId
-                this["screen"] = screenId
-            }
-        }
+    protected fun checkScreenId(screenId: String) {
+        screenRegistrationHelper.checkScreenId(screenId)
+    }
 
-        val mainMessages = projectStructure.getModule(ModuleStructure.WEB_MODULE)
-                .rootPackageDirectory
-                .resolve("web")
-                .resolve("messages.properties")
-        PropertiesHelper(mainMessages) {
-            set("menu-config.$screenId", caption)
-        }
+    protected fun checkExistence(packageName: String, descriptor: String? = null, controller: String? = null) {
+        screenRegistrationHelper.checkExistence(packageName, descriptor, controller)
+    }
+
+    protected fun addToScreensXml(id: String, packageName: String, descriptorName: String) {
+        screenRegistrationHelper.addToScreensXml(id, packageName, descriptorName)
     }
 }

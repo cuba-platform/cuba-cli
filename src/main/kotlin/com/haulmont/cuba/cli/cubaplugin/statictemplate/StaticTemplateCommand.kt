@@ -113,9 +113,16 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
                     val id = velocityHelper.generate(registration.id, "id", bindings)
                     val packageName = velocityHelper.generate(registration.packageName, "packageName", bindings)
                     val descriptorName = velocityHelper.generate(registration.descriptorName, "descriptorName", bindings)
+                    val addToMenu = velocityHelper.generate(registration.addToMenu, "addToMenu", bindings) == "true"
+                    val menuCaption = velocityHelper.generate(registration.menuCaption, "menuCaption", bindings)
 
                     screenRegistrationHelper.checkScreenId(id)
                     screenRegistrationHelper.addToScreensXml(id, packageName, descriptorName)
+
+                    if (addToMenu) {
+                        screenRegistrationHelper.addToMenu(id, menuCaption)
+                    }
+
                 }
                 is ServiceRegistration -> {
                     val name = velocityHelper.generate(registration.name, "name", bindings)

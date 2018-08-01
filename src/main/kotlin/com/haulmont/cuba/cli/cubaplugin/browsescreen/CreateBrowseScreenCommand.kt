@@ -94,8 +94,8 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
     override fun createModel(answers: Answers): BrowseScreenModel = BrowseScreenModel(answers)
 
     override fun beforeGeneration() {
-        screenRegistrationHelper.checkScreenId(model.screenId)
-        screenRegistrationHelper.checkExistence(model.packageName, descriptor = model.descriptorName, controller = model.controllerName)
+        checkScreenId(model.screenId)
+        checkExistence(model.packageName, descriptor = model.descriptorName, controller = model.controllerName)
     }
 
     override fun generate(bindings: Map<String, Any>) {
@@ -105,7 +105,7 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
 
         val webModule = projectStructure.getModule(ModuleStructure.WEB_MODULE)
 
-        screenRegistrationHelper.addToScreensXml(model.screenId, model.packageName, model.descriptorName)
+        addToScreensXml(model.screenId, model.packageName, model.descriptorName)
 
         val messages = webModule.resolvePackagePath(model.packageName).resolve("messages.properties")
 
@@ -113,7 +113,7 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
             set("browseCaption", model.entityName + " browser")
         }
 
-        addToMenu(webModule.rootPackageDirectory.resolve("web-menu.xml"), model.screenId, "${model.entityName}s")
+        addToMenu(model.screenId, "${model.entityName}s")
     }
 
 }

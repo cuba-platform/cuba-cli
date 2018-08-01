@@ -30,9 +30,9 @@ data class Template(val path: Path, val name: String, val questions: List<Templa
 data class GenerationInstruction(val from: String, val to: String, val transform: Boolean)
 
 sealed class Registration
-data class ScreenRegistration(val id: String, val packageName: String, val descriptorName: String) : Registration()
+data class ScreenRegistration(val id: String, val packageName: String, val descriptorName: String, val addToMenu: String, val menuCaption: String) : Registration()
 data class ServiceRegistration(val name: String, val packageName: String, val interfaceName: String) : Registration()
-data class EntityRegistration(val className: String, val persistent: String): Registration()
+data class EntityRegistration(val className: String, val persistent: String) : Registration()
 
 
 sealed class TemplateQuestion(val name: String, val caption: String)
@@ -109,7 +109,9 @@ private fun parseRegistrations(registrationsListElement: Element): List<Registra
                         "screen" -> ScreenRegistration(
                                 it.findFirstChild("id")!!.textContent,
                                 it.findFirstChild("package")!!.textContent,
-                                it.findFirstChild("descriptor")!!.textContent)
+                                it.findFirstChild("descriptor")!!.textContent,
+                                it.findFirstChild("add-to-menu")?.textContent ?: "false",
+                                it.findFirstChild("menu-caption")?.textContent ?: "")
 
                         "service" -> ServiceRegistration(
                                 it.findFirstChild("name")!!.textContent,

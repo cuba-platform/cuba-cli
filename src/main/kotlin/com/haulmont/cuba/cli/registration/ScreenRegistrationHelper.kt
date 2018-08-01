@@ -63,6 +63,28 @@ class ScreenRegistrationHelper {
         }
     }
 
+    fun addToMenu(screenId: String, caption: String) {
+        val projectStructure = ProjectStructure()
+        val webModule = projectStructure.getModule(ModuleStructure.WEB_MODULE)
+
+        updateXml(webModule.rootPackageDirectory.resolve("web-menu.xml")) {
+            val menuItem = findFirstChild("menu") ?: appendChild("menu")
+
+            menuItem.appendChild("item") {
+                this["id"] = screenId
+                this["screen"] = screenId
+            }
+        }
+
+        val mainMessages = webModule
+                .rootPackageDirectory
+                .resolve("web")
+                .resolve("messages.properties")
+        PropertiesHelper(mainMessages) {
+            set("menu-config.$screenId", caption)
+        }
+    }
+
     private fun ensureFileAbsence(file: Path, cause: String, silent: Boolean = false) {
         if (Files.exists(file))
             throw CommandExecutionException(cause, silent = silent)

@@ -65,6 +65,8 @@
                                             <xs:element name="id"/>
                                             <xs:element name="package"/>
                                             <xs:element name="descriptor"/>
+                                            <xs:element name="add-to-menu" minOccurs="0"/>
+                                            <xs:element name="menu-caption" minOccurs="0"/>
                                         </xs:all>
                                     </xs:complexType>
                                 </xs:element>

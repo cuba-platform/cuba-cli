@@ -41,8 +41,8 @@ class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {
     override fun createModel(answers: Answers): ScreenExtensionModel = ScreenExtensionModel(answers)
 
     override fun beforeGeneration() {
-        screenRegistrationHelper.checkScreenId(model.id)
-        screenRegistrationHelper.checkExistence(model.packageName, descriptor = model.screen)
+        checkScreenId(model.id)
+        checkExistence(model.packageName, descriptor = model.screen)
     }
 
     override fun generate(bindings: Map<String, Any>) {
@@ -53,7 +53,7 @@ class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {
 
         val webModule = projectStructure.getModule(WEB_MODULE)
 
-        screenRegistrationHelper.addToScreensXml(model.id, model.packageName, model.descriptor)
+        addToScreensXml(model.id, model.packageName, model.descriptor)
 
         val messages = webModule.resolvePackagePath(model.packageName).resolve("messages.properties")
 
