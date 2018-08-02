@@ -43,6 +43,7 @@ Type: filesandordirs; Name: "{app}\bin"
 Type: filesandordirs; Name: "{app}\conf"
 Type: filesandordirs; Name: "{app}\legal"
 Type: filesandordirs; Name: "{app}\lib"
+Type: filesandordirs; Name: "{app}\native-windows"
 
 [Messages]
 FinishedLabelNoIcons=Setup has finished installing [name] on your computer. Open a terminal and run the cuba-cli command to start.
@@ -95,11 +96,11 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
     if CurStep = ssPostInstall
-     then EnvAddPath(ExpandConstant('{app}'));
+     then EnvAddPath(ExpandConstant('{app}') + '\bin');
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
     if CurUninstallStep = usPostUninstall
-    then EnvRemovePath(ExpandConstant('{app}'));
+    then EnvRemovePath(ExpandConstant('{app}') + '\bin');
 end;
