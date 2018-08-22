@@ -27,10 +27,10 @@ class ScreenExtensionModel(answers: Answers) {
     init {
         if (screen == "login") {
             id = "loginWindow"
-            descriptor = "ext-loginWindow.xml"
+            descriptor = "ext-loginWindow"
         } else {
             id = "mainWindow"
-            descriptor = "ext-mainwindow.xml"
+            descriptor = "ext-mainwindow"
         }
     }
 
