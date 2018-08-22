@@ -2,7 +2,7 @@ module com.google.common {
     requires transitive java.logging;
     requires transitive java.xml;
 
-    requires transitive checker.compat.qual;
+    requires transitive checker.qual;
     requires transitive error.prone.annotations;
     requires transitive j2objc.annotations;
     requires transitive animal.sniffer.annotations;
@@ -23,6 +23,4 @@ module com.google.common {
     exports com.google.common.reflect;
     exports com.google.common.util.concurrent;
     exports com.google.common.xml;
-
-    uses com.google.common.base.PatternCompiler;
 }
