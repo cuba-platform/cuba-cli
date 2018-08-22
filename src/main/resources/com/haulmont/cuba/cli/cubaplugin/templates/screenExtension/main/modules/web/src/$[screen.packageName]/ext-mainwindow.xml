@@ -2,10 +2,16 @@
 <window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
         class="${screen.packageName}.ExtAppMainWindow"
         extends="/com/haulmont/cuba/web/app/mainwindow/mainwindow.xml"
-        messagesPack="${screen.packageName}">
+        messagesPack="${screen.packageName}"
+        xmlns:main="http://schemas.haulmont.com/cuba/mainwindow.xsd">
     <dialogMode height="600"
                 width="800"/>
-    <layout>
-        <!--TODO add your layout here-->
+    <layout spacing="true">
+        <split id="foldersSplit">
+            <main:workArea id="workArea">
+                <main:initialLayout>
+                </main:initialLayout>
+            </main:workArea>
+        </split>
     </layout>
 </window>
