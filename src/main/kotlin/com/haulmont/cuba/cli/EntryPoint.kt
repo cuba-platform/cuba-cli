@@ -143,7 +143,7 @@ private fun loadPlugins(commandsRegistry: CommandsRegistry, mode: CliMode) {
     ).layer()
 
     for (plugin in ServiceLoader.load(pluginsLayer, CliPlugin::class.java)) {
-        if (plugin !is CubaPlugin) {
+        if (plugin !is CubaPlugin && mode == CliMode.SHELL) {
             writer.println("Loaded plugin @|green ${plugin.javaClass.name}|@.")
         }
         bus.register(plugin)
