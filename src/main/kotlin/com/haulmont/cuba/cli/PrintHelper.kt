@@ -46,10 +46,11 @@ class PrintHelper : GenerationProgressPrinter {
 
         saveStacktrace(e)
 
+        printFailMessage(e)
+
         if (CommonParameters.stacktrace) {
+            writer.println("".bgRed())
             printLastStacktrace()
-        } else {
-            printFailMessage(e)
         }
     }
 
