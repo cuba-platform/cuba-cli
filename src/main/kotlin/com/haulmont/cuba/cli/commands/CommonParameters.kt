@@ -29,7 +29,7 @@ object CommonParameters {
         private set
 
     @DynamicParameter(names = ["-P"], description = "Non interactive mode parameters", hidden = true)
-    var nonInteractive: Map<String, String> = mutableMapOf()
+    var nonInteractive: Map<String, Any> = mutableMapOf()
 
     fun reset() {
         stacktrace = false

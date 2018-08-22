@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin
 
 import com.google.common.eventbus.Subscribe
 import com.haulmont.cuba.cli.*
+import com.haulmont.cuba.cli.commands.CdCommand
 import com.haulmont.cuba.cli.cubaplugin.appcomponentxml.AppComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.browsescreen.CreateBrowseScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.componentbean.CreateComponentBeanCommand
@@ -80,6 +81,10 @@ class CubaPlugin : CliPlugin {
 
     @Subscribe
     fun beforeCommand(event: BeforeCommandExecutionEvent) {
+        when(event.command) {
+            is CdCommand -> return
+        }
+
         context.addModel("names", namesUtils)
 
         val projectStructure = try {

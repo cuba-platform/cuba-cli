@@ -95,13 +95,34 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
             }
         }
 
-        options("platformVersion", "Platform version", platformVersionsManager.versions + CUSTOM_VERSION) {
-            default(0)
+        if (isNonInteractiveMode()) {
+            askVersion()
+            askCustomVersion()
+        } else {
+            askCustomVersion()
+            askVersion()
         }
 
-        question("customPlatformVersion", "Platform version") {
+
+        options("database", "Choose database", databases) {
+            default(0)
+        }
+    }
+
+    private fun QuestionsList.askVersion() {
+        options("predefinedPlatformVersion", "Platform version", platformVersionsManager.versions + CUSTOM_VERSION) {
             askIf {
-                it["platformVersion"] == CUSTOM_VERSION
+                "customPlatformVersion" !in it
+            }
+
+            default(0)
+        }
+    }
+
+    private fun QuestionsList.askCustomVersion() {
+        question("platformVersion", "Platform version") {
+            askIf {
+                it["predefinedPlatformVersion"] == CUSTOM_VERSION
             }
 
             validate {
@@ -116,10 +137,6 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
                 }
 
             }
-        }
-
-        options("database", "Choose database", databases) {
-            default(0)
         }
     }
 

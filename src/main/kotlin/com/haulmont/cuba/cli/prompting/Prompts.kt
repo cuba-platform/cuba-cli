@@ -122,7 +122,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
     private fun read(prompt: String): String = reader.readLine(Ansi.ansi().render(prompt).toString()).trim()
 
     fun askNonInteractive(): Answers {
-        val answers = CommonParameters.nonInteractive
+        val answers = CommonParameters.nonInteractive.toMutableMap()
 
         questionsList.all {
             it is PlainQuestion<*>
@@ -131,25 +131,44 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
         questionsList
                 .filterIsInstance(PlainQuestion::class.java)
                 .forEach {
-                    checkQuestion(it, answers)
+                    processQuestion(it, answers)
                 }
 
         return answers
     }
 
-    private fun <T : Any> checkQuestion(question: PlainQuestion<T>, answers: Map<String, String>) {
-        question.name in answers ||
+    private fun <T : Any> processQuestion(question: PlainQuestion<T>, answers: MutableMap<String, Any>) {
+        if (!question.askCondition(answers))
+            return
+
+        question.name in answers || question.defaultValue !== None ||
                 throw ValidationException("Parameter ${question.name} not passed")
 
-        val value = answers[question.name] as String
+        if (question.name in answers) {
+            val value = answers[question.name] as String
 
-        when (question) {
-            is OptionsQuestion -> value in question.options ||
-                    throw ValidationException("Invalid value $value for parameter ${question.name}. Available values are ${question.options}.")
+            when (question) {
+                is OptionsQuestion -> value in question.options ||
+                        throw ValidationException("Invalid value $value for parameter ${question.name}. Available values are ${question.options}.")
 
-            else -> question.run {
-                validation(value.read(), answers)
+                else -> question.run {
+                    validation(value.read(), answers)
+                    answers[question.name] = question.run {
+                        value.read()
+                    }
+                }
             }
+
+
+        } else question.defaultValue.let { defaultValue ->
+            when (defaultValue) {
+                None -> throw ValidationException("Parameter ${question.name} not passed")
+                is PlainValue -> answers[question.name] = defaultValue.value
+                is CalculatedValue -> answers[question.name] = defaultValue.function(answers)
+            }
+
+            if (question is OptionsQuestion)
+                answers[question.name] = question.options[answers[question.name] as Int]
         }
     }
 }
