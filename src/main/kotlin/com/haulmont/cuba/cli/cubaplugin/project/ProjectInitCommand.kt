@@ -169,7 +169,6 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
         val dpTipsMessageName = when (model.database.database) {
             databases[5] -> "oracleDbTips"
-            databases[6] -> "mysqlDbTips"
             else -> return
         }
 
