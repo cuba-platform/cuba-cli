@@ -68,7 +68,7 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
             default { projectModel.namespace + "_" + it["className"] }
         }
 
-        questionList {
+        questionList("interfaces") {
             val interfaces = listOf("beforeInsert", "beforeUpdate", "beforeDelete",
                     "afterInsert", "afterUpdate", "afterDelete",
                     "beforeAttach", "beforeDetach")

@@ -23,14 +23,16 @@ class EntityListenerModel(answers: Answers) {
     val packageName: String by answers
     val beanName: String by answers
 
-    val beforeInsert: Boolean by answers
-    val beforeUpdate: Boolean by answers
-    val beforeDelete: Boolean by answers
-    val afterInsert: Boolean by answers
-    val afterUpdate: Boolean by answers
-    val afterDelete: Boolean by answers
-    val beforeAttach: Boolean by answers
-    val beforeDetach: Boolean by answers
+    private val interfaces: Answers by answers
+
+    val beforeInsert: Boolean by interfaces
+    val beforeUpdate: Boolean by interfaces
+    val beforeDelete: Boolean by interfaces
+    val afterInsert: Boolean by interfaces
+    val afterUpdate: Boolean by interfaces
+    val afterDelete: Boolean by interfaces
+    val beforeAttach: Boolean by interfaces
+    val beforeDetach: Boolean by interfaces
 
     val entityName: String
     val entityPackageName: String

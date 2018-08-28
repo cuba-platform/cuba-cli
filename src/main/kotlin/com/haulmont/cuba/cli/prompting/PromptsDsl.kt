@@ -42,13 +42,20 @@ abstract class PlainQuestion<T : Any>(name: String, val caption: String) : Quest
     }
 }
 
-abstract class CompositeQuestion(name: String) : Iterable<Question>, Question(name), WithValidation<Answers> {
+class QuestionsList(name: String, setup: QuestionsList.() -> Unit) : Iterable<Question>, Question(name), WithValidation<Answers> {
     override var validation: (Answers, Answers) -> Unit = acceptAll
 
-    protected val questions: MutableList<Question> = mutableListOf()
+    private val questions: MutableList<Question> = mutableListOf()
 
-    val isFlat: Boolean
-        get() = name.isEmpty()
+    init {
+        setup()
+
+        questions.groupingBy { it.name }
+                .eachCount()
+                .entries
+                .firstOrNull { (_, count) -> count > 1 }
+                ?.let { (name, _) -> throw RuntimeException("Duplicated questions with name $name") }
+    }
 
     fun question(name: String, caption: String, configuration: (StringQuestionConfigurationScope.() -> Unit)? = null) {
         StringQuestion(name, caption).apply {
@@ -71,7 +78,7 @@ abstract class CompositeQuestion(name: String) : Iterable<Question>, Question(na
         }
     }
 
-    fun repeating(name: String, offer: String, configuration: CompositeQuestion.() -> Unit) {
+    fun repeating(name: String, offer: String, configuration: QuestionsList.() -> Unit) {
         questions.add(RepeatingQuestion(name, offer, configuration))
     }
 
@@ -82,19 +89,7 @@ abstract class CompositeQuestion(name: String) : Iterable<Question>, Question(na
     override fun iterator(): Iterator<Question> = questions.iterator()
 }
 
-class QuestionsList(name: String = "", setup: (QuestionsList.() -> Unit)) : CompositeQuestion(name) {
-    init {
-        setup()
-
-        questions.groupingBy { it.name }
-                .eachCount()
-                .entries
-                .firstOrNull { (_, count) -> count > 1 }
-                ?.let { (name, _) -> throw RuntimeException("Duplicated questions with name $name") }
-    }
-}
-
-class RepeatingQuestion(name: String, offer: String, setup: (CompositeQuestion.() -> Unit)) : Question(name) {
+class RepeatingQuestion(name: String, offer: String, setup: (QuestionsList.() -> Unit)) : Question(name) {
     val offerQuestion: ConfirmationQuestion = ConfirmationQuestion("", offer)
     val questions: QuestionsList = QuestionsList(name, setup)
 }

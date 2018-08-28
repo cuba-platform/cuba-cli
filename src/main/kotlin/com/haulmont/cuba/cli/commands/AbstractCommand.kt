@@ -72,6 +72,12 @@ abstract class AbstractCommand : CliCommand {
             throw CommandExecutionException(cause, silent = silent)
 
     /**
+     * Silently stops command execution
+     */
+    @Throws(CommandExecutionException::class)
+    protected fun abort(): Nothing = fail("Aborted", silent = true)
+
+    /**
      * If [file] exists throws CommandExecutionException with [cause] message.
      * If [silent] user will not see the error.
      */

@@ -34,41 +34,31 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
     fun ask(): Answers = questionsList.ask { it }
 
     @Suppress("NON_TAIL_RECURSIVE_CALL")
-    private tailrec fun CompositeQuestion.ask(rootAnswers: (Answers) -> Answers): Answers {
-        try {
-            return this.fold<Question, Answers>(mapOf()) { answers, question ->
-                if (!question.shouldAsk(rootAnswers(answers))) {
-                    return@fold answers
-                }
+    private tailrec fun QuestionsList.ask(rootAnswers: (Answers) -> Answers): Answers {
+        val answers: MutableMap<String, Answer> = mutableMapOf()
 
-                return@fold when (question) {
-                    is PlainQuestion<*> -> {
-                        val answer = question.ask(rootAnswers(answers))
-                        answers + (question.name to answer)
-                    }
-                    is RepeatingQuestion -> {
-                        val storeFn = { it: Answer ->
-                            answers + (question.name to it)
-                        }
-                        question.ask {
-                            rootAnswers(storeFn(it))
-                        }.let(storeFn)
-                    }
-                    is CompositeQuestion -> {
-                        val storeFn = { it: Answers ->
-                            mergeAnswers(answers, it)
-                        }
-                        question.ask {
-                            rootAnswers(storeFn(it))
-                        }.let(storeFn)
-                    }
-                }
-            }.also { localAnswers ->
-                validation(localAnswers, rootAnswers(localAnswers))
+        for (question in this) {
+            if (!question.shouldAsk(rootAnswers(answers))) {
+                continue
             }
+
+            answers[question.name] = when (question) {
+                is PlainQuestion<*> -> question.ask(rootAnswers(answers))
+                is RepeatingQuestion -> question.ask {
+                    rootAnswers(answers) + (question.name to it)
+                }
+                is QuestionsList -> question.ask {
+                    rootAnswers(answers) + (question.name to it)
+                }
+            }
+        }
+
+        try {
+            return answers.also { validation(it, rootAnswers(it)) }
         } catch (e: ValidationException) {
             writer.println(e.message.bgRed())
         }
+
         return this.ask(rootAnswers)
     }
 
@@ -82,13 +72,6 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
         }
         return answersList
     }
-
-    private fun CompositeQuestion.mergeAnswers(targetAnswers: Answers, toMerge: Answers): Answers =
-            if (isFlat) {
-                targetAnswers + toMerge
-            } else {
-                targetAnswers + (name to toMerge)
-            }
 
     private tailrec fun <T : Any> PlainQuestion<T>.ask(answers: Answers, prompts: String = printPrompts(answers)): T {
         try {

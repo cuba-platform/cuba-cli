@@ -96,13 +96,12 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
         }
 
         if (isNonInteractiveMode()) {
-            askVersion()
             askCustomVersion()
+            askVersion()
         } else {
-            askCustomVersion()
             askVersion()
+            askCustomVersion()
         }
-
 
         options("database", "Choose database", databases) {
             default(0)
