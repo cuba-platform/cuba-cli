@@ -61,13 +61,10 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
     }
 
     override fun run() {
-        val questions = QuestionsList("") { prompting() }
-        val answers = if (isNonInteractiveMode()) {
-            Prompts(questions).askNonInteractive()
-        } else {
-            Prompts(questions).ask()
-        }
-        val model = createModel(answers)
+        val model = Prompts.create { prompting() }
+                .let(Prompts::ask)
+                .let(this::createModel)
+
         context.addModel(getModelName(), model)
 
         beforeGeneration()
@@ -75,7 +72,7 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
         generate(context.getModels())
     }
 
-    fun isNonInteractiveMode() = !CommonParameters.nonInteractive.isEmpty()
+    fun isNonInteractiveMode() = CommonParameters.nonInteractive.isNotEmpty()
 
     /**
      * Special method to make additional validations before generating artifact from model.

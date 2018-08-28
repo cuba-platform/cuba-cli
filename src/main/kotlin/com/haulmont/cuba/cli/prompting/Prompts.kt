@@ -31,7 +31,16 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
     private val reader: LineReader by kodein.instance(arg = NullCompleter())
     private val writer: PrintWriter by kodein.instance()
 
-    fun ask(): Answers = questionsList.ask { it }
+    /**
+     * Asks user in non-interactive mode if he specified any dynamic parameter.
+     * Asks user in interactive mode otherwise.
+     */
+    fun ask(): Answers = if (CommonParameters.nonInteractive.isEmpty())
+        askInteractive()
+    else
+        askNonInteractive()
+
+    fun askInteractive() = questionsList.ask { it }
 
     @Suppress("NON_TAIL_RECURSIVE_CALL")
     private tailrec fun QuestionsList.ask(rootAnswers: (Answers) -> Answers): Answers {
@@ -153,6 +162,10 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
             if (question is OptionsQuestion)
                 answers[question.name] = question.options[answers[question.name] as Int]
         }
+    }
+
+    companion object {
+        fun create(init: QuestionsList.() -> Unit) = Prompts(QuestionsList("", init))
     }
 }
 
