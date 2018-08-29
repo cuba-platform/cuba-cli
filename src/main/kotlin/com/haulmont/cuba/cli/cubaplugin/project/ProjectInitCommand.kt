@@ -85,7 +85,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
             }
 
             validate {
-                checkRegex("[a-zA-Z][a-zA-Z0-9]*", "Project namespace can contain only alphanumeric characters and start with a letter.")
+                checkRegex("[a-z][a-z0-9]*", "Project namespace can contain only lowercase alphanumeric characters and start with a letter.")
             }
         }
 
