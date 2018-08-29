@@ -42,6 +42,10 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
         messages["databases"].split(',')
     }
 
+    private val databasesAliases by lazy {
+        messages["databaseAliases"].split(',')
+    }
+
     private val writer: PrintWriter by kodein.instance()
 
     override fun getModelName(): String = "project"
@@ -103,7 +107,10 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
             askCustomVersion()
         }
 
-        options("database", "Choose database", databases) {
+
+        val databaseOptions = databasesAliases.takeIf { isNonInteractiveMode() } ?: databases
+
+        options("database", "Choose database", databaseOptions) {
             default(0)
         }
     }

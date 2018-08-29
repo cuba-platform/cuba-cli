@@ -17,6 +17,7 @@
 package com.haulmont.cuba.cli.cubaplugin.project
 
 import com.haulmont.cuba.cli.commands.CommandExecutionException
+import com.haulmont.cuba.cli.commands.CommonParameters
 import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 
@@ -35,11 +36,17 @@ class ProjectInitModel(answers: Answers) {
 }
 
 class DatabaseModel(answers: Answers) {
-    val database: String by answers
-
     private val messages by localMessages()
 
-    private val DATABASES = messages["databases"].split(',')
+    private val databases = messages["databases"].split(',')
+    private val aliases = messages["databaseAliases"].split(',')
+
+    val database: String = (answers["database"] as String).let {
+        if (CommonParameters.nonInteractive.isEmpty())
+            it
+        else
+            aliases.zip(databases).toMap()[it]!!
+    }
 
     val schema: String
     val driver: String
@@ -47,13 +54,13 @@ class DatabaseModel(answers: Answers) {
     val driverDependencyName: String
     val username: String
     val password: String
-    val connectionParams: String = if (database == DATABASES.last()) {
+    val connectionParams: String = if (database == databases.last()) {
         "?useSSL=false&amp;allowMultiQueries=true"
     } else ""
 
     init {
         when (database) {
-            DATABASES[0] -> {
+            databases[0] -> {
                 schema = "jdbc:hsqldb:hsql:"
                 driver = "org.hsqldb.jdbc.JDBCDriver"
                 driverDependency = "'org.hsqldb:hsqldb:2.2.9'"
@@ -61,7 +68,7 @@ class DatabaseModel(answers: Answers) {
                 username = "sa"
                 password = ""
             }
-            DATABASES[1] -> {
+            databases[1] -> {
                 schema = "jdbc:postgresql:"
                 driver = "org.postgresql.Driver"
                 driverDependency = "'org.postgresql:postgresql:9.4.1212'"
@@ -69,7 +76,7 @@ class DatabaseModel(answers: Answers) {
                 username = "cuba"
                 password = "cuba"
             }
-            DATABASES[2] -> {
+            databases[2] -> {
                 schema = "jdbc:sqlserver:"
                 driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
                 driverDependency = "'com.microsoft.sqlserver:mssql-jdbc:6.4.0.jre8'"
@@ -77,7 +84,7 @@ class DatabaseModel(answers: Answers) {
                 username = "sa"
                 password = "saPass1"
             }
-            DATABASES[3] -> {
+            databases[3] -> {
                 schema = "jdbc:jtds:sqlserver:"
                 driver = "net.sourceforge.jtds.jdbc.Driver"
                 driverDependency = "'net.sourceforge.jtds:jtds:1.3.1'"
@@ -85,7 +92,7 @@ class DatabaseModel(answers: Answers) {
                 username = "sa"
                 password = "saPass1"
             }
-            DATABASES[4] -> {
+            databases[4] -> {
                 schema = "jdbc:sqlserver:"
                 driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
                 driverDependency = "'com.microsoft.sqlserver:mssql-jdbc:6.4.0.jre8'"
@@ -93,7 +100,7 @@ class DatabaseModel(answers: Answers) {
                 username = "sa"
                 password = "saPass1"
             }
-            DATABASES[5] -> {
+            databases[5] -> {
                 schema = "jdbc:oracle:thin:@"
                 driver = "oracle.jdbc.OracleDriver"
                 driverDependency = "files(\"\$cuba.tomcat.dir/lib/ojdbc6.jar\")"
@@ -101,7 +108,7 @@ class DatabaseModel(answers: Answers) {
                 username = (answers["projectName"] as String).replace('-', '_')
                 password = "cuba"
             }
-            DATABASES[6] -> {
+            databases[6] -> {
                 schema = "jdbc:mysql:"
                 driver = "com.mysql.jdbc.Driver"
                 driverDependency = "'mysql:mysql-connector-java:5.1.38'"
