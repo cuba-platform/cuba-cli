@@ -20,7 +20,7 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
-import com.haulmont.cuba.cli.generation.PropertiesHelper
+import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -100,7 +100,7 @@ class CreateEnumerationCommand : GeneratorCommand<EnumerationModel>() {
 
         val messages = packageDirectory.resolve("messages.properties")
 
-        PropertiesHelper(messages) {
+        Properties.modify(messages) {
             set(model.className, enumerationPrintableName)
             model.values.forEach {
                 set("${model.className}.${it.name}", it.name.replace('_', ' ').toLowerCase().capitalize().trim())

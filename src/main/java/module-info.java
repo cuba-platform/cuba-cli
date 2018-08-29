@@ -34,6 +34,8 @@ module com.haulmont.cuba.cli {
     requires com.google.common;
     requires gson;
 
+    requires commons.configuration;
+
     requires jdk.zipfs;
     requires kodein.di.core.jvm;
     requires kodein.di.generic.jvm;
@@ -66,6 +68,7 @@ module com.haulmont.cuba.cli {
     opens com.haulmont.cuba.cli.cubaplugin.editscreen;
     opens com.haulmont.cuba.cli.cubaplugin.config;
     opens com.haulmont.cuba.cli.cubaplugin.updatescript;
+    opens com.haulmont.cuba.cli.cubaplugin.premiumrepo;
 
     exports com.haulmont.cuba.cli;
     exports com.haulmont.cuba.cli.event;

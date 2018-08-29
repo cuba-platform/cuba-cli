@@ -3,6 +3,8 @@ module velocity {
     requires transitive commons.lang;
     requires transitive java.logging;
 
+    requires commons.logging;
+
     exports org.apache.velocity;
     exports org.apache.velocity.anakia;
     exports org.apache.velocity.app;

@@ -22,7 +22,7 @@ import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
-import com.haulmont.cuba.cli.generation.PropertiesHelper
+import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
@@ -109,7 +109,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
                 .rootPackageDirectory
                 .resolve("web-app.properties")
 
-        PropertiesHelper(webAppProperties) {
+        Properties.modify(webAppProperties) {
             update("cuba.connectionUrlList") {
                 it?.replaceAfterLast('/', "$prefix-core") ?: "http://localhost:8080/$prefix-core"
             }
@@ -120,7 +120,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
                 .rootPackageDirectory
                 .resolve("app.properties")
 
-        PropertiesHelper(appProperties) {
+        Properties.modify(appProperties) {
             set("cuba.webContextName", "$prefix-core")
         }
     }

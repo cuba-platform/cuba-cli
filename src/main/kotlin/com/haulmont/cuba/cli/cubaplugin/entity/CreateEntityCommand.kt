@@ -26,6 +26,7 @@ import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.generation.*
+import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -181,7 +182,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
 
         val messages = packageDirectory.resolve("messages.properties")
 
-        PropertiesHelper(messages) {
+        Properties.modify(messages) {
             set(model.name, entityPrintableName)
         }
     }

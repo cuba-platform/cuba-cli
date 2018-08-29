@@ -105,7 +105,7 @@ class CreateEditScreenCommand : ScreenCommandBase<EditScreenModel>() {
         addToScreensXml(model.screenId, model.packageName, model.descriptorName)
 
         val screenMessages = webModule.resolvePackagePath(model.packageName).resolve("messages.properties")
-        PropertiesHelper(screenMessages) {
+        Properties.modify(screenMessages) {
             set("editorCaption", model.entityName + " editor")
         }
     }

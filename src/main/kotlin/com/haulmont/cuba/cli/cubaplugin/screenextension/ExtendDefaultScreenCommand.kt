@@ -20,7 +20,7 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.ScreenCommandBase
-import com.haulmont.cuba.cli.generation.PropertiesHelper
+import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -57,7 +57,7 @@ class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {
 
         val messages = webModule.resolvePackagePath(model.packageName).resolve("messages.properties")
 
-        PropertiesHelper(messages) {}
+        Properties(messages).save()
     }
 }
 

@@ -17,12 +17,26 @@
 package com.haulmont.cuba.cli.commands
 
 import com.haulmont.cuba.cli.CliContext
+import com.haulmont.cuba.cli.ProjectModel
+import com.haulmont.cuba.cli.ProjectStructure
 import com.haulmont.cuba.cli.kodein
 import org.kodein.di.generic.instance
 import java.nio.file.Files
 import java.nio.file.Path
 
 abstract class AbstractCommand : CliCommand {
+    protected val projectStructure: ProjectStructure by lazy { ProjectStructure() }
+
+    /**
+     * Returns project model if it already generated. Otherwise, it will raise an exception,
+     * so call it only after [checkProjectExistence].
+     */
+    protected val projectModel: ProjectModel by lazy {
+        if (context.hasModel(ProjectModel.MODEL_NAME)) {
+            context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
+        } else fail("No project module found")
+    }
+
     /**
      * Is used to generation model saving and retrieving.
      */

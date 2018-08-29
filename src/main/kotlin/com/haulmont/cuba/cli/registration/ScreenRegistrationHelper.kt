@@ -80,7 +80,7 @@ class ScreenRegistrationHelper {
                 .rootPackageDirectory
                 .resolve("web")
                 .resolve("messages.properties")
-        PropertiesHelper(mainMessages) {
+        Properties.modify(mainMessages) {
             set("menu-config.$screenId", caption)
         }
     }

@@ -23,9 +23,7 @@ import com.haulmont.cuba.cli.generation.parse
 import com.haulmont.cuba.cli.generation.xpath
 import net.sf.practicalxml.DomUtil
 import org.w3c.dom.Element
-import java.io.File
 import java.nio.file.Path
-import java.nio.file.Paths
 
 @Suppress("MemberVisibilityCanBePrivate")
 class ProjectModel(projectStructure: ProjectStructure) {

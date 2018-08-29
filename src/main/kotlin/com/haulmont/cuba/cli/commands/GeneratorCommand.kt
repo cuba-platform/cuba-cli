@@ -38,18 +38,6 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
  * At generation phase, the command gets all available models as ```Map<String, Any>``` and generates artifact.
  */
 abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
-    protected val projectStructure: ProjectStructure by lazy { ProjectStructure() }
-
-    /**
-     * Returns project model if it already generated. Otherwise, it will raise an exception,
-     * so call it only after [checkProjectExistence].
-     */
-    protected val projectModel: ProjectModel by lazy {
-        if (context.hasModel(ProjectModel.MODEL_NAME)) {
-            context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
-        } else fail("No project module found")
-    }
-
     /**
      * Returns current model if it already generated. Otherwise, it will raise an exception,
      * so don't call it before [createModel] method.

@@ -72,7 +72,12 @@ class PrintHelper : GenerationProgressPrinter {
         writer.println(messages["errorMessage", message])
     }
 
-    private fun relativize(path: Path) = workingDirectoryManager.absolutePath.relativize(path.toAbsolutePath())
+    private fun relativize(path: Path): Path {
+        val projectPath = workingDirectoryManager.absolutePath
+        if (path.toAbsolutePath().startsWith(projectPath))
+            return projectPath.relativize(path.toAbsolutePath())
+        return path
+    }
 
     fun saveStacktrace(e: Exception) {
         lastStacktrace = StringWriter().also {
