@@ -22,15 +22,18 @@ class ScreenExtensionModel(answers: Answers) {
     val screen: String by answers
     val packageName: String by answers
     val id: String
-    val descriptor: String
+    val descriptorName: String
+    val controllerName: String
 
     init {
         if (screen == "login") {
-            id = "loginWindow"
-            descriptor = "ext-loginWindow"
+            id = answers["screenId"] as String? ?: "loginWindow"
+            descriptorName = answers["descriptorName"] as String? ?: "ext-loginWindow"
+            controllerName = answers["controllerName"] as String? ?: "ExtAppLoginWindow"
         } else {
-            id = "mainWindow"
-            descriptor = "ext-mainwindow"
+            id = answers["screenId"] as String? ?: "mainWindow"
+            descriptorName = answers["descriptorName"] as String? ?: "ext-mainwindow"
+            controllerName = answers["controllerName"] as String? ?: "ExtAppMainWindow"
         }
     }
 

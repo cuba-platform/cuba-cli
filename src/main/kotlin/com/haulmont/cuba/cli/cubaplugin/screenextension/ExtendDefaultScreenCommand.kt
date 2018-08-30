@@ -36,6 +36,46 @@ class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {
         question("packageName", "Package name") {
             default(projectModel.rootPackage + ".web.screens")
         }
+        question("screenId", "Screen with default id already exists. Specify new id.") {
+            askIf {
+                if (it["screen"] == "login") {
+                    screenRegistrationHelper.isScreenIdExists("loginWindow")
+                } else {
+                    screenRegistrationHelper.isScreenIdExists("mainWindow")
+                }
+            }
+            validate {
+                screenIdDoesNotExists(value)
+            }
+        }
+
+        question("descriptorName", "Descriptor name") {
+            askIf {
+                if (it["screen"] == "login") {
+                    screenRegistrationHelper.isDescriptorExists(it["packageName"] as String, "ext-loginWindow")
+                } else {
+                    screenRegistrationHelper.isDescriptorExists(it["packageName"] as String, "ext-mainwindow")
+                }
+            }
+            validate {
+                checkIsScreenDescriptor()
+                screenDescriptorDoesNotExists(value)
+            }
+        }
+
+        question("controllerName", "Controller name") {
+            askIf {
+                if (it["screen"] == "login") {
+                    screenRegistrationHelper.isControllerExists(it["packageName"] as String, "ExtAppLoginWindow")
+                } else {
+                    screenRegistrationHelper.isDescriptorExists(it["packageName"] as String, "ExtAppMainWindow")
+                }
+            }
+            validate {
+                checkIsClass()
+                screenControllerDoesNotExists(value)
+            }
+        }
     }
 
     override fun createModel(answers: Answers): ScreenExtensionModel = ScreenExtensionModel(answers)
@@ -53,7 +93,7 @@ class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {
 
         val webModule = projectStructure.getModule(WEB_MODULE)
 
-        addToScreensXml(model.id, model.packageName, model.descriptor)
+        addToScreensXml(model.id, model.packageName, model.descriptorName)
 
         val messages = webModule.resolvePackagePath(model.packageName).resolve("messages.properties")
 

@@ -19,6 +19,7 @@ package com.haulmont.cuba.cli.cubaplugin
 import com.haulmont.cuba.cli.ModuleStructure
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.prompting.ValidationHelper
 import com.haulmont.cuba.cli.registration.ScreenRegistrationHelper
 import org.kodein.di.generic.instance
 import java.nio.file.Path
@@ -31,7 +32,7 @@ abstract class ScreenCommandBase<out Model : Any> : GeneratorCommand<Model>() {
         webModule.screensXml
     }
 
-    private val screenRegistrationHelper: ScreenRegistrationHelper by kodein.instance()
+    protected val screenRegistrationHelper: ScreenRegistrationHelper by kodein.instance()
 
     protected fun addToMenu(screenId: String, caption: String) {
         screenRegistrationHelper.addToMenu(screenId, caption)
@@ -48,4 +49,24 @@ abstract class ScreenCommandBase<out Model : Any> : GeneratorCommand<Model>() {
     protected fun addToScreensXml(id: String, packageName: String, descriptorName: String) {
         screenRegistrationHelper.addToScreensXml(id, packageName, descriptorName)
     }
+
+    protected fun ValidationHelper<String>.screenIdDoesNotExists(screenId: String) {
+        if (screenRegistrationHelper.isScreenIdExists(screenId))
+            fail("Screen with id $screenId already exists")
+    }
+
+    protected fun ValidationHelper<String>.screenDescriptorDoesNotExists(descriptorName: String, packageName: String = packageName()) {
+        if (screenRegistrationHelper.isDescriptorExists(packageName, descriptorName)) {
+            fail("Such screen descriptor already exists")
+        }
+    }
+
+    protected fun ValidationHelper<String>.screenControllerDoesNotExists(controllerName: String, packageName: String = answers["packageName"] as String) {
+        if (screenRegistrationHelper.isControllerExists(packageName, controllerName)) {
+            fail("Such screen controller already exists")
+        }
+    }
+
+    protected fun ValidationHelper<String>.packageName() =
+            answers["packageName"] as String
 }

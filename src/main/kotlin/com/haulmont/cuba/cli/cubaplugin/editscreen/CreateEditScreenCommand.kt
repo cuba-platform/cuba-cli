@@ -20,7 +20,10 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.ScreenCommandBase
-import com.haulmont.cuba.cli.generation.*
+import com.haulmont.cuba.cli.generation.Properties
+import com.haulmont.cuba.cli.generation.TemplateProcessor
+import com.haulmont.cuba.cli.generation.getChildElements
+import com.haulmont.cuba.cli.generation.parse
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import net.sf.practicalxml.DomUtil
@@ -65,6 +68,10 @@ class CreateEditScreenCommand : ScreenCommandBase<EditScreenModel>() {
 
                 projectModel.namespace + "$" + entityName.split('.').last() + ".edit"
             }
+
+            validate {
+                screenIdDoesNotExists(value)
+            }
         }
 
         question("descriptorName", "Descriptor name") {
@@ -76,6 +83,8 @@ class CreateEditScreenCommand : ScreenCommandBase<EditScreenModel>() {
 
             validate {
                 checkIsScreenDescriptor()
+
+                screenDescriptorDoesNotExists(value)
             }
         }
 
@@ -84,6 +93,8 @@ class CreateEditScreenCommand : ScreenCommandBase<EditScreenModel>() {
 
             validate {
                 checkIsClass()
+
+                screenControllerDoesNotExists(value)
             }
         }
     }

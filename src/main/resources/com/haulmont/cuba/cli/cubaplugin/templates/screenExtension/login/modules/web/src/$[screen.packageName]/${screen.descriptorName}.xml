@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
-        class="${screen.packageName}.ExtAppLoginWindow"
+        class="${screen.packageName}.${screen.controllerName}"
         extends="/com/haulmont/cuba/web/app/loginwindow/loginwindow.xml"
         messagesPack="${screen.packageName}">
     <dialogMode height="600"

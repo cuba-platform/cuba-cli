@@ -68,6 +68,10 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
 
                 projectModel.namespace + "$" + entityName.split('.').last() + ".browse"
             }
+
+            validate {
+                screenIdDoesNotExists(value)
+            }
         }
 
         question("descriptorName", "Descriptor name") {
@@ -79,6 +83,8 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
 
             validate {
                 checkIsScreenDescriptor()
+
+                screenDescriptorDoesNotExists(value)
             }
         }
 
@@ -87,6 +93,8 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
 
             validate {
                 checkIsClass()
+
+                screenControllerDoesNotExists(value)
             }
         }
     }

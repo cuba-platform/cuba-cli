@@ -42,24 +42,37 @@ class ScreenRegistrationHelper {
         }
     }
 
-    fun checkScreenId(screenId: String) {
-        parse(screensXml).documentElement
+    fun isScreenIdExists(screenId: String): Boolean {
+        return parse(screensXml).documentElement
                 .xpath("//screen[@id=\"$screenId\"]")
-                .firstOrNull()?.let {
-                    throw CommandExecutionException("Screen with id \"$screenId\" already exists")
-                }
+                .firstOrNull() != null
+    }
+
+    fun isDescriptorExists(packageName: String, descriptor: String): Boolean {
+        val packagePath = ProjectStructure().getModule(ModuleStructure.WEB_MODULE).resolvePackagePath(packageName)
+
+        return Files.exists(packagePath.resolve("$descriptor.xml"))
+    }
+
+    fun isControllerExists(packageName: String, controller: String): Boolean {
+        val packagePath = ProjectStructure().getModule(ModuleStructure.WEB_MODULE).resolvePackagePath(packageName)
+
+        return Files.exists(packagePath.resolve("$controller.java"))
+    }
+
+    fun checkScreenId(screenId: String) {
+        if (isScreenIdExists(screenId))
+            throw CommandExecutionException("Screen with id \"$screenId\" already exists")
     }
 
     fun checkExistence(packageName: String, descriptor: String? = null, controller: String? = null) {
-        val packagePath = ProjectStructure().getModule(ModuleStructure.WEB_MODULE).resolvePackagePath(packageName)
-
         descriptor?.let {
-            ensureFileAbsence(packagePath.resolve("$descriptor.xml"),
-                    cause = "Screen descriptor $packageName.$descriptor.xml already exists")
+            if (isDescriptorExists(packageName, descriptor))
+                throw CommandExecutionException("Screen descriptor $packageName.$descriptor.xml already exists")
         }
         controller?.let {
-            ensureFileAbsence(packagePath.resolve("$controller.java"),
-                    cause = "Screen controller $packageName.$controller already exists")
+            if (isControllerExists(packageName, controller))
+                throw CommandExecutionException("Screen controller $packageName.$controller already exists")
         }
     }
 
@@ -84,10 +97,4 @@ class ScreenRegistrationHelper {
             set("menu-config.$screenId", caption)
         }
     }
-
-    private fun ensureFileAbsence(file: Path, cause: String, silent: Boolean = false) {
-        if (Files.exists(file))
-            throw CommandExecutionException(cause, silent = silent)
-    }
-
 }
