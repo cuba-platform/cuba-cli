@@ -18,17 +18,24 @@ package com.haulmont.cuba.cli.cubaplugin.componentbean
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
 @Parameters(commandDescription = "Creates new Spring bean")
-class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>() {
+class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>(), NonInteractiveInfo {
     override fun getModelName(): String = ComponentBeanModel.MODEL_NAME
 
     override fun preExecute() = checkProjectExistence()
 
+    override fun getNonInteractiveParameters(): Map<String, String> = mapOf(
+            "name" to "Class name",
+            "packageName" to "Package name",
+            "beanName" to "Bean name",
+            "module" to "Target module, web or core."
+    )
 
     override fun QuestionsList.prompting() {
         question("name", "Class name") {

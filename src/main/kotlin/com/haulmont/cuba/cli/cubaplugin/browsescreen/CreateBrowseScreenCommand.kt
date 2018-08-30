@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.browsescreen
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure
+import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.ScreenCommandBase
 import com.haulmont.cuba.cli.generation.Properties
@@ -29,12 +30,20 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
 import net.sf.practicalxml.DomUtil
 
 @Parameters(commandDescription = "Creates new browse screen")
-class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>() {
+class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>(), NonInteractiveInfo {
     override fun getModelName(): String = BrowseScreenModel.MODEL_NAME
 
     override fun preExecute() {
         checkProjectExistence()
     }
+
+    override fun getNonInteractiveParameters(): Map<String, String> = mapOf(
+            "entityName" to "Fully qualified entity name",
+            "packageName" to "Package name",
+            "screenId" to "Screen id",
+            "descriptorName" to "Descriptor name",
+            "controllerName" to "Controller name"
+    )
 
     override fun QuestionsList.prompting() {
         val persistenceXml = projectStructure.getModule(ModuleStructure.GLOBAL_MODULE).persistenceXml

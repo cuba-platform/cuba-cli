@@ -282,7 +282,7 @@ interface Conditional {
 
     fun askIf(confirmationQuestionName: String) {
         askIf {
-            it[confirmationQuestionName] as Boolean
+            it[confirmationQuestionName] as Boolean? ?: false
         }
     }
 }

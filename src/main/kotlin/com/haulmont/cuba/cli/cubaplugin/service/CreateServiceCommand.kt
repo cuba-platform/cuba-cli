@@ -20,22 +20,30 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
-import com.haulmont.cuba.cli.registration.ServiceRegistrationHelper
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.registration.ServiceRegistrationHelper
 import org.kodein.di.generic.instance
 
 @Parameters(commandDescription = "Creates new service")
-class CreateServiceCommand : GeneratorCommand<ServiceModel>() {
+class CreateServiceCommand : GeneratorCommand<ServiceModel>(), NonInteractiveInfo {
 
     private val serviceRegistrationHelper: ServiceRegistrationHelper by kodein.instance()
 
     override fun getModelName(): String = ServiceModel.MODEL_NAME
 
     override fun preExecute() = checkProjectExistence()
+
+    override fun getNonInteractiveParameters(): Map<String, String> = mapOf(
+            "interfaceName" to "Service interface name",
+            "beanName" to "Service bean name",
+            "packageName" to "Package name",
+            "serviceName" to "Service name"
+    )
 
     override fun QuestionsList.prompting() {
         question("interfaceName", "Service interface name") {

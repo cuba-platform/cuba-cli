@@ -71,4 +71,5 @@ private fun registerBaseCommands(commandsRegistry: CommandsRegistry) =
         commandsRegistry {
             command("help", HelpCommand)
             command("version", VersionCommand)
+            command("parameters", ShowNonInteractiveParameters(commandsRegistry))
         }

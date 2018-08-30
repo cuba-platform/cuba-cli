@@ -21,6 +21,7 @@ import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.Snippets
@@ -33,7 +34,7 @@ import org.kodein.di.generic.instance
 import java.nio.file.Path
 
 @Parameters(commandDescription = "Generates app-component.xml")
-class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
+class AppComponentCommand : GeneratorCommand<AppComponentModel>(), NonInteractiveInfo {
     private val messages by localMessages()
 
     private val printHelper: PrintHelper by kodein.instance()
@@ -48,22 +49,36 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
 
     override fun getModelName(): String = AppComponentModel.MODEL_NAME
 
+    override fun getNonInteractiveParameters(): Map<String, String> = mapOf(
+            "modulePrefix" to "If specified, changes module prefix for project"
+    )
+
     override fun QuestionsList.prompting() {
-        if (projectModel.modulePrefix == "app") {
+        if (isNonInteractiveMode()) {
+            askPrefix(projectModel.modulePrefix)
+        } else if (projectModel.modulePrefix == "app") {
             confirmation("changePrefix", messages["changePrefix"])
 
-            question("modulePrefix", "New prefix") {
-                askIf("changePrefix")
+            askPrefix()
+        }
+    }
 
-                validate {
-                    if (value.isBlank())
-                        fail("Empty project prefix is not allowed")
+    private fun QuestionsList.askPrefix(defaultPrefix: String? = null) {
+        question("modulePrefix", "New prefix") {
+            askIf("changePrefix")
 
-                    val invalidNameRegex = Regex("[^\\w\\-]")
+            defaultPrefix?.let {
+                default(it)
+            }
 
-                    if (invalidNameRegex.find(value) != null) {
-                        fail("Project name should contain only Latin letters, digits, dashes and underscores.")
-                    }
+            validate {
+                if (value.isBlank())
+                    fail("Empty project prefix is not allowed")
+
+                val invalidNameRegex = Regex("[^\\w\\-]")
+
+                if (invalidNameRegex.find(value) != null) {
+                    fail("Project name should contain only Latin letters, digits, dashes and underscores.")
                 }
             }
         }
@@ -71,7 +86,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>() {
 
     override fun createModel(answers: Answers): AppComponentModel {
         val modulePrefix: String = answers["modulePrefix"] as String? ?: projectModel.modulePrefix
-        val changePrefix = answers["changePrefix"] as Boolean? ?: false
+        val changePrefix = modulePrefix != projectModel.modulePrefix
         return AppComponentModel(changePrefix, modulePrefix)
     }
 

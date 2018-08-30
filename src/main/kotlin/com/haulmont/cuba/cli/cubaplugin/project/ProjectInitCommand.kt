@@ -19,6 +19,7 @@ package com.haulmont.cuba.cli.cubaplugin.project
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
@@ -31,7 +32,7 @@ import java.nio.file.attribute.PosixFilePermission
 import java.util.*
 
 @Parameters(commandDescription = "Creates new project")
-class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
+class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveInfo {
     private val messages by localMessages()
 
     private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
@@ -48,6 +49,14 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
     private val writer: PrintWriter by kodein.instance()
 
+    override fun getNonInteractiveParameters(): Map<String, String> = mapOf(
+            "projectName" to "Project name",
+            "namespace" to "Project namespace",
+            "rootPackage" to "Root package",
+            "platformVersion" to "Platform version",
+            "database" to "Project database. Might be one of ${databasesAliases.printOptions()}."
+    )
+
     override fun getModelName(): String = "project"
 
     override fun preExecute() {
@@ -56,9 +65,11 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
 
     override fun QuestionsList.prompting() {
         question("projectName", "Project Name") {
-            default(
-                    ADJECTIVES.random() + "-" + ANIMALS.random()
-            )
+            if (!isNonInteractiveMode()) {
+                default(
+                        ADJECTIVES.random() + "-" + ANIMALS.random()
+                )
+            }
 
             validate {
                 val invalidNameRegex = Regex("[^\\w\\-]")

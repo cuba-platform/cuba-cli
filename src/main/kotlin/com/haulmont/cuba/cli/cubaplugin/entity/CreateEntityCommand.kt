@@ -22,6 +22,7 @@ import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.ProjectStructure
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
@@ -37,7 +38,7 @@ import java.nio.file.Files
 import java.util.*
 
 @Parameters(commandDescription = "Creates new entity")
-class CreateEntityCommand : GeneratorCommand<EntityModel>() {
+class CreateEntityCommand : GeneratorCommand<EntityModel>(), NonInteractiveInfo {
     private val entityTypes = listOf("Persistent", "Persistent embedded", "Not persistent")
 
     private val namesUtils: NamesUtils by kodein.instance()
@@ -53,6 +54,12 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>() {
     private val calendar = Calendar.getInstance()
 
     override fun getModelName(): String = EntityModel.MODEL_NAME
+
+    override fun getNonInteractiveParameters(): Map<String, String> = mapOf(
+            "entityName" to "Entity Name",
+            "packageName" to "Package Name",
+            "entityType" to "Entity type. Might be one of ${entityTypes.printOptions()}"
+    )
 
     override fun QuestionsList.prompting() {
         question("entityName", "Entity Name") {

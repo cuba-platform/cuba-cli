@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.editscreen
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure
+import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.ScreenCommandBase
 import com.haulmont.cuba.cli.generation.Properties
@@ -29,12 +30,20 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
 import net.sf.practicalxml.DomUtil
 
 @Parameters(commandDescription = "Creates new edit screen")
-class CreateEditScreenCommand : ScreenCommandBase<EditScreenModel>() {
+class CreateEditScreenCommand : ScreenCommandBase<EditScreenModel>(), NonInteractiveInfo {
     override fun getModelName(): String = EditScreenModel.MODEL_NAME
 
     override fun preExecute() {
         checkProjectExistence()
     }
+
+    override fun getNonInteractiveParameters(): Map<String, String> = mapOf(
+            "entityName" to "Fully qualified entity name",
+            "packageName" to "Package name",
+            "screenId" to "Screen id",
+            "descriptorName" to "Descriptor name",
+            "controllerName" to "Controller name"
+    )
 
     override fun QuestionsList.prompting() {
         val persistenceXml = projectStructure.getModule(ModuleStructure.GLOBAL_MODULE).persistenceXml

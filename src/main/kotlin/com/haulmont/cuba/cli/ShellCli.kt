@@ -59,6 +59,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
             command("version", VersionCommand)
             command("exit", ExitCommand)
             command("cd", CdCommand())
+            command("parameters", ShowNonInteractiveParameters(commandsRegistry))
         }
 
         commandParser = CommandParser(commandsRegistry, shellMode = true)
