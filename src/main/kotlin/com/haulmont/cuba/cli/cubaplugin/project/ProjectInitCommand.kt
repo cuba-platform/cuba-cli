@@ -81,7 +81,10 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>() {
             default { answers ->
                 val notAlphaNumeric = Regex("[^a-zA-Z0-9]")
 
-                notAlphaNumeric.replace(answers["projectName"] as String, "").toLowerCase()
+                notAlphaNumeric
+                        .replace(answers["projectName"] as String, "")
+                        .replace("^[0-9]+".toRegex(), "")
+                        .toLowerCase()
             }
 
             validate {
