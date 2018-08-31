@@ -17,7 +17,10 @@
 package com.haulmont.cuba.cli.cubaplugin.statictemplate
 
 import com.haulmont.cuba.cli.commands.CommandExecutionException
-import com.haulmont.cuba.cli.generation.*
+import com.haulmont.cuba.cli.generation.findFirstChild
+import com.haulmont.cuba.cli.generation.get
+import com.haulmont.cuba.cli.generation.getChildElements
+import com.haulmont.cuba.cli.generation.parse
 import com.haulmont.cuba.cli.kodein
 import net.sf.practicalxml.DomUtil
 import org.kodein.di.generic.instance
@@ -25,8 +28,9 @@ import org.w3c.dom.Element
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 
-data class Template(val path: Path, val name: String, val questions: List<TemplateQuestion>, val instructions: List<GenerationInstruction>, val registrations: List<Registration>)
+data class StaticTemplate(val path: Path, val name: String, val questions: List<TemplateQuestion>, val instructions: List<GenerationInstruction>, val registrations: List<Registration>)
 data class GenerationInstruction(val from: String, val to: String, val transform: Boolean)
 
 sealed class Registration
@@ -41,8 +45,8 @@ class OptionsQuestion(name: String, caption: String, val options: List<String>) 
 
 private val printWriter: PrintWriter by kodein.instance()
 
-fun parseTemplate(templateName: String): Template {
-    val templateBasePath = TemplateProcessor.findTemplate(templateName)
+fun parseTemplate(templateName: String): StaticTemplate {
+    val templateBasePath = findTemplate(templateName)
     val templateXml = templateBasePath
             .resolve("template.xml")
 
@@ -62,7 +66,7 @@ fun parseTemplate(templateName: String): Template {
         parseRegistrations(it)
     } ?: emptyList()
 
-    return Template(templateBasePath, templateDocument["name"], questions, instructions, registrations)
+    return StaticTemplate(templateBasePath, templateDocument["name"], questions, instructions, registrations)
 }
 
 private fun parseQuestions(questionsListElement: Element): List<TemplateQuestion> =
@@ -125,3 +129,12 @@ private fun parseRegistrations(registrationsListElement: Element): List<Registra
                         else -> throw CommandExecutionException("Invalid registration type ${it.tagName}")
                     }
                 }.toList()
+
+val CUSTOM_TEMPLATES_PATH: Path = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "templates")
+        .also {
+            if (!Files.exists(it)) {
+                Files.createDirectories(it)
+            }
+        }
+
+private fun findTemplate(templateBasePath: String): Path = CUSTOM_TEMPLATES_PATH.resolve(templateBasePath)

@@ -20,9 +20,9 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.PrintHelper
+import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
@@ -39,8 +39,10 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>(), NonInteractiv
 
     private val printHelper: PrintHelper by kodein.instance()
 
+    private val resources by Resources.fromMyPlugin()
+
     private val snippets: Snippets by lazy {
-        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "appcomponentxml", javaClass, projectModel.platformVersion)
+        Snippets(resources, "appcomponentxml", projectModel.platformVersion)
     }
 
     override fun preExecute() {
@@ -95,7 +97,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>(), NonInteractiv
             changePrefix(model.modulePrefix)
         }
 
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "appComponent", bindings, projectModel.platformVersion) {
+        TemplateProcessor(resources.getTemplate("appComponent"), bindings) {
             transformWhole()
         }
 

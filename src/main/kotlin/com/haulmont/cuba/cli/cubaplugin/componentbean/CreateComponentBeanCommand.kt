@@ -17,15 +17,17 @@
 package com.haulmont.cuba.cli.cubaplugin.componentbean
 
 import com.beust.jcommander.Parameters
+import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
 @Parameters(commandDescription = "Creates new Spring bean")
 class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>(), NonInteractiveInfo {
+    private val resources by Resources.fromMyPlugin()
+
     override fun getModelName(): String = ComponentBeanModel.MODEL_NAME
 
     override fun preExecute() = checkProjectExistence()
@@ -67,7 +69,7 @@ class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>(), NonIn
     }
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "componentBean", bindings, projectModel.platformVersion) {
+        TemplateProcessor(resources.getTemplate("componentBean"), bindings) {
             transformWhole()
         }
     }

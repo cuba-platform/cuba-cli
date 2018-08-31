@@ -16,6 +16,8 @@
 
 package com.haulmont.cuba.cli
 
+import org.kodein.di.direct
+import org.kodein.di.generic.instance
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
@@ -106,6 +108,16 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
         }
 
         operator fun invoke(versionStr: String): PlatformVersion = parse(versionStr)
+
+        fun findVersion(): PlatformVersion {
+            val context = kodein.direct.instance<CliContext>()
+            if (context.hasModel(ProjectModel.MODEL_NAME)) {
+                val model = context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
+                return model.platformVersion
+            }
+
+            return LatestVersion
+        }
     }
 }
 

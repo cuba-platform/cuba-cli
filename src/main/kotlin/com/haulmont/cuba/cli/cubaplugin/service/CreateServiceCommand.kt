@@ -19,9 +19,9 @@ package com.haulmont.cuba.cli.cubaplugin.service
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
+import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
@@ -31,6 +31,8 @@ import org.kodein.di.generic.instance
 
 @Parameters(commandDescription = "Creates new service")
 class CreateServiceCommand : GeneratorCommand<ServiceModel>(), NonInteractiveInfo {
+
+    private val resources by Resources.fromMyPlugin()
 
     private val serviceRegistrationHelper: ServiceRegistrationHelper by kodein.instance()
 
@@ -87,7 +89,7 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>(), NonInteractiveInf
     }
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "service", bindings, projectModel.platformVersion) {
+        TemplateProcessor(resources.getTemplate("service"), bindings) {
             transformWhole()
         }
         serviceRegistrationHelper.registerService(model.serviceName, model.packageName, model.interfaceName)

@@ -22,7 +22,6 @@ import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
 import org.kodein.di.generic.instance
 import java.io.File
-import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -48,7 +47,6 @@ import kotlin.reflect.full.memberProperties
 class TemplateProcessor {
     private val bindings: Map<String, Any>
 
-    private val writer: PrintWriter by kodein.instance()
     private val printHelper: PrintHelper by kodein.instance()
 
     private val pathExpressionPattern: Regex = Regex("\\$\\{[a-zA-Z][0-9a-zA-Z]*(\\.[a-zA-Z][0-9a-zA-Z]*)*}")
@@ -183,34 +181,15 @@ class TemplateProcessor {
         val projectRoot: Path
             get() = workingDirectoryManager.workingDirectory.toAbsolutePath()
 
-        private val resources: Resources by kodein.instance()
-
-        val CUSTOM_TEMPLATES_PATH = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "templates")
-                .also {
-                    if (!Files.exists(it)) {
-                        Files.createDirectories(it)
-                    }
-                }
 
         init {
             Velocity.init()
         }
 
         operator fun invoke(
-                templateName: String,
-                bindings: Map<String, Any>,
-                platformVersion: PlatformVersion = LatestVersion,
-                block: TemplateProcessor.() -> Unit): String? {
-            val templateBasePath = findTemplate(templateName)
-            TemplateProcessor(templateBasePath, bindings, platformVersion).block()
-
-            return maybeTips(templateBasePath)
-        }
-
-        operator fun invoke(
                 templateBasePath: Path,
                 bindings: Map<String, Any>,
-                platformVersion: PlatformVersion = LatestVersion,
+                platformVersion: PlatformVersion = PlatformVersion.findVersion(),
                 block: TemplateProcessor.() -> Unit): String? {
             TemplateProcessor(templateBasePath, bindings, platformVersion).block()
 
@@ -225,10 +204,5 @@ class TemplateProcessor {
                                     .bufferedReader()
                                     .readText()
                         }
-
-
-        fun findTemplate(templateBasePath: String): Path =
-                resources.getResourcePath(templateBasePath, javaClass)
-                        ?: CUSTOM_TEMPLATES_PATH.resolve(templateBasePath)
     }
 }

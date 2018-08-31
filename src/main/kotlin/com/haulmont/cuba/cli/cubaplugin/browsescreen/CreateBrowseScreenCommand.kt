@@ -18,8 +18,8 @@ package com.haulmont.cuba.cli.cubaplugin.browsescreen
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure
+import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.ScreenCommandBase
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.TemplateProcessor
@@ -31,6 +31,8 @@ import net.sf.practicalxml.DomUtil
 
 @Parameters(commandDescription = "Creates new browse screen")
 class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>(), NonInteractiveInfo {
+    private val resources by Resources.fromMyPlugin()
+
     override fun getModelName(): String = BrowseScreenModel.MODEL_NAME
 
     override fun preExecute() {
@@ -116,7 +118,7 @@ class CreateBrowseScreenCommand : ScreenCommandBase<BrowseScreenModel>(), NonInt
     }
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "browseScreen", bindings, projectModel.platformVersion) {
+        TemplateProcessor(resources.getTemplate("browseScreen"), bindings) {
             transformWhole()
         }
 

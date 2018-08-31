@@ -18,7 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.screenextension
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
+import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.cubaplugin.ScreenCommandBase
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.TemplateProcessor
@@ -27,6 +27,8 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
 
 @Parameters(commandDescription = "Extends login and main screens")
 class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {
+    private val resources by Resources.fromMyPlugin()
+
     override fun getModelName(): String = ScreenExtensionModel.MODEL_NAME
 
     override fun preExecute() = checkProjectExistence()
@@ -86,8 +88,7 @@ class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {
     }
 
     override fun generate(bindings: Map<String, Any>) {
-        val templatePath = CubaPlugin.TEMPLATES_BASE_PATH + "screenExtension/" + model.screen
-        TemplateProcessor(templatePath, bindings, projectModel.platformVersion) {
+        TemplateProcessor(resources.getTemplate("screenExtension/" + model.screen), bindings) {
             transformWhole()
         }
 

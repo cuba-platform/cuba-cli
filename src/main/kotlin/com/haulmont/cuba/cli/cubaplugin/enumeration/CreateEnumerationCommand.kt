@@ -18,8 +18,8 @@ package com.haulmont.cuba.cli.cubaplugin.enumeration
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure
+import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
@@ -27,6 +27,9 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
 
 @Parameters(commandDescription = "Creates new enumeration")
 class CreateEnumerationCommand : GeneratorCommand<EnumerationModel>() {
+
+    private val resources by Resources.fromMyPlugin()
+
     override fun getModelName(): String = EnumerationModel.MODEL_NAME
 
     override fun QuestionsList.prompting() {
@@ -85,7 +88,7 @@ class CreateEnumerationCommand : GeneratorCommand<EnumerationModel>() {
     }
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "enumeration", bindings, projectModel.platformVersion) {
+        TemplateProcessor(resources.getTemplate("enumeration"), bindings) {
             transformWhole()
         }
 

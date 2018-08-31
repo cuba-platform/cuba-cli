@@ -17,22 +17,18 @@
 package com.haulmont.cuba.cli.cubaplugin.entity
 
 import com.beust.jcommander.Parameters
+import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
-import com.haulmont.cuba.cli.PrintHelper
-import com.haulmont.cuba.cli.ProjectStructure
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.commands.from
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.generation.Properties
-import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import com.haulmont.cuba.cli.registration.EntityRegistrationHelper
-import com.haulmont.cuba.cli.resolve
 import org.kodein.di.generic.instance
 import java.nio.file.Files
 import java.util.*
@@ -45,8 +41,10 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>(), NonInteractiveInfo 
 
     private val printHelper: PrintHelper by kodein.instance()
 
+    private val resources by Resources.fromMyPlugin()
+
     private val snippets by lazy {
-        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "entity", javaClass, projectModel.platformVersion)
+        Snippets(resources, "entity")
     }
 
     private val entityRegistrationHelper: EntityRegistrationHelper by kodein.instance()
@@ -119,7 +117,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>(), NonInteractiveInfo 
     }
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "entity", bindings) {
+        TemplateProcessor(resources.getTemplate("entity"), bindings) {
             transformWhole()
         }
 

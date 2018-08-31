@@ -85,14 +85,6 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
     abstract fun createModel(answers: Answers): Model
 
     abstract fun generate(bindings: Map<String, Any>)
-
-    fun processTemplate(templateName: String, bindings: Map<String, Any>, block: TemplateProcessor.() -> Unit) {
-        if (context.hasModel(ProjectModel.MODEL_NAME)) {
-            TemplateProcessor(templateName, bindings, projectModel.platformVersion, block)
-        } else {
-            TemplateProcessor(templateName, bindings, LatestVersion, block)
-        }
-    }
 }
 
 /**

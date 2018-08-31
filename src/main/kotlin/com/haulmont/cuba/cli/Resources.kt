@@ -16,39 +16,77 @@
 
 package com.haulmont.cuba.cli
 
+import com.haulmont.cuba.cli.commands.CliCommand
+import org.kodein.di.direct
+import org.kodein.di.generic.instance
 import java.net.URI
 import java.nio.file.*
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
-class Resources {
+class Resources(private val cliPlugin: CliPlugin) {
 
-    fun getResourcePath(resourceName: String, clazz: Class<Any>): Path? {
-        if (jrtFileSystem != null) {
-            val moduleName = clazz.module.name
-            val jrtPath = jrtFileSystem.getPath("/modules", moduleName, resourceName)
-            if (Files.exists(jrtPath)) {
-                return jrtPath
-            }
-        }
-
-        val uri = clazz.getResource(resourceName)?.toURI()
-
-        return if (uri != null) {
-            if (uri.scheme == "jar") {
-                val fileSystem = getFileSystem(uri)
-                fileSystem.getPath(resourceName)
-            } else {
-                Paths.get(uri)
-            }
-        } else null
+    private val resourcesBasePath: String = cliPlugin.resources.let {
+        (it as? HasResources)?.resourcesBasePath
+                ?: throw RuntimeException("Plugin ${cliPlugin.javaClass} doesn't support resources")
     }
 
-    private fun getFileSystem(templateUri: URI?) = try {
-        FileSystems.getFileSystem(templateUri)
-    } catch (e: FileSystemNotFoundException) {
-        FileSystems.newFileSystem(templateUri, mutableMapOf<String, Any>())
+
+    fun getTemplate(templateName: String): Path {
+        return getResourcePath(resourcesBasePath + "templates/" + templateName)
+                ?: throw RuntimeException("Template $templateName not found in ${cliPlugin.javaClass} plugin")
+    }
+
+    fun getSnippets(snippetsBasePath: String): Path {
+        return getResourcePath(resourcesBasePath + "snippets/" + snippetsBasePath)
+                ?: throw RuntimeException("Snippets $snippetsBasePath not found in ${cliPlugin.javaClass} plugin")
+
+    }
+
+    fun getResourcePath(resourceName: String): Path? {
+        return getResourcePath(resourceName, cliPlugin.javaClass)
     }
 
     companion object {
+        fun fromMyPlugin(): ReadOnlyProperty<CliCommand, Resources> = object : ReadOnlyProperty<CliCommand, Resources> {
+            override fun getValue(thisRef: CliCommand, property: KProperty<*>): Resources {
+                val context = kodein.direct.instance<CliContext>()
+
+                val plugin = context.plugins.find {
+                    it.javaClass.module == thisRef.javaClass.module
+                }!!
+
+                return Resources(plugin)
+            }
+        }
+
+        fun getResourcePath(resourceName: String, clazz: Class<Any>): Path? {
+            if (jrtFileSystem != null) {
+                val moduleName = clazz.module.name
+                val jrtPath = jrtFileSystem.getPath("/modules", moduleName, resourceName)
+                if (Files.exists(jrtPath)) {
+                    return jrtPath
+                }
+            }
+
+            return clazz.getResource(resourceName)
+                    ?.toURI()
+                    ?.let {
+                        if (it.scheme == "jar") {
+                            val fileSystem = getFileSystem(it)
+                            fileSystem.getPath(resourceName)
+                        } else {
+                            Paths.get(it)
+                        }
+                    }
+        }
+
+        private fun getFileSystem(templateUri: URI?) = try {
+            FileSystems.getFileSystem(templateUri)
+        } catch (e: FileSystemNotFoundException) {
+            FileSystems.newFileSystem(templateUri, mutableMapOf<String, Any>())
+        }
+
         private val jrtFileSystem: FileSystem? = try {
             FileSystems.getFileSystem(URI.create("jrt:/"))
         } catch (e: Exception) {

@@ -20,9 +20,8 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.PrintHelper
+import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
-import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.getChildElements
 import com.haulmont.cuba.cli.generation.parse
@@ -34,8 +33,9 @@ import org.kodein.di.generic.instance
 
 @Parameters(commandDescription = "Creates new entity listener")
 class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
-    private val namesUtils: NamesUtils by kodein.instance()
     private val printHelper: PrintHelper by kodein.instance()
+
+    private val resources by Resources.fromMyPlugin()
 
     override fun getModelName(): String = EntityListenerModel.MODEL_NAME
 
@@ -99,7 +99,7 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
     }
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "entityListener", bindings, projectModel.platformVersion) {
+        TemplateProcessor(resources.getTemplate("entityListener"), bindings) {
             transformWhole()
         }
 

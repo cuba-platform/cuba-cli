@@ -16,11 +16,8 @@
 
 package com.haulmont.cuba.cli.generation
 
-import com.haulmont.cuba.cli.LatestVersion
 import com.haulmont.cuba.cli.PlatformVersion
 import com.haulmont.cuba.cli.Resources
-import com.haulmont.cuba.cli.kodein
-import org.kodein.di.generic.instance
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -35,10 +32,8 @@ class Snippets(private val snippetsPath: Path) {
     }
 
     companion object {
-        private val resources: Resources by kodein.instance()
-
-        operator fun invoke(basePath: String, clazz: Class<Any>, platformVersion: PlatformVersion = LatestVersion): Snippets {
-            val baseDirectory = resources.getResourcePath(basePath, clazz)!!
+        operator fun invoke(resources: Resources, snippetsPath: String, platformVersion: PlatformVersion = PlatformVersion.findVersion()): Snippets {
+            val baseDirectory = resources.getSnippets(snippetsPath)
 
             return platformVersion.findMostSuitableVersionDirectory(baseDirectory)
                     .let(::Snippets)

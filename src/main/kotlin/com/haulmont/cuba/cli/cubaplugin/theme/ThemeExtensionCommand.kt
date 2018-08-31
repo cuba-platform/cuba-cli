@@ -17,18 +17,14 @@
 package com.haulmont.cuba.cli.cubaplugin.theme
 
 import com.beust.jcommander.Parameters
+import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
-import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import com.haulmont.cuba.cli.resolve
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.nio.file.Files
@@ -38,8 +34,10 @@ import java.util.stream.Collectors
 class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
     private val messages by localMessages()
 
+    private val resources by Resources.fromMyPlugin()
+
     private val snippets: Snippets by lazy {
-        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "theme", javaClass, projectModel.platformVersion)
+        Snippets(resources, "theme")
     }
 
     private val writer: PrintWriter by kodein.instance()
@@ -95,9 +93,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         val targetDirectory = projectStructure.getModule(WEB_MODULE).path
                 .resolve("themes", model.themeName)
 
-        TemplateProcessor(
-                CubaPlugin.TEMPLATES_BASE_PATH + "themes/" + model.themeName,
-                bindings, projectModel.platformVersion) {
+        TemplateProcessor(resources.getTemplate("themes/" + model.themeName), bindings) {
             transform("styles.scss", to = targetDirectory)
             transform("\${project.rootPackage}", to = targetDirectory)
             copy("favicon.ico", to = targetDirectory)

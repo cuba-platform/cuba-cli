@@ -79,8 +79,6 @@ val kodein = Kodein {
 
     bind<NamesUtils>() with instance(NamesUtils())
 
-    bind<Resources>() with instance(Resources())
-
     bind<WorkingDirectoryManager>() with instance(WorkingDirectoryManager())
 
     bind<PlatformVersionsManager>() with singleton { PlatformVersionsManager() }
@@ -147,6 +145,7 @@ private fun loadPlugins(commandsRegistry: CommandsRegistry, mode: CliMode) {
             writer.println("Loaded plugin @|green ${plugin.javaClass.name}|@.")
         }
         bus.register(plugin)
+        context.registerPlugin(plugin)
     }
 
     bus.post(InitPluginEvent(commandsRegistry, mode))

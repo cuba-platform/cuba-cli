@@ -50,7 +50,7 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
     @Parameter(description = "Template name")
     private var templateName: String? = null
 
-    private val template: Template by lazy {
+    private val template: StaticTemplate by lazy {
         parseTemplate(templateName!!)
     }
 
@@ -58,9 +58,9 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
         if (templateName != null) {
             super.run()
         } else {
-            Files.walk(TemplateProcessor.CUSTOM_TEMPLATES_PATH, 1)
+            Files.walk(CUSTOM_TEMPLATES_PATH, 1)
                     .filter {
-                        it != TemplateProcessor.CUSTOM_TEMPLATES_PATH &&
+                        it != CUSTOM_TEMPLATES_PATH &&
                                 Files.isDirectory(it) &&
                                 Files.exists(it.resolve("template.xml"))
                     }

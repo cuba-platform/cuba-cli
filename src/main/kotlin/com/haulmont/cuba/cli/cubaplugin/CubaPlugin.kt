@@ -45,6 +45,8 @@ import java.io.PrintWriter
 
 @Suppress("UNUSED_PARAMETER")
 class CubaPlugin : CliPlugin {
+    override val resources: ResourcesPath = HasResources("/com/haulmont/cuba/cli/cubaplugin/")
+
     private val context: CliContext by kodein.instance()
 
     private val writer: PrintWriter by kodein.instance()
@@ -83,7 +85,7 @@ class CubaPlugin : CliPlugin {
 
     @Subscribe
     fun beforeCommand(event: BeforeCommandExecutionEvent) {
-        when(event.command) {
+        when (event.command) {
             is CdCommand -> return
         }
 
@@ -102,10 +104,5 @@ class CubaPlugin : CliPlugin {
 
             printHelper.saveStacktrace(e)
         }
-    }
-
-    companion object {
-        const val TEMPLATES_BASE_PATH = "/com/haulmont/cuba/cli/cubaplugin/templates/"
-        const val SNIPPETS_BASE_PATH = "/com/haulmont/cuba/cli/cubaplugin/snippets/"
     }
 }

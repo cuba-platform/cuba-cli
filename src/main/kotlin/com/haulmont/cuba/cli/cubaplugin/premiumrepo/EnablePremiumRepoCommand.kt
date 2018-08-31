@@ -18,8 +18,8 @@ package com.haulmont.cuba.cli.cubaplugin.premiumrepo
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.PrintHelper
+import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.AbstractCommand
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.kodein
@@ -39,8 +39,10 @@ class EnablePremiumRepoCommand : AbstractCommand() {
     private val printWriter: PrintWriter by kodein.instance()
     private val messages by localMessages()
 
+    private val resources by Resources.fromMyPlugin()
+
     private val snippets by lazy {
-        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "premiumrepo", javaClass, projectModel.platformVersion)
+        Snippets(resources, "premiumrepo")
     }
 
     override fun preExecute() {

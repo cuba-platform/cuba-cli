@@ -62,4 +62,11 @@ package com.haulmont.cuba.cli
  *
  * @see com.haulmont.cuba.cli.cubaplugin.CubaPlugin
  */
-interface CliPlugin
+interface CliPlugin {
+    val resources: ResourcesPath
+        get() = NoResources
+}
+
+sealed class ResourcesPath
+object NoResources: ResourcesPath()
+class HasResources(val resourcesBasePath: String) : ResourcesPath()

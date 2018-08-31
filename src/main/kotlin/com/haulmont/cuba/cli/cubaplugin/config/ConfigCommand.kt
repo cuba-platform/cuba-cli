@@ -20,14 +20,16 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
+import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
 @Parameters(commandDescription = "Creates new configuration interface")
 class ConfigCommand : GeneratorCommand<ConfigModel>() {
+
+    private val resources by Resources.fromMyPlugin()
 
     override fun getModelName(): String = ConfigModel.NAME
 
@@ -58,7 +60,7 @@ class ConfigCommand : GeneratorCommand<ConfigModel>() {
     override fun createModel(answers: Answers): ConfigModel = ConfigModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "config", bindings, projectModel.platformVersion) {
+        TemplateProcessor(resources.getTemplate("config"), bindings) {
             transformWhole()
         }
     }

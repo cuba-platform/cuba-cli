@@ -17,19 +17,14 @@
 package com.haulmont.cuba.cli.cubaplugin.polymer
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.PrintHelper
+import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import com.haulmont.cuba.cli.walk
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
-import java.nio.file.Paths
 
 @Parameters(commandDescription = "Creates Polymer module")
 class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
@@ -37,8 +32,10 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
 
     private val writer: PrintWriter by kodein.instance()
 
+    private val resources by Resources.fromMyPlugin()
+
     private val snippets: Snippets by lazy {
-        Snippets(CubaPlugin.SNIPPETS_BASE_PATH + "polymer", javaClass, projectModel.platformVersion)
+        Snippets(resources, "polymer", projectModel.platformVersion)
     }
 
     private val printHelper: PrintHelper by kodein.instance()
@@ -68,7 +65,7 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
     override fun generate(bindings: Map<String, Any>) {
         val destinationDir = projectStructure.path.resolve("modules/polymer-client")
 
-        val maybeHints = TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "polymer", bindings) {
+        val maybeHints = TemplateProcessor(resources.getTemplate("polymer"), bindings) {
             templatePath.walk(1).filter {
                 it.fileName.toString() != "images" && it != templatePath
             }.forEach {

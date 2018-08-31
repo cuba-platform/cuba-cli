@@ -33,6 +33,8 @@ class CliContext {
 
     private val models: MutableMap<String, Any> = mutableMapOf()
 
+    internal val plugins: List<CliPlugin> = mutableListOf()
+
     /**
      * Retrieves model by [key].
      * The method produces exception, if the model doesn't exist,
@@ -52,6 +54,17 @@ class CliContext {
     }
 
     internal fun clearModels() = models.clear()
+
+    internal fun registerPlugin(plugin: CliPlugin) {
+        (plugins as MutableList).add(plugin)
+    }
+
+    fun getResources(pluginClass: Class<out CliPlugin>): Resources {
+        return plugins.filterIsInstance(pluginClass)
+                .firstOrNull()?.let {
+                    Resources(it)
+                } ?: throw RuntimeException("Plugin $pluginClass was not loaded")
+    }
 
     /**
      * Returns all containing models.

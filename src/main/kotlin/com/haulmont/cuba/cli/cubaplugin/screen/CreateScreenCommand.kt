@@ -19,7 +19,7 @@ package com.haulmont.cuba.cli.cubaplugin.screen
 import com.beust.jcommander.Parameters
 import com.google.common.base.CaseFormat
 import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
+import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.cubaplugin.ScreenCommandBase
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.TemplateProcessor
@@ -28,6 +28,8 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
 
 @Parameters(commandDescription = "Creates new screen")
 class CreateScreenCommand : ScreenCommandBase<ScreenModel>() {
+    private val resources by Resources.fromMyPlugin()
+
     override fun getModelName(): String = ScreenModel.MODEL_NAME
 
     override fun preExecute() = checkProjectExistence()
@@ -66,7 +68,7 @@ class CreateScreenCommand : ScreenCommandBase<ScreenModel>() {
     }
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "screen", bindings, projectModel.platformVersion) {
+        TemplateProcessor(resources.getTemplate("screen"), bindings, projectModel.platformVersion) {
             transformWhole()
         }
 

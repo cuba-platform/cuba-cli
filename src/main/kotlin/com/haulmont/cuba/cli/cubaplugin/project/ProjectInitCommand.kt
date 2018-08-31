@@ -20,7 +20,6 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -34,6 +33,8 @@ import java.util.*
 @Parameters(commandDescription = "Creates new project")
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveInfo {
     private val messages by localMessages()
+
+    private val resources by Resources.fromMyPlugin()
 
     private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
 
@@ -168,7 +169,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveI
 
         Files.createDirectories(cwd)
 
-        val templateTips = TemplateProcessor(CubaPlugin.TEMPLATES_BASE_PATH + "project", bindings, PlatformVersion(model.platformVersion)) {
+        val templateTips = TemplateProcessor(resources.getTemplate("project"), bindings, PlatformVersion(model.platformVersion)) {
             listOf("modules", "build.gradle", "settings.gradle").forEach {
                 transform(it)
             }
