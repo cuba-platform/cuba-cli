@@ -37,12 +37,16 @@ class VelocityHelper {
         }.toString()
     }
 
-    fun generate(inputPath: Path, outputFile: Path, vc: VelocityContext) {
+    fun generate(inputPath: Path, vc: VelocityContext): String {
         val templateText = Files.newInputStream(inputPath)
                 .bufferedReader().readText()
         val templateName = generate(templateText, inputPath.fileName.toString(), vc)
 
-        val output = generate(templateText, templateName, vc)
+        return generate(templateText, templateName, vc)
+    }
+
+    fun generate(inputPath: Path, outputFile: Path, vc: VelocityContext) {
+        val output = generate(inputPath, vc)
 
         Files.newBufferedWriter(outputFile).use { writer ->
             writer.write(output)

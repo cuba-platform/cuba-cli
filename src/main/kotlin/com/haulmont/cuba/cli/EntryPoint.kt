@@ -95,10 +95,10 @@ fun main(args: Array<String>) {
     if (mode == CliMode.SHELL) {
         parseLaunchOptions(args)
         setupLogger()
-
-        val versionManager = kodein.direct.instance<PlatformVersionsManager>()
-        versionManager.load()
     }
+
+    val versionManager = kodein.direct.instance<PlatformVersionsManager>()
+    versionManager.load()
 
     val commandsRegistry = CommandsRegistry()
 

@@ -241,6 +241,10 @@ class ValidationHelper<T : Any>(val value: T, val answers: Answers) {
             fail(failMessage)
     }
 
+    fun checkIsNotBlank(failMessage: String = "Specify value") {
+        value is String && value.isBlank() && fail(failMessage)
+    }
+
     fun checkIsPackage(failMessage: String = "Is not valid package name") =
             checkRegex("[a-zA-Z][0-9a-zA-Z]*(\\.[a-zA-Z][0-9a-zA-Z]*)*", failMessage)
 

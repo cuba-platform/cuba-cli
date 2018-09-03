@@ -29,9 +29,13 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.attribute.PosixFilePermission
 import java.util.*
+import java.util.logging.Level
+import java.util.logging.Logger
 
 @Parameters(commandDescription = "Creates new project")
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveInfo {
+    private val logger = Logger.getLogger(ProjectInitCommand::class.java.name)
+
     private val messages by localMessages()
 
     private val resources by Resources.fromMyPlugin()
@@ -62,6 +66,12 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveI
 
     override fun preExecute() {
         !context.hasModel("project") || fail("There is an existing project found in current directory.")
+
+        try {
+            platformVersionsManager.loadThread?.join(20_000)
+        } catch (e: Exception) {
+            logger.log(Level.SEVERE, e) { "" }
+        }
     }
 
     override fun QuestionsList.prompting() {

@@ -22,6 +22,7 @@ import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
 import org.kodein.di.generic.instance
 import java.io.File
+import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -44,8 +45,7 @@ import kotlin.reflect.full.memberProperties
  * Packages of all your models should be opened in order to Apache Velocity may access them through reflexion.
  *
  */
-class TemplateProcessor {
-    private val bindings: Map<String, Any>
+class TemplateProcessor(templateBasePath: Path, private val bindings: Map<String, Any>, version: PlatformVersion = PlatformVersion.findVersion()) {
 
     private val printHelper: PrintHelper by kodein.instance()
 
@@ -57,11 +57,9 @@ class TemplateProcessor {
 
     private val velocityHelper: VelocityHelper = VelocityHelper()
 
-    val templatePath: Path
+    val templatePath: Path = version.findMostSuitableVersionDirectory(templateBasePath)
 
-    private constructor(templateBasePath: Path, bindings: Map<String, Any>, version: PlatformVersion) {
-        templatePath = version.findMostSuitableVersionDirectory(templateBasePath)
-        this.bindings = bindings
+    init {
         this.velocityContext = VelocityContext().apply {
             bindings.forEach { k, v -> put(k, v) }
         }
@@ -165,6 +163,24 @@ class TemplateProcessor {
 
     fun transform(subPath: String, to: Path = projectRoot) {
         process(templatePath.resolve(subPath), to, true)
+    }
+
+    fun transform(subPath: String, to: OutputStream) {
+        val filePath = templatePath.resolve(subPath)
+
+        check(Files.isRegularFile(filePath)) { "Only file may be saved to output stream" }
+
+        velocityHelper.generate(filePath, velocityContext).let {
+            to.write(it.toByteArray())
+        }
+    }
+
+    fun copy(subPath: String, to: OutputStream) {
+        val filePath = templatePath.resolve(subPath)
+
+        check(Files.isRegularFile(filePath)) { "Only file may be saved to output stream" }
+
+        Files.newInputStream(filePath).copyTo(to)
     }
 
     fun transformWhole(to: Path = projectRoot) {

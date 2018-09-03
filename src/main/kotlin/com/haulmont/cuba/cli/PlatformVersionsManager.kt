@@ -22,6 +22,7 @@ import java.net.URL
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.concurrent.thread
+import kotlin.properties.Delegates
 
 class PlatformVersionsManager {
     private val messages by localMessages()
@@ -31,14 +32,20 @@ class PlatformVersionsManager {
     var versions: List<String> = messages["platformVersions"].split(",").map { it.trim() }
         private set
 
+    var loadThread: Thread? by Delegates.vetoable<Thread?>(null) { _, oldValue, _ ->
+        oldValue == null
+    }
+
     fun load() {
-        if (!LaunchOptions.skipVersionLoading) thread(isDaemon = true) {
-            try {
-                versions = loadInfoJson()
-                        .let(::extractVersions)
-                        .let(::filterVersions)
-            } catch (e: Throwable) {
-                logger.log(Level.SEVERE, "Error during platform versions retrieving", e)
+        if (!LaunchOptions.skipVersionLoading) {
+            loadThread = thread(isDaemon = true) {
+                try {
+                    versions = loadInfoJson()
+                            .let(::extractVersions)
+                            .let(::filterVersions)
+                } catch (e: Throwable) {
+                    logger.log(Level.SEVERE, "Error during platform versions retrieving", e)
+                }
             }
         }
     }
