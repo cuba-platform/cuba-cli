@@ -20,25 +20,21 @@ import com.google.gson.Gson
 import com.haulmont.cuba.cli.commands.LaunchOptions
 import java.net.URL
 import java.util.logging.Level
-import java.util.logging.Logger
 import kotlin.concurrent.thread
-import kotlin.properties.Delegates
 
 class PlatformVersionsManager {
     private val messages by localMessages()
 
-    private val logger = Logger.getLogger(PlatformVersionsManager::class.java.name)
+    private val logger by thisClassLogger()
+
+    val supportedVersionsRange = SpecificVersion(6, 8, 0)..SpecificVersion(6, 11, 0)
 
     var versions: List<String> = messages["platformVersions"].split(",").map { it.trim() }
         private set
 
-    var loadThread: Thread? by Delegates.vetoable<Thread?>(null) { _, oldValue, _ ->
-        oldValue == null
-    }
-
-    fun load() {
-        if (!LaunchOptions.skipVersionLoading) {
-            loadThread = thread(isDaemon = true) {
+    val loadThread: Thread by lazy {
+        thread(isDaemon = true) {
+            if (!LaunchOptions.skipVersionLoading) {
                 try {
                     versions = loadInfoJson()
                             .let(::extractVersions)
@@ -48,6 +44,10 @@ class PlatformVersionsManager {
                 }
             }
         }
+    }
+
+    fun load() {
+        loadThread // force field initialization
     }
 
     private fun extractVersions(infoJson: String) = Gson()
@@ -66,19 +66,27 @@ class PlatformVersionsManager {
             }
 
     private fun filterVersions(fullList: List<String>): List<String> {
-        val v68 = SpecificVersion(listOf(6, 8))
-        val v69 = SpecificVersion(listOf(6, 9))
-        val v6_10 = SpecificVersion(listOf(6, 10))
+        val borders = listOf<PlatformVersion>(
+                SpecificVersion(6, 8),
+                SpecificVersion(6, 9),
+                SpecificVersion(6, 10),
+                SpecificVersion(6, 11)
+        )
+
+        val supportedVersionRanges = (0 until borders.size - 1).map {
+            borders[it]..borders[it + 1]
+        }.toList()
 
         val sortedVersions = fullList.sortedBy { PlatformVersion(it) }
 
-        val lastTwo68 = sortedVersions.filter { PlatformVersion(it).let { v -> v >= v68 && v < v69 } }.takeLast(1)
-        val lastTwo69 = sortedVersions.filter { PlatformVersion(it).let { v -> v >= v69 && v < v6_10 } }.takeLast(1)
-
-        return lastTwo68 + lastTwo69
+        return supportedVersionRanges.flatMap { range ->
+            sortedVersions.filter {
+                PlatformVersion(it) in range
+            }.takeLast(1)
+        }.reversed()
     }
 
-    data class StudioConfig(val platform_versions: List<String>)
+    private data class StudioConfig(val platform_versions: List<String>)
 
     companion object {
         private const val TIMEOUT_MS = 60_000

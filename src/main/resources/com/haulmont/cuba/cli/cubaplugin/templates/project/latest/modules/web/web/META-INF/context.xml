@@ -1,0 +1,6 @@
+<Context>
+
+    <!-- Switch off session serialization -->
+    <Manager pathname=""/>
+
+</Context>

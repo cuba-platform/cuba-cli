@@ -30,11 +30,10 @@ import java.nio.file.Paths
 import java.nio.file.attribute.PosixFilePermission
 import java.util.*
 import java.util.logging.Level
-import java.util.logging.Logger
 
 @Parameters(commandDescription = "Creates new project")
 class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveInfo {
-    private val logger = Logger.getLogger(ProjectInitCommand::class.java.name)
+    private val logger by thisClassLogger()
 
     private val messages by localMessages()
 
@@ -161,8 +160,8 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveI
                     fail("Type platform version")
 
                 try {
-                    if (PlatformVersion("6.8.0") > PlatformVersion(value))
-                        fail("Only versions greater or equal 6.8.0 are allowed")
+                    if (PlatformVersion(value) !in platformVersionsManager.supportedVersionsRange)
+                        fail("Only versions from ${platformVersionsManager.supportedVersionsRange} range are allowed")
                 } catch (e: PlatformVersionParseException) {
                     fail("Unable to parse \"$value\" as platform version")
                 }

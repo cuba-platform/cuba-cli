@@ -62,6 +62,8 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
         return versionNumbersWithoutTrailingZeros.size.compareTo(other.versionNumbersWithoutTrailingZeros.size)
     }
 
+    operator fun rangeTo(toExclusive: PlatformVersion) = VersionRange(this, toExclusive)
+
     fun findMostSuitableVersionDirectory(baseDirectory: Path): Path {
         Files.walk(baseDirectory, 1)
                 .filter { Files.isDirectory(it) && it != baseDirectory }
@@ -75,7 +77,7 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
                     }
                 }.toSortedMap()
                 .onEach { (dirVersion, directory) ->
-                    if (dirVersion >= this)
+                    if (dirVersion > this)
                         return directory
                 }.let {
                     if (it.isNotEmpty())
@@ -121,10 +123,18 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
     }
 }
 
-object LatestVersion : PlatformVersion()
+object LatestVersion : PlatformVersion() {
+    override fun toString(): String = "Latest version"
+}
+
 class SpecificVersion(val versionNumbers: List<Int>) : PlatformVersion() {
+
+    constructor(vararg versionNumbers: Int) : this(versionNumbers.asList())
+
     internal val versionNumbersWithoutTrailingZeros
         get() = versionNumbers.dropLastWhile { it == 0 }
+
+    override fun toString(): String = versionNumbers.joinToString(separator = ".")
 }
 
 class PlatformVersionParseException : Exception {
@@ -132,4 +142,16 @@ class PlatformVersionParseException : Exception {
 
     constructor(cause: Exception) : super(cause)
 
+}
+
+class VersionRange(private val fromInclusive: PlatformVersion, private val toExclusive: PlatformVersion) {
+    init {
+        require(fromInclusive < toExclusive)
+    }
+
+    operator fun contains(version: PlatformVersion): Boolean = fromInclusive <= version && version < toExclusive
+
+    override fun toString(): String {
+        return "[$fromInclusive .. $toExclusive)"
+    }
 }
