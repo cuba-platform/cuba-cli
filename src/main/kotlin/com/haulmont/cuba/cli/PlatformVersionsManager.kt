@@ -86,7 +86,7 @@ class PlatformVersionsManager {
         }.reversed()
     }
 
-    private data class StudioConfig(val platform_versions: List<String>)
+    data class StudioConfig(val platform_versions: List<String>)
 
     companion object {
         private const val TIMEOUT_MS = 60_000

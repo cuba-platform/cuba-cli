@@ -144,14 +144,25 @@ class PlatformVersionParseException : Exception {
 
 }
 
-class VersionRange(private val fromInclusive: PlatformVersion, private val toExclusive: PlatformVersion) {
+class VersionRange(val fromInclusive: PlatformVersion, val toExclusive: PlatformVersion) {
     init {
         require(fromInclusive < toExclusive)
+        require(fromInclusive < LatestVersion)
     }
 
     operator fun contains(version: PlatformVersion): Boolean = fromInclusive <= version && version < toExclusive
 
-    override fun toString(): String {
-        return "[$fromInclusive .. $toExclusive)"
+    fun printAllowedVersionsRange(): String {
+        return when (toExclusive) {
+            LatestVersion -> "Only versions upper $fromInclusive are allowed"
+            is SpecificVersion -> {
+                val upperBound = toExclusive.versionNumbers.dropLast(1).let {
+                    it.mapIndexed { index, i ->
+                        if (index == it.lastIndex) i - 1 else i
+                    }.map { it.toString() } + listOf("x")
+                }.joinToString(separator = ".")
+                "Only versions from $fromInclusive to $upperBound are allowed"
+            }
+        }
     }
 }
