@@ -152,16 +152,16 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveI
     private fun QuestionsList.askCustomVersion() {
         question("platformVersion", "Platform version") {
             askIf {
-                it["predefinedPlatformVersion"] == CUSTOM_VERSION
+                (it["predefinedPlatformVersion"] == CUSTOM_VERSION) || isNonInteractiveMode()
             }
 
             validate {
-                if (value.isBlank())
+                if (value.isBlank() && !isNonInteractiveMode())
                     fail("Type platform version")
 
                 try {
                     if (PlatformVersion(value) !in platformVersionsManager.supportedVersionsRange)
-                        fail("Only versions from ${platformVersionsManager.supportedVersionsRange} range are allowed")
+                        fail(platformVersionsManager.supportedVersionsRange.printAllowedVersionsRange())
                 } catch (e: PlatformVersionParseException) {
                     fail("Unable to parse \"$value\" as platform version")
                 }
