@@ -1,0 +1,5 @@
+@import "hover-ext";
+
+@mixin ${names.packageToUnderscore($project.rootPackage)} {
+  @include ${names.packageToUnderscore($project.rootPackage)}-hover-ext;
+}

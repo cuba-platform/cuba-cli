@@ -1,0 +1,11 @@
+@import "hover-defaults";
+@import "${project.rootPackage}/hover-ext-defaults";
+@import "app-components";
+@import "${project.rootPackage}/hover-ext";
+
+.hover {
+  // include auto-generated app components SCSS
+  @include app_components;
+  
+  @include ${names.packageToUnderscore($project.rootPackage)}-hover-ext;
+}

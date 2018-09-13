@@ -55,7 +55,12 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         } else listOf<String>()
 
 
-        val restThemes = listOf("halo") - alreadyExtended
+        val restThemes: MutableList<String> = mutableListOf("halo")
+        restThemes.removeAll(alreadyExtended)
+
+        if(projectModel.platformVersion >= SpecificVersion(6, 10)) {
+            restThemes.add("hover")
+        }
 
         restThemes.isNotEmpty() || fail("Halo and havana themes already extended")
 

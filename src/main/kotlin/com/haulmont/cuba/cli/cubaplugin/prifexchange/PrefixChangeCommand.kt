@@ -50,7 +50,7 @@ class PrefixChangeCommand : AbstractCommand() {
                     val invalidNameRegex = Regex("[^\\w\\-]")
 
                     if (invalidNameRegex.find(value) != null) {
-                        fail("Project name should contain only Latin letters, digits, dashes and underscores.")
+                        fail("Locale name should contain only Latin letters, digits, dashes and underscores.")
                     }
                 }
             }
