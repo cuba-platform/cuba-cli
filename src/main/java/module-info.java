@@ -69,6 +69,7 @@ module com.haulmont.cuba.cli {
     opens com.haulmont.cuba.cli.cubaplugin.config;
     opens com.haulmont.cuba.cli.cubaplugin.updatescript;
     opens com.haulmont.cuba.cli.cubaplugin.premiumrepo;
+    opens com.haulmont.cuba.cli.cubaplugin.prifexchange;
 
     exports com.haulmont.cuba.cli;
     exports com.haulmont.cuba.cli.event;

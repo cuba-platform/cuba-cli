@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin
 
 import com.haulmont.cuba.cli.ModuleStructure
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.ValidationHelper
 import com.haulmont.cuba.cli.registration.ScreenRegistrationHelper
@@ -32,7 +33,7 @@ abstract class ScreenCommandBase<out Model : Any> : GeneratorCommand<Model>() {
         webModule.screensXml
     }
 
-    protected val screenRegistrationHelper: ScreenRegistrationHelper by kodein.instance()
+    protected val screenRegistrationHelper: ScreenRegistrationHelper by cubaKodein.instance()
 
     protected fun addToMenu(screenId: String, caption: String) {
         screenRegistrationHelper.addToMenu(screenId, caption)

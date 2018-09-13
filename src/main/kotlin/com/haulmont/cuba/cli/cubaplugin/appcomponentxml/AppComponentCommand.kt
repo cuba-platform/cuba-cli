@@ -17,27 +17,23 @@
 package com.haulmont.cuba.cli.cubaplugin.appcomponentxml
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
-import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
-import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
-import com.haulmont.cuba.cli.generation.Properties
+import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
+import com.haulmont.cuba.cli.cubaplugin.prifexchange.PrefixChanger
 import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
-import java.nio.file.Path
 
 @Parameters(commandDescription = "Generates app-component.xml")
 class AppComponentCommand : GeneratorCommand<AppComponentModel>(), NonInteractiveInfo {
     private val messages by localMessages()
 
-    private val printHelper: PrintHelper by kodein.instance()
+    private val prefixChanger: PrefixChanger by cubaKodein.instance()
 
     private val resources by Resources.fromMyPlugin()
 
@@ -94,7 +90,7 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>(), NonInteractiv
 
     override fun generate(bindings: Map<String, Any>) {
         if (model.changePrefix) {
-            changePrefix(model.modulePrefix)
+            prefixChanger.changePrefix(model.modulePrefix)
         }
 
         TemplateProcessor(resources.getTemplate("appComponent"), bindings) {
@@ -116,42 +112,6 @@ class AppComponentCommand : GeneratorCommand<AppComponentModel>(), NonInteractiv
                 buildGradle.writeText(it)
             }
         }
-    }
-
-    private fun changePrefix(prefix: String) {
-        replacePrefix(projectStructure.buildGradle, prefix)
-        replacePrefix(projectStructure.settingsGradle, prefix)
-
-        val webAppProperties = projectStructure.getModule(WEB_MODULE)
-                .rootPackageDirectory
-                .resolve("web-app.properties")
-
-        Properties.modify(webAppProperties) {
-            update("cuba.connectionUrlList") {
-                it?.replaceAfterLast('/', "$prefix-core") ?: "http://localhost:8080/$prefix-core"
-            }
-            set("cuba.webContextName", prefix)
-        }
-
-        val appProperties = projectStructure.getModule(CORE_MODULE)
-                .rootPackageDirectory
-                .resolve("app.properties")
-
-        Properties.modify(appProperties) {
-            set("cuba.webContextName", "$prefix-core")
-        }
-    }
-
-    private fun replacePrefix(gradleScriptPath: Path, prefix: String) {
-        val modulePrefixRegex = Regex("def *modulePrefix *= *['\"]([a-zA-Z0-9_.\\-]+)['\"]")
-
-        val scriptFile = gradleScriptPath.toFile()
-
-        scriptFile.readText()
-                .replace(modulePrefixRegex, "def modulePrefix = \"$prefix\"")
-                .let { scriptFile.writeText(it) }
-
-        printHelper.fileModified(gradleScriptPath)
     }
 }
 

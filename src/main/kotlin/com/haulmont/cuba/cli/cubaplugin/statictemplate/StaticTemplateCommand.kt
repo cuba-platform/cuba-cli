@@ -21,6 +21,7 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.LatestVersion
 import com.haulmont.cuba.cli.WorkingDirectoryManager
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.VelocityHelper
 import com.haulmont.cuba.cli.kodein
@@ -41,9 +42,9 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
 
     private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
 
-    private val screenRegistrationHelper: ScreenRegistrationHelper by kodein.instance()
-    private val serviceRegistrationHelper: ServiceRegistrationHelper by kodein.instance()
-    private val entityRegistrationHelper: EntityRegistrationHelper by kodein.instance()
+    private val screenRegistrationHelper: ScreenRegistrationHelper by cubaKodein.instance()
+    private val serviceRegistrationHelper: ServiceRegistrationHelper by cubaKodein.instance()
+    private val entityRegistrationHelper: EntityRegistrationHelper by cubaKodein.instance()
 
     private val velocityHelper = VelocityHelper()
 

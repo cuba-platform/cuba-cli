@@ -67,7 +67,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveI
         !context.hasModel("project") || fail("There is an existing project found in current directory.")
 
         try {
-            platformVersionsManager.loadThread?.join(20_000)
+            platformVersionsManager.loadThread.join(20_000)
         } catch (e: Exception) {
             logger.log(Level.SEVERE, e) { "" }
         }

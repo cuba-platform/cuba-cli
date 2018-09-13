@@ -30,6 +30,7 @@ import com.haulmont.cuba.cli.cubaplugin.enumeration.CreateEnumerationCommand
 import com.haulmont.cuba.cli.cubaplugin.installcomponent.AddComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.polymer.CreatePolymerModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.premiumrepo.EnablePremiumRepoCommand
+import com.haulmont.cuba.cli.cubaplugin.prifexchange.PrefixChangeCommand
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
 import com.haulmont.cuba.cli.cubaplugin.screen.CreateScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.screen.ScreenCommandsGroup
@@ -80,6 +81,7 @@ class CubaPlugin : CliPlugin {
             command("config", ConfigCommand())
             command("update-script", UpdateScriptCommand())
             command("premium-repo", EnablePremiumRepoCommand())
+            command("change-prefix", PrefixChangeCommand())
         }
     }
 

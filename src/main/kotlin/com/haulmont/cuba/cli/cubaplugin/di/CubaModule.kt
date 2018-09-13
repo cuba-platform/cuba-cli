@@ -14,27 +14,14 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.registration
+package com.haulmont.cuba.cli.cubaplugin.di
 
-import com.haulmont.cuba.cli.cubaplugin.prifexchange.PrefixChanger
+import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.registration.cubaModule
 import org.kodein.di.Kodein
-import org.kodein.di.generic.bind
-import org.kodein.di.generic.singleton
 
-internal val cubaModule = Kodein.Module {
-    bind<ScreenRegistrationHelper>() with singleton {
-        ScreenRegistrationHelper()
-    }
+internal val cubaKodein = Kodein {
+    extend(kodein)
 
-    bind<ServiceRegistrationHelper>() with singleton {
-        ServiceRegistrationHelper()
-    }
-
-    bind<EntityRegistrationHelper>() with singleton {
-        EntityRegistrationHelper()
-    }
-
-    bind<PrefixChanger>() with singleton {
-        PrefixChanger()
-    }
+    import(cubaModule)
 }
