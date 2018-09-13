@@ -50,7 +50,7 @@ class PrefixChangeCommand : AbstractCommand() {
                     val invalidNameRegex = Regex("[^\\w\\-]")
 
                     if (invalidNameRegex.find(value) != null) {
-                        fail("Prefix name should contain only Latin letters, digits, dashes and underscores.")
+                        fail("Module prefix can contain letters, digits, dashes and underscore characters")
                     }
                 }
             }
