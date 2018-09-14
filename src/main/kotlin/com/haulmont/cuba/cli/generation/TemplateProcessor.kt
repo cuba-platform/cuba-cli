@@ -21,6 +21,7 @@ import com.haulmont.cuba.cli.commands.CommandExecutionException
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
 import org.kodein.di.generic.instance
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStream
 import java.nio.file.Files
@@ -174,6 +175,11 @@ class TemplateProcessor(templateBasePath: Path, private val bindings: Map<String
             to.write(it.toByteArray())
         }
     }
+
+    fun transformToText(subPath: String): String = ByteArrayOutputStream().also {
+        transform(subPath, it)
+    }.toByteArray().let { String(it) }
+
 
     fun copy(subPath: String, to: OutputStream) {
         val filePath = templatePath.resolve(subPath)

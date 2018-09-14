@@ -27,3 +27,11 @@ fun Path.resolve(vararg parts: String): Path = parts.fold(this) { currentPath, p
 fun Path.walk(depth: Int = Int.MAX_VALUE): List<Path> =
         Files.walk(this, depth)
                 .collect(Collectors.toList())!!
+
+fun Path.readText(): String = Files.newInputStream(this).bufferedReader().use { it.readText() }
+
+fun Path.writeText(text: String) = Files.newOutputStream(this).bufferedWriter().use {
+    it.write(text)
+}
+
+fun Path.appendText(text: String) = writeText(readText() + text)

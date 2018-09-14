@@ -47,6 +47,8 @@ class ProjectModel(projectStructure: ProjectStructure) {
 
     val appComponents: List<String>
 
+    val appComponentsStr: String
+
     val database: Database
 
     init {
@@ -84,6 +86,8 @@ class ProjectModel(projectStructure: ProjectStructure) {
             modulePrefix = modulePrefixRegex.findAll(buildGradle) groupNOrNull 1 ?: artifactParseError()
 
             appComponents = parseAppComponents(projectStructure)
+
+            appComponentsStr = appComponents.joinToString(separator = " ")
 
             database = parseDatabase(projectStructure)
         } catch (e: ProjectFileNotFoundException) {
@@ -127,7 +131,14 @@ private fun parseDatabase(projectStructure: ProjectStructure): Database {
     val contextXmlRoot = parse(contextXml).documentElement
     val resourceElement = contextXmlRoot.xpath("//Resource[@name=\"jdbc/CubaDS\"]").first() as Element
 
-    return Database(getDbTypeByDriver(resourceElement["driverClassName"]), resourceElement["url"], resourceElement["driverClassName"])
+    return Database(
+            getDbTypeByDriver(resourceElement["driverClassName"]),
+            resourceElement["url"],
+            resourceElement["driverClassName"],
+            getPrefixUrl(resourceElement["driverClassName"]),
+            resourceElement["username"],
+            resourceElement["password"]
+    )
 }
 
 private fun getDbTypeByDriver(driverClass: String): String = when {
@@ -139,10 +150,18 @@ private fun getDbTypeByDriver(driverClass: String): String = when {
     else -> throw ProjectScanException("Unrecognized jdbc driver class $driverClass")
 }
 
+fun getPrefixUrl(driverClass: String): String = when {
+    "hsql" in driverClass -> "jdbc:hsqldb:hsql://"
+    "postgres" in driverClass -> "jdbc:postgresql://"
+    "sqlserver" in driverClass -> "jdbc:sqlserver://"
+    "oracle" in driverClass -> "jdbc:oracle:thin:@//"
+    "mysql" in driverClass -> "jdbc:mysql://"
+    else -> throw ProjectScanException("Unrecognized jdbc driver class $driverClass")
+}
 
 private infix fun Sequence<MatchResult>.groupNOrNull(groupIndex: Int): String? =
         firstOrNull()?.groupValues?.get(groupIndex)
 
 class ProjectScanException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
-data class Database(val type: String, val connectionString: String, val driverClassName: String)
+data class Database(val type: String, val connectionString: String, val driverClassName: String, val urlPrefix: String, val username: String, val password: String)

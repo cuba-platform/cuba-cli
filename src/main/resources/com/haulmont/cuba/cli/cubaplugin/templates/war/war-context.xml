@@ -1,0 +1,18 @@
+<Context>
+
+    <!-- Database connection -->
+    <Resource
+        name="jdbc/CubaDS"
+        type="javax.sql.DataSource"
+        maxTotal="20"
+        maxIdle="2"
+        maxWaitMillis="5000"
+        driverClassName="${project.database.driverClassName}"
+        url="${war.warContextParams.dbUrl}"
+        username="${war.warContextParams.dbUser}"
+        password="${war.warContextParams.dbPassword}"
+        #if( ${project.database.type} == "mssql" )validationQuery="select 1" #end/>
+    <!-- Switch off session serialization -->
+    <Manager pathname=""/>
+
+</Context>

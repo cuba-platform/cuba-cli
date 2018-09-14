@@ -1,0 +1,30 @@
+
+
+task buildWar(type: CubaWarBuilding) {
+#if( ${war.generateLogback} )
+    logbackConfigurationFile = 'etc/war-logback.xml'
+#elseif( ${war.customLogback} )
+    logbackConfigurationFile = '${war.customLogback}'
+#end
+#if( ${war.generateWebXml} )
+    webXmlPath = 'modules/web/web/WEB-INF/single-war-web.xml'
+#elseif ( ${war.customWebXmlPath} )
+    webXmlPath = '${war.customWebXmlPath}'
+#end
+#if( ${war.generateContextXml} )
+    coreContextXmlPath = 'modules/core/web/META-INF/war-context.xml'
+#elseif ( ${war.customContextXmlPath} )
+    coreContextXmlPath = '${war.customContextXmlPath}'
+#end
+#if( $war.includeTomcatContextXml )
+    includeContextXml = true
+#end
+    appProperties = ['cuba.automaticDatabaseUpdate' : true]
+#if( ${war.includeTomcatContextXml} )
+    includeContextXml = true
+#end
+    appHome = '${war.appHome}'
+#if( ${war.includeJdbcDriver} )
+    includeJdbcDriver = true
+#end
+}
