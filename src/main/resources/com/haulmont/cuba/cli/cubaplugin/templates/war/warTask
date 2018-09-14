@@ -1,6 +1,9 @@
 
 
 task buildWar(type: CubaWarBuilding) {
+#if( !${war.singleWar} )
+    singleWar = false
+#end
 #if( ${war.generateLogback} )
     logbackConfigurationFile = 'etc/war-logback.xml'
 #elseif( ${war.customLogback} )
