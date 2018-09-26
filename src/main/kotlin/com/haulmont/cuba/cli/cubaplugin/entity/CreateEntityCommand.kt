@@ -24,6 +24,7 @@ import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
+import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.prompting.Answers
@@ -47,7 +48,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>(), NonInteractiveInfo 
         Snippets(resources, "entity")
     }
 
-    private val entityRegistrationHelper: EntityRegistrationHelper by kodein.instance()
+    private val entityRegistrationHelper: EntityRegistrationHelper by cubaKodein.instance()
 
     private val calendar = Calendar.getInstance()
 
