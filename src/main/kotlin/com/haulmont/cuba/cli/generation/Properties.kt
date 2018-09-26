@@ -17,9 +17,11 @@
 package com.haulmont.cuba.cli.generation
 
 import com.haulmont.cuba.cli.PrintHelper
+import com.haulmont.cuba.cli.generation.properties.MessagesWriter
 import com.haulmont.cuba.cli.kodein
 import org.apache.commons.configuration.PropertiesConfiguration
 import org.kodein.di.generic.instance
+import java.io.Writer
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -48,7 +50,19 @@ class Properties private constructor(private val propertiesConfiguration: Proper
         private val printHelper: PrintHelper by kodein.instance()
 
         operator fun invoke(path: Path): Properties {
-            val properties = PropertiesConfiguration(path.toFile())
+            val properties = PropertiesConfiguration().apply {
+                encoding = "UTF-8"
+                file = path.toFile()
+                ioFactory = object : PropertiesConfiguration.DefaultIOFactory() {
+                    override fun createPropertiesWriter(out: Writer, delimiter: Char): PropertiesConfiguration.PropertiesWriter {
+                        return MessagesWriter(out, delimiter)
+                    }
+                }
+
+                if (file.exists()) {
+                    load()
+                }
+            }
 
             return Properties(properties, !Files.exists(path))
         }

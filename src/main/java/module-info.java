@@ -35,6 +35,7 @@ module com.haulmont.cuba.cli {
     requires gson;
 
     requires commons.configuration;
+    requires commons.lang;
 
     requires jdk.zipfs;
     requires kodein.di.core.jvm;
