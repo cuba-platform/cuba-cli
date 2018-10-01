@@ -26,10 +26,13 @@ import com.haulmont.cuba.cli.event.ErrorEvent
 import org.jline.builtins.Completers
 import org.jline.builtins.Completers.TreeCompleter.Node
 import org.jline.builtins.Completers.TreeCompleter.node
-import org.jline.reader.*
+import org.jline.reader.Completer
+import org.jline.reader.EndOfFileException
+import org.jline.reader.LineReader
+import org.jline.reader.UserInterruptException
+import org.jline.reader.impl.LineReaderImpl
 import org.jline.terminal.Terminal
 import org.jline.terminal.impl.DumbTerminal
-import org.kodein.di.direct
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
@@ -66,6 +69,8 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
         commandParser = CommandParser(commandsRegistry, shellMode = true)
     }
 
+    private val lineReader: LineReader by kodein.instance(arg = createCommandsCompleter(commandsRegistry))
+
     override fun run() {
         printWelcome()
 
@@ -74,7 +79,9 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
             commandParser.reset()
 
             val command = try {
-                val lineReader = createLineReader()
+
+                (lineReader as? LineReaderImpl)?.completer = createCommandsCompleter(commandsRegistry)
+
                 val line = lineReader.readLine(PROMPT).also {
                     it != null || return
                 }.takeIf {
@@ -109,9 +116,6 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
             }
         }
     }
-
-    private fun createLineReader() =
-            kodein.direct.instance<Completers.TreeCompleter, LineReader>(arg = createCommandsCompleter(commandsRegistry))
 
     private fun evalCommand(command: CliCommand) {
         bus.post(BeforeCommandExecutionEvent(command))
