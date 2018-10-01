@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.commands
 
+import org.jline.reader.Completer
 /**
  * CommandRegistry stores hierarchy of commands provided by plugins.
  *
@@ -23,50 +24,51 @@ package com.haulmont.cuba.cli.commands
  *
  */
 class CommandsRegistry {
-    private val builders = mutableListOf<HasSubCommand.() -> Unit>()
+    private val builders = mutableListOf<CommandContainerConfiguration.() -> Unit>()
 
     /**
      * Registers commands in CLI by setup function.
      * Note, that all setup functions executes lazily every time before command name parsing.
      */
-    fun command(setup: HasSubCommand.() -> Unit) {
+    fun command(setup: CommandContainerConfiguration.() -> Unit) {
         builders.add(setup)
     }
 
-    operator fun invoke(setup: HasSubCommand.() -> Unit) {
+    operator fun invoke(setup: CommandContainerConfiguration.() -> Unit) {
         command(setup)
     }
 
     internal fun traverse(visitor: CommandVisitor) {
-        HasSubCommand().apply {
+        BaseCommand().apply {
             builders.forEach { it() }
         }.let { traverse(it, visitor) }
     }
 
-    private fun traverse(hasSubCommand: HasSubCommand, visitor: CommandVisitor) {
-        hasSubCommand.commands.forEach { name, subCommand ->
-            visitor.enterCommand(name, subCommand.cliCommand)
+    private fun traverse(command: CommandContainer, visitor: CommandVisitor) {
+        command.commands.forEach { name, subCommand ->
+            visitor.enterCommand(name, subCommand.cliCommand, subCommand.completer)
             traverse(subCommand, visitor)
             visitor.exitCommand()
         }
     }
 }
 
-interface CommandVisitor {
-    fun enterCommand(name: String, command: CliCommand)
-
-    fun exitCommand()
+interface CommandContainerConfiguration {
+    fun command(name: String, cliCommand: CliCommand, setup: (CommandConfiguration.() -> Unit)? = null)
 }
 
-open class HasSubCommand internal constructor() {
+interface CommandConfiguration : CommandContainerConfiguration {
+    fun completer(completer: Completer)
+}
 
+private open class CommandContainer : CommandContainerConfiguration {
     internal val commands: MutableMap<String, Command> = mutableMapOf()
 
     /**
      * Registers [cliCommand] by [name] name.
      * Optionally allows to register sub-commands with [setup] function.
      */
-    fun command(name: String, cliCommand: CliCommand, setup: (HasSubCommand.() -> Unit)? = null) {
+    override fun command(name: String, cliCommand: CliCommand, setup: (CommandConfiguration.() -> Unit)?) {
         check(name.isNotBlank()) {
             "Empty names for commands are not allowed"
         }
@@ -74,10 +76,24 @@ open class HasSubCommand internal constructor() {
             "Command with such name is already presented by ${commands[name]!!.cliCommand::class}"
         }
 
-        commands[name] = Command(cliCommand).apply {
+        commands[name] = Command(cliCommand, name).apply {
             setup?.let { it() }
         }
     }
 }
 
-internal class Command(val cliCommand: CliCommand) : HasSubCommand()
+private class BaseCommand : CommandContainer()
+
+private class Command(val cliCommand: CliCommand, val name: String, var completer: Completer? = null) :
+        CommandContainer(), CommandConfiguration {
+
+    override fun completer(completer: Completer) {
+        this.completer = completer
+    }
+}
+
+interface CommandVisitor {
+    fun enterCommand(name: String, command: CliCommand, completer: Completer? = null)
+
+    fun exitCommand()
+}

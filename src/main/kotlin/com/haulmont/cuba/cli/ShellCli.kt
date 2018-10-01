@@ -29,10 +29,11 @@ import org.jline.builtins.Completers.TreeCompleter.node
 import org.jline.reader.*
 import org.jline.terminal.Terminal
 import org.jline.terminal.impl.DumbTerminal
+import org.kodein.di.direct
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
-class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
+class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
 
     private val commandParser: CommandParser
 
@@ -48,9 +49,7 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
 
     private val messages by localMessages()
 
-    private val completer: Completer
-
-    private val lineParser: Parser by lazy { reader.parser }
+    private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
 
     init {
         commandsRegistry {
@@ -58,15 +57,14 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
             command("stacktrace", Stacktrace)
             command("version", VersionCommand)
             command("exit", ExitCommand)
-            command("cd", CdCommand())
+            command("cd", CdCommand()) {
+                completer(Completers.DirectoriesCompleter(workingDirectoryManager.workingDirectory))
+            }
             command("parameters", ShowNonInteractiveParameters(commandsRegistry))
         }
 
         commandParser = CommandParser(commandsRegistry, shellMode = true)
-        completer = createCommandsCompleter(commandsRegistry)
     }
-
-    private val reader: LineReader by kodein.instance(arg = completer)
 
     override fun run() {
         printWelcome()
@@ -76,13 +74,14 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
             commandParser.reset()
 
             val command = try {
-                val line = reader.readLine(PROMPT).also {
+                val lineReader = createLineReader()
+                val line = lineReader.readLine(PROMPT).also {
                     it != null || return
                 }.takeIf {
                     it.isNotBlank()
                 } ?: continue
 
-                val parsedLine = lineParser.parse(line, 0)
+                val parsedLine = lineReader.parser.parse(line, 0)
                 val args = parsedLine.words().toTypedArray()
                 commandParser.parseCommand(args)
             } catch (e: UserInterruptException) {
@@ -110,6 +109,9 @@ class ShellCli(commandsRegistry: CommandsRegistry) : Cli {
             }
         }
     }
+
+    private fun createLineReader() =
+            kodein.direct.instance<Completers.TreeCompleter, LineReader>(arg = createCommandsCompleter(commandsRegistry))
 
     private fun evalCommand(command: CliCommand) {
         bus.post(BeforeCommandExecutionEvent(command))
@@ -144,8 +146,8 @@ private fun createCommandsCompleter(commandsRegistry: CommandsRegistry): Complet
     val stack = mutableListOf<NodeBuilder>()
 
     commandsRegistry.traverse(object : CommandVisitor {
-        override fun enterCommand(name: String, command: CliCommand) {
-            val builder = NodeBuilder(name, command)
+        override fun enterCommand(name: String, command: CliCommand, completer: Completer?) {
+            val builder = NodeBuilder(name, completer)
             if (stack.isEmpty()) {
                 rootBuilders += builder
             } else {
@@ -162,12 +164,20 @@ private fun createCommandsCompleter(commandsRegistry: CommandsRegistry): Complet
     return Completers.TreeCompleter(*rootBuilders.buildNodes())
 }
 
-private class NodeBuilder(val name: String, val command: CliCommand) {
+private class NodeBuilder(val name: String, val completer: Completer?) {
     val builders: MutableList<NodeBuilder> = mutableListOf()
 
     fun build(): Node = when {
-        builders.isEmpty() -> node(name)
-        else -> node(name, *builders.buildNodes())
+        builders.isEmpty() -> if (completer == null) {
+            node(name)
+        } else {
+            node(name, node(completer))
+        }
+        else -> if (completer == null) {
+            node(name, *builders.buildNodes())
+        } else {
+            node(name, *builders.buildNodes(), node(completer))
+        }
     }
 }
 
