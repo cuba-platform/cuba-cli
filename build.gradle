@@ -20,6 +20,8 @@ buildscript {
 group 'com.haulmont.cuba.cli'
 version rootProject.hasProperty('buildVersion') ? rootProject['buildVersion'] : '2.0-SNAPSHOT'
 
+def apiVersion = 2
+
 def moduleName = "com.haulmont.cuba.cli"
 
 def velocityVersion = "1.7"
@@ -98,6 +100,7 @@ configurations {
 processResources.doLast {
     def buildProperties = new File(project.buildDir, 'resources/main/com/haulmont/cuba/cli/application.properties')
     buildProperties.text = buildProperties.text.replace('version = DEVELOPMENT', 'version = ' + project.version)
+        .replace('apiVersion = 2', "apiVersion = $apiVersion")
 }
 
 compileJava {

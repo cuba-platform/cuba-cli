@@ -49,6 +49,8 @@ import java.io.PrintWriter
 
 @Suppress("UNUSED_PARAMETER")
 class CubaPlugin : CliPlugin {
+    override val apiVersion: Int = API_VERSION
+
     override val resources: ResourcesPath = HasResources("/com/haulmont/cuba/cli/cubaplugin/")
 
     private val context: CliContext by kodein.instance()

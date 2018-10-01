@@ -65,6 +65,8 @@ package com.haulmont.cuba.cli
 interface CliPlugin {
     val resources: ResourcesPath
         get() = NoResources
+
+    val apiVersion: Int
 }
 
 sealed class ResourcesPath

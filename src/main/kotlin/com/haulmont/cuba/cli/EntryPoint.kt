@@ -20,27 +20,23 @@ import com.beust.jcommander.JCommander
 import com.google.common.eventbus.EventBus
 import com.haulmont.cuba.cli.commands.CommandsRegistry
 import com.haulmont.cuba.cli.commands.LaunchOptions
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.di.terminalModule
 import com.haulmont.cuba.cli.event.DestroyPluginEvent
 import com.haulmont.cuba.cli.event.ErrorEvent
-import com.haulmont.cuba.cli.event.InitPluginEvent
 import org.kodein.di.Kodein
 import org.kodein.di.direct
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
 import org.kodein.di.generic.singleton
 import java.io.PrintWriter
-import java.lang.module.ModuleFinder
 import java.nio.charset.StandardCharsets
-import java.nio.file.Paths
 import java.util.*
 import java.util.logging.ConsoleHandler
 import java.util.logging.Level
 import java.util.logging.Logger
 
-val CLI_VERSION: String by lazy {
+private val applicationProperties by lazy {
     val properties = Properties()
 
     val propertiesInputStream = Cli::class.java.getResourceAsStream("application.properties")
@@ -49,7 +45,15 @@ val CLI_VERSION: String by lazy {
         properties.load(inputStreamReader)
     }
 
-    "CUBA CLI " + properties["version"]!!
+    properties
+}
+
+val CLI_VERSION: String by lazy {
+    "CUBA CLI " + applicationProperties["version"]!!
+}
+
+val API_VERSION: Int by lazy {
+    (applicationProperties["apiVersion"] as String).toInt()
 }
 
 private val bus: EventBus = EventBus { throwable: Throwable, subscriberContext ->
@@ -82,8 +86,6 @@ val kodein = Kodein {
     bind<PlatformVersionsManager>() with singleton { PlatformVersionsManager() }
 }
 
-private val context: CliContext by kodein.instance()
-
 private val writer: PrintWriter by kodein.instance()
 
 fun main(args: Array<String>) {
@@ -100,7 +102,7 @@ fun main(args: Array<String>) {
 
     val commandsRegistry = CommandsRegistry()
 
-    loadPlugins(commandsRegistry, mode)
+    PluginLoader().loadPlugins(commandsRegistry, mode)
 
     val cli: Cli = when (mode) {
         CliMode.SHELL -> ShellCli(commandsRegistry)
@@ -118,37 +120,6 @@ private fun getCliMode(args: Array<String>): CliMode =
         } else {
             CliMode.SINGLE_COMMAND
         }
-
-private fun loadPlugins(commandsRegistry: CommandsRegistry, mode: CliMode) {
-
-    val pluginsDir = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "plugins")
-
-    val bootLayer = ModuleLayer.boot()
-
-    val pluginModulesFinder = ModuleFinder.of(pluginsDir)
-    val pluginModules = pluginModulesFinder.findAll().map {
-        it.descriptor().name()
-    }
-
-    val configuration = bootLayer.configuration().resolve(pluginModulesFinder, ModuleFinder.of(), pluginModules)
-
-    val pluginsLayer = ModuleLayer.defineModulesWithOneLoader(
-            configuration,
-            mutableListOf(bootLayer),
-            ClassLoader.getSystemClassLoader()
-    ).layer()
-
-    for (plugin in ServiceLoader.load(pluginsLayer, CliPlugin::class.java)) {
-        if (plugin !is CubaPlugin && mode == CliMode.SHELL) {
-            writer.println("Loaded plugin @|green ${plugin.javaClass.name}|@.")
-        }
-        bus.register(plugin)
-        context.registerPlugin(plugin)
-    }
-
-    bus.post(InitPluginEvent(commandsRegistry, mode))
-}
-
 
 private fun parseLaunchOptions(args: Array<String>) =
         JCommander(LaunchOptions).parseWithoutValidation(*args)
