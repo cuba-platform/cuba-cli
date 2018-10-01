@@ -1,5 +1,5 @@
 import kotlin.reflect.jvm.internal.impl.builtins.BuiltInsLoader;
-import kotlin.reflect.jvm.internal.impl.builtins.BuiltInsLoaderImpl;
+import kotlin.reflect.jvm.internal.impl.serialization.deserialization.builtins.BuiltInsLoaderImpl;
 import kotlin.reflect.jvm.internal.impl.util.ModuleVisibilityHelper;
 import kotlin.reflect.jvm.internal.impl.resolve.ExternalOverridabilityCondition;
 
