@@ -46,7 +46,7 @@ class CommandsRegistry {
 
     private fun traverse(command: CommandContainer, visitor: CommandVisitor) {
         command.commands.forEach { name, subCommand ->
-            visitor.enterCommand(name, subCommand.cliCommand, subCommand.completer)
+            visitor.enterCommand(CommandRecord(name, subCommand.cliCommand, subCommand.completer))
             traverse(subCommand, visitor)
             visitor.exitCommand()
         }
@@ -93,7 +93,9 @@ private class Command(val cliCommand: CliCommand, val name: String, var complete
 }
 
 interface CommandVisitor {
-    fun enterCommand(name: String, command: CliCommand, completer: Completer? = null)
+    fun enterCommand(command: CommandRecord)
 
     fun exitCommand()
 }
+
+data class CommandRecord(val name: String, val cliCommand: CliCommand, val completer: Completer?)

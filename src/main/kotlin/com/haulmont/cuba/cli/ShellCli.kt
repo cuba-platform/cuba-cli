@@ -146,8 +146,8 @@ private fun createCommandsCompleter(commandsRegistry: CommandsRegistry): Complet
     val stack = mutableListOf<NodeBuilder>()
 
     commandsRegistry.traverse(object : CommandVisitor {
-        override fun enterCommand(name: String, command: CliCommand, completer: Completer?) {
-            val builder = NodeBuilder(name, completer)
+        override fun enterCommand(command: CommandRecord) {
+            val builder = NodeBuilder(command.name, command.completer)
             if (stack.isEmpty()) {
                 rootBuilders += builder
             } else {

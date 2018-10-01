@@ -19,7 +19,6 @@ package com.haulmont.cuba.cli.commands
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
 import com.haulmont.cuba.cli.kodein
-import org.jline.reader.Completer
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import kotlin.reflect.full.memberProperties
@@ -94,8 +93,8 @@ class CommandParser(private val commandsRegistry: CommandsRegistry, private val 
         val stack: MutableList<JCommander> = mutableListOf(commander)
 
         commandsRegistry.traverse(object : CommandVisitor {
-            override fun enterCommand(name: String, command: CliCommand, completer: Completer?) {
-                stack += stack.last().createCommand(name, command)
+            override fun enterCommand(command: CommandRecord) {
+                stack += stack.last().createCommand(command.name, command.cliCommand)
             }
 
             override fun exitCommand() {

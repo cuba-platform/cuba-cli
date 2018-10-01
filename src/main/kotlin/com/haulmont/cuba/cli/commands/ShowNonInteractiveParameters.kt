@@ -21,7 +21,6 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.bgRed
 import com.haulmont.cuba.cli.green
 import com.haulmont.cuba.cli.kodein
-import org.jline.reader.Completer
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
@@ -37,11 +36,11 @@ class ShowNonInteractiveParameters(private val commandsRegistry: CommandsRegistr
         val currentPath = mutableListOf<String>()
 
         commandsRegistry.traverse(object : CommandVisitor {
-            override fun enterCommand(name: String, command: CliCommand, completer: Completer?) {
-                currentPath.add(name)
+            override fun enterCommand(command: CommandRecord) {
+                currentPath.add(command.name)
 
                 if (currentPath == commandPath) {
-                    printParameters(command)
+                    printParameters(command.cliCommand)
 
                     abort()
                 }
