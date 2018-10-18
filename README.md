@@ -14,15 +14,15 @@
       Website
     </a>
     <span> | </span>
-    <a href="https://www.cuba-platform.com/online-demo" target="_blank">
-      Online Demo
+    <a href="https://github.com/cuba-platform/cuba-cli/wiki/Installation" target="_blank">
+      Installation
     </a>
     <span> | </span>
-    <a href="https://www.cuba-platform.com/tutorials" target="_blank">
-      Tutorials
+    <a href="https://www.cuba-platform.com/webinars/cuba-cli-quick-start" target="_blank">
+      Quick Start Webinar
     </a>
     <span> | </span>
-    <a href="https://www.cuba-platform.com/documentation" target="_blank">
+    <a href="https://github.com/cuba-platform/cuba-cli/wiki" target="_blank">
       Documentation
     </a>
     <span> | </span>
