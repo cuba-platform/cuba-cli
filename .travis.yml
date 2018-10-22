@@ -1,5 +1,5 @@
 language: java
-jdk: openjdk10
+jdk: openjdk11
 
 install:
   - ./gradlew --no-daemon assemble
@@ -14,7 +14,7 @@ cache:
 
 matrix:
   include:
-    - jdk: openjdk10
+    - jdk: openjdk11
       before_install:
         - rm "${JAVA_HOME}/lib/security/cacerts"
         - ln -s /etc/ssl/certs/java/cacerts "${JAVA_HOME}/lib/security/cacerts"
