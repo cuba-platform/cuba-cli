@@ -74,8 +74,13 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveI
     }
 
     override fun QuestionsList.prompting() {
+
+        options("repo", "Repository to be used in project.", REPOS) {
+            default(0)
+        }
+
         question("projectName", "Project Name") {
-            if (!isNonInteractiveMode()) {
+            if (isInteractiveMode()) {
                 default(
                         ADJECTIVES.random() + "-" + ANIMALS.random()
                 )
@@ -156,7 +161,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveI
             }
 
             validate {
-                if (value.isBlank() && !isNonInteractiveMode())
+                if (value.isBlank() && isInteractiveMode())
                     fail("Type platform version")
 
                 try {
@@ -209,6 +214,8 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveI
         private val ANIMALS: List<String> = listOf("phoenix", "centaur", "mermaid", "leviathan", "dragon", "pegasus", "siren", "hydra", "sphinx", "unicorn", "wyvern", "behemoth", "griffon", "dodo", "mammoth")
         private val ADJECTIVES: List<String> = listOf("great", "cool", "ambitious", "generous", "cute", "dear", "nice", "reliable", "solid", "trusty", "simple", "pure", "brave", "manly", "fearless", "artful", "vivid", "utopic", "lucid", "radiant")
         private const val CUSTOM_VERSION = "another version"
+
+        private val REPOS = listOf("https://dl.bintray.com/cuba-platform/main", "https://repo.cuba-platform.com/content/work")
 
         private fun <E> List<E>.random(): E = get(Random().nextInt(size))
     }

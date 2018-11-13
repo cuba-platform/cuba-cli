@@ -17,7 +17,10 @@
 package com.haulmont.cuba.cli
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.InstanceCreator
 import com.haulmont.cuba.cli.commands.LaunchOptions
+import java.lang.reflect.Type
 import java.net.URL
 import java.util.logging.Level
 import kotlin.concurrent.thread
@@ -27,7 +30,7 @@ class PlatformVersionsManager {
 
     private val logger by thisClassLogger()
 
-    val supportedVersionsRange = SpecificVersion(6, 8, 0)..SpecificVersion(6, 11, 0)
+    val supportedVersionsRange = SpecificVersion(6, 8, 0)..SpecificVersion(7, 1, 0)
 
     var versions: List<String> = messages["platformVersions"].split(",").map { it.trim() }
         private set
@@ -70,7 +73,8 @@ class PlatformVersionsManager {
                 SpecificVersion(6, 8),
                 SpecificVersion(6, 9),
                 SpecificVersion(6, 10),
-                SpecificVersion(6, 11)
+                SpecificVersion(6, 11),
+                SpecificVersion(7, 0)
         )
 
         val supportedVersionRanges = (0 until borders.size - 1).map {
@@ -86,7 +90,7 @@ class PlatformVersionsManager {
         }.reversed()
     }
 
-    data class StudioConfig(val platform_versions: List<String>)
+    data class StudioConfig(val platform_versions: List<String> = emptyList())
 
     companion object {
         private const val TIMEOUT_MS = 60_000

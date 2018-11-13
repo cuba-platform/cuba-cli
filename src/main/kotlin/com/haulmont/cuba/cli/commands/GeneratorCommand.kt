@@ -62,6 +62,8 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
 
     fun isNonInteractiveMode() = CommonParameters.nonInteractive.isNotEmpty()
 
+    fun isInteractiveMode() = CommonParameters.nonInteractive.isEmpty()
+
     /**
      * Special method to make additional validations before generating artifact from model.
      * If generation is impossible for some reasons, call [fail] method.
