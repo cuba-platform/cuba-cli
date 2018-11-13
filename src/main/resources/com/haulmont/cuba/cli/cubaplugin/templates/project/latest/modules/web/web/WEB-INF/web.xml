@@ -3,12 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0">
-    
-    <context-param>
-        <description>Web resources version for correct caching in browser</description>
-        <param-name>webResourcesTs</param-name>
-        <param-value>${webResourcesTs}</param-value>
-    </context-param>
+
     <!-- Application properties config files -->
     <context-param>
         <param-name>appPropertiesConfig</param-name>
@@ -24,9 +19,6 @@
         <param-name>appComponents</param-name>
         <param-value>com.haulmont.cuba</param-value>
     </context-param>
-    <listener>
-        <listener-class>com.vaadin.server.communication.JSR356WebsocketInitializer</listener-class>
-    </listener>
     <listener>
         <listener-class>com.haulmont.cuba.web.sys.WebAppContextLoader</listener-class>
     </listener>
