@@ -97,7 +97,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
             }.let {
                 @Suppress("UNCHECKED_CAST")
                 when {
-                    this is OptionsQuestion -> this.options[it as Int] as T
+                    this is OptionsQuestion -> this.options[it as Int].name as T
                     else -> it
                 }
             }
@@ -140,8 +140,8 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
             val value = answers[question.name] as String
 
             when (question) {
-                is OptionsQuestion -> value in question.options ||
-                        throw ValidationException("Invalid value $value for parameter ${question.name}. Available values are ${question.options}.")
+                is OptionsQuestion -> value in question ||
+                        throw ValidationException("Invalid value $value for parameter ${question.name}. Available values are ${question.options.map { it.name }}.")
 
                 else -> question.run {
                     validation(value.read(), answers)
@@ -160,7 +160,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
             }
 
             if (question is OptionsQuestion)
-                answers[question.name] = question.options[answers[question.name] as Int]
+                answers[question.name] = question.options[answers[question.name] as Int].name
         }
     }
 

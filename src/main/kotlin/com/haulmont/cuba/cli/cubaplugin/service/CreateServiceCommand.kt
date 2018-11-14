@@ -17,8 +17,8 @@
 package com.haulmont.cuba.cli.cubaplugin.service
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
-import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.CORE_MODULE
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo

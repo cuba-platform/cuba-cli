@@ -20,24 +20,23 @@ import com.google.common.eventbus.Subscribe
 import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.CdCommand
 import com.haulmont.cuba.cli.cubaplugin.appcomponentxml.AppComponentCommand
-import com.haulmont.cuba.cli.cubaplugin.browsescreen.CreateBrowseScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.componentbean.CreateComponentBeanCommand
 import com.haulmont.cuba.cli.cubaplugin.config.ConfigCommand
 import com.haulmont.cuba.cli.cubaplugin.deploy.DeployCommandGroup
 import com.haulmont.cuba.cli.cubaplugin.deploy.uberjar.UberJarCommand
 import com.haulmont.cuba.cli.cubaplugin.deploy.war.WarCommand
-import com.haulmont.cuba.cli.cubaplugin.editscreen.CreateEditScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.entity.CreateEntityCommand
 import com.haulmont.cuba.cli.cubaplugin.entitylistener.CreateEntityListenerCommand
 import com.haulmont.cuba.cli.cubaplugin.enumeration.CreateEnumerationCommand
 import com.haulmont.cuba.cli.cubaplugin.installcomponent.AddComponentCommand
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectScanException
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import com.haulmont.cuba.cli.cubaplugin.polymer.CreatePolymerModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.premiumrepo.EnablePremiumRepoCommand
 import com.haulmont.cuba.cli.cubaplugin.prifexchange.PrefixChangeCommand
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
-import com.haulmont.cuba.cli.cubaplugin.screen.CreateScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.screen.ScreenCommandsGroup
-import com.haulmont.cuba.cli.cubaplugin.screenextension.ExtendDefaultScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.service.CreateServiceCommand
 import com.haulmont.cuba.cli.cubaplugin.statictemplate.StaticTemplateCommand
 import com.haulmont.cuba.cli.cubaplugin.theme.ThemeExtensionCommand
@@ -68,12 +67,7 @@ class CubaPlugin : CliPlugin {
         event.commandsRegistry {
             command("create-app", ProjectInitCommand())
             command("entity", CreateEntityCommand())
-            command("screen", ScreenCommandsGroup) {
-                command("custom", CreateScreenCommand())
-                command("extend", ExtendDefaultScreenCommand())
-                command("browse", CreateBrowseScreenCommand())
-                command("edit", CreateEditScreenCommand())
-            }
+            command("screen", ScreenCommandsGroup)
             command("service", CreateServiceCommand())
             command("custom-template", StaticTemplateCommand())
             command("bean", CreateComponentBeanCommand())

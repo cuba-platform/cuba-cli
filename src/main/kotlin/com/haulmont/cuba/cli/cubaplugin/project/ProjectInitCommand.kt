@@ -21,6 +21,9 @@ import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.generation.TemplateProcessor
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionParseException
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
@@ -215,7 +218,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveI
         private val ADJECTIVES: List<String> = listOf("great", "cool", "ambitious", "generous", "cute", "dear", "nice", "reliable", "solid", "trusty", "simple", "pure", "brave", "manly", "fearless", "artful", "vivid", "utopic", "lucid", "radiant")
         private const val CUSTOM_VERSION = "another version"
 
-        private val REPOS = listOf("https://dl.bintray.com/cuba-platform/main", "https://repo.cuba-platform.com/content/work")
+        private val REPOS = listOf("https://dl.bintray.com/cuba-platform/main", "https://repo.cuba-platform.com/content/groups/work")
 
         private fun <E> List<E>.random(): E = get(Random().nextInt(size))
     }

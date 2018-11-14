@@ -16,10 +16,6 @@
 
 package com.haulmont.cuba.cli.commands
 
-import com.haulmont.cuba.cli.LatestVersion
-import com.haulmont.cuba.cli.ProjectModel
-import com.haulmont.cuba.cli.ProjectStructure
-import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.Prompts
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -42,11 +38,12 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
      * Returns current model if it already generated. Otherwise, it will raise an exception,
      * so don't call it before [createModel] method.
      */
-    protected val model: Model by lazy {
-        if (context.hasModel(getModelName())) {
-            context.getModel<Model>(getModelName())
-        } else fail("Model has not yet been created")
-    }
+    protected val model: Model
+        get() = run {
+            if (context.hasModel(getModelName())) {
+                context.getModel<Model>(getModelName())
+            } else fail("Model has not yet been created")
+        }
 
     override fun run() {
         val model = Prompts.create { prompting() }

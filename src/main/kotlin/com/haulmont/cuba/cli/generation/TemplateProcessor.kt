@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.generation
 
 import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.CommandExecutionException
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
 import org.kodein.di.generic.instance

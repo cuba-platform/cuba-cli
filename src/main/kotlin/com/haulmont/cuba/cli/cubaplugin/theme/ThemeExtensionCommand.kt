@@ -18,11 +18,12 @@ package com.haulmont.cuba.cli.cubaplugin.theme
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.*
-import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
+import com.haulmont.cuba.cli.cubaplugin.model.SpecificVersion
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance

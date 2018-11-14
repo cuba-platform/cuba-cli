@@ -24,6 +24,7 @@ import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.di.terminalModule
 import com.haulmont.cuba.cli.event.DestroyPluginEvent
 import com.haulmont.cuba.cli.event.ErrorEvent
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
 import org.kodein.di.Kodein
 import org.kodein.di.direct
 import org.kodein.di.generic.bind

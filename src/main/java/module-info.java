@@ -52,6 +52,8 @@ module com.haulmont.cuba.cli {
     opens com.haulmont.cuba.cli.commands;
     opens com.haulmont.cuba.cli;
 
+    opens com.haulmont.cuba.cli.cubaplugin.model;
+
     opens com.haulmont.cuba.cli.cubaplugin.appcomponentxml;
     opens com.haulmont.cuba.cli.cubaplugin.componentbean;
     opens com.haulmont.cuba.cli.cubaplugin.entity;
@@ -59,14 +61,14 @@ module com.haulmont.cuba.cli {
     opens com.haulmont.cuba.cli.cubaplugin.enumeration;
     opens com.haulmont.cuba.cli.cubaplugin.project;
     opens com.haulmont.cuba.cli.cubaplugin.screen;
-    opens com.haulmont.cuba.cli.cubaplugin.screenextension;
+    opens com.haulmont.cuba.cli.cubaplugin.screen.blankscreen;
+    opens com.haulmont.cuba.cli.cubaplugin.screen.screenextension;
+    opens com.haulmont.cuba.cli.cubaplugin.screen.entityscreen;
     opens com.haulmont.cuba.cli.cubaplugin.service;
     opens com.haulmont.cuba.cli.cubaplugin.statictemplate;
     opens com.haulmont.cuba.cli.cubaplugin.theme;
     opens com.haulmont.cuba.cli.cubaplugin.installcomponent;
     opens com.haulmont.cuba.cli.cubaplugin.polymer;
-    opens com.haulmont.cuba.cli.cubaplugin.browsescreen;
-    opens com.haulmont.cuba.cli.cubaplugin.editscreen;
     opens com.haulmont.cuba.cli.cubaplugin.config;
     opens com.haulmont.cuba.cli.cubaplugin.updatescript;
     opens com.haulmont.cuba.cli.cubaplugin.premiumrepo;

@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.deploy.uberjar
 
-import com.haulmont.cuba.cli.ProjectModel
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 import com.haulmont.cuba.cli.cubaplugin.deploy.ContextXmlParams
 import com.haulmont.cuba.cli.prompting.Answers
 

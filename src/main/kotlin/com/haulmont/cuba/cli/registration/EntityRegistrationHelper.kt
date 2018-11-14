@@ -16,8 +16,8 @@
 
 package com.haulmont.cuba.cli.registration
 
-import com.haulmont.cuba.cli.ModuleStructure
-import com.haulmont.cuba.cli.ProjectStructure
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import com.haulmont.cuba.cli.generation.appendChild
 import com.haulmont.cuba.cli.generation.findFirstChild
 import com.haulmont.cuba.cli.generation.updateXml

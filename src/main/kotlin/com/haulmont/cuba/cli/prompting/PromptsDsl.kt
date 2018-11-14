@@ -65,6 +65,13 @@ class QuestionsList(name: String, setup: QuestionsList.() -> Unit) : Iterable<Qu
     }
 
     fun options(name: String, caption: String, options: List<String>, configuration: (DefaultValueConfigurable<Int>.() -> Unit)? = null) {
+        OptionsQuestion(name, caption, options.map { Option(it) }).apply {
+            configuration?.let { this.it() }
+            questions.add(this)
+        }
+    }
+
+    fun optionsWithDescription(name: String, caption: String, options: List<Option>, configuration: (DefaultValueConfigurable<Int>.() -> Unit)? = null) {
         OptionsQuestion(name, caption, options).apply {
             configuration?.let { this.it() }
             questions.add(this)
@@ -111,7 +118,7 @@ class StringQuestion(name: String, caption: String) :
 
 interface StringQuestionConfigurationScope : DefaultValueConfigurable<String>, ValidationConfigurable<String>, Conditional
 
-class OptionsQuestion(name: String, caption: String, val options: List<String>) :
+class OptionsQuestion(name: String, caption: String, val options: List<Option>) :
         PlainQuestion<Int>(name, caption),
         HasDefault<Int>,
         WithValidation<Int>,
@@ -130,6 +137,8 @@ class OptionsQuestion(name: String, caption: String, val options: List<String>) 
             fail("Input 1-${options.size}")
         }
     }
+
+    operator fun contains(option: String): Boolean = option in options.map { it.name }
 
     init {
         check(options.isNotEmpty())
@@ -154,6 +163,12 @@ class OptionsQuestion(name: String, caption: String, val options: List<String>) 
             append('\n')
             append("> ")
         }
+    }
+}
+
+data class Option(val name: String, val description: String? = null) {
+    override fun toString(): String {
+        return description ?: name
     }
 }
 

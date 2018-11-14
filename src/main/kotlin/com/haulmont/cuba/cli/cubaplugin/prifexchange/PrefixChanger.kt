@@ -16,9 +16,9 @@
 
 package com.haulmont.cuba.cli.cubaplugin.prifexchange
 
-import com.haulmont.cuba.cli.ModuleStructure
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
 import com.haulmont.cuba.cli.PrintHelper
-import com.haulmont.cuba.cli.ProjectStructure
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.kodein
 import org.kodein.di.generic.instance

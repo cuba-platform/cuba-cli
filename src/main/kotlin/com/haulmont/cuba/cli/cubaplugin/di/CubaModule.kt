@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.di
 
+import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
 import com.haulmont.cuba.cli.cubaplugin.prifexchange.PrefixChanger
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.registration.EntityRegistrationHelper
@@ -40,6 +41,10 @@ private val cubaModule = Kodein.Module {
 
     bind<PrefixChanger>() with singleton {
         PrefixChanger()
+    }
+
+    bind<EntitySearch>() with singleton {
+        EntitySearch()
     }
 }
 

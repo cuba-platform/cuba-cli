@@ -17,7 +17,7 @@
 package com.haulmont.cuba.cli.cubaplugin.updatescript
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.ModuleStructure
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.kodein

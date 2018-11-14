@@ -17,7 +17,7 @@
 package com.haulmont.cuba.cli.cubaplugin.enumeration
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.ModuleStructure
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
 import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.generation.Properties

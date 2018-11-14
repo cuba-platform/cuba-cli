@@ -17,7 +17,7 @@
 package com.haulmont.cuba.cli.cubaplugin.installcomponent
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.ModuleStructure.Companion.WEB_MODULE
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from

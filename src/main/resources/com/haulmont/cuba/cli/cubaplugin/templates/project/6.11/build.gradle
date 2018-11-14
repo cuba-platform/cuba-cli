@@ -14,6 +14,12 @@ buildscript {
         }
 #if( $bintray )
         jcenter()
+#if( !${project.platformVersion.startsWith("6.9")} )
+        mavenCentral()
+        maven {
+            url 'http://maven.vaadin.com/vaadin-addons'
+        }
+#end
 #end
 
     }
@@ -72,7 +78,15 @@ configure([globalModule, coreModule, webModule]) {
 }
 
 configure(globalModule) {
+#if( !${project.platformVersion.startsWith("6.9")} )
+    entitiesEnhancing {
+        main {
+            enabled = true
+        }
+    }
+#else
     task enhance(type: CubaEnhancing)
+#end
 }
 
 #if( ${project.database.database} == "Microsoft SQL Server" || ${project.database.database} == "Microsoft SQL Server 2012+" )

@@ -1,0 +1,72 @@
+#set( $entities = "${screen.entity.className.toLowerCase()}s")
+#set( $entity = "${screen.entity.className.toLowerCase()}")
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/screen/window.xsd"
+        caption="msg://browseCaption"
+        focusComponent="table"
+        messagesPack="${screen.packageName}">
+    <data>
+        <collection id="${entities}Dc"
+                    class="${screen.entity.fqn}"
+                    view="_local">
+            <loader id="${entities}Ld">
+                <query>
+                    <![CDATA[select e from ${screen.entity.name} e]]>
+                </query>
+            </loader>
+        </collection>
+        <instance id="${entity}Dc"
+                  class="${screen.entity.fqn}"
+                  view="_local">
+            <loader/>
+        </instance>
+    </data>
+    <actions>
+        <action id="save" icon="icons/ok.png" caption="mainMsg://actions.Ok" shortcut="CTRL-ENTER"/>
+        <action id="cancel" icon="icons/cancel.png" caption="mainMsg://actions.Cancel" description="Esc"/>
+    </actions>
+    <dialogMode height="600" width="800"/>
+    <layout>
+        <split id="split" height="100%" orientation="horizontal" reversePosition="true" width="100%">
+            <vbox id="lookupBox" expand="table" height="100%" margin="false,true,false,false" spacing="true">
+                <filter id="filter" applyTo="table" dataLoader="${entities}Ld">
+                    <properties include=".*"/>
+                </filter>
+                <groupTable id="table"
+                            width="100%"
+                            dataContainer="${entities}Dc">
+                    <actions>
+                        <action id="create" type="create"/>
+                        <action id="edit" type="edit"/>
+                        <action id="remove" type="remove"/>
+                    </actions>
+                    <columns>
+                        <!--TODO specify columns here-->
+                    </columns>
+                    <rowsCount/>
+                    <buttonsPanel id="buttonsPanel"
+                                  alwaysVisible="true">
+                        <button id="createBtn" action="table.create"/>
+                        <button id="editBtn" action="table.edit"/>
+                        <button id="removeBtn" action="table.remove"/>
+                    </buttonsPanel>
+                </groupTable>
+                <fragment id="lookupActions"
+                          screen="lookupActions"/>
+            </vbox>
+            <vbox id="editBox" height="100%" margin="false,false,false,true" expand='fieldGroupBox' spacing="true">
+                <scrollBox id="fieldGroupBox">
+                    <form id="form" dataContainer="${entity}Dc">
+                        <column width="250px">
+                            <!--TODO specify fields here-->
+                        </column>
+                    </form>
+                </scrollBox>
+                <hbox id="actionsPane" spacing="true" visible="false">
+                    <button id="saveBtn" action="save"/>
+                    <button id="cancelBtn" action="cancel"/>
+                </hbox>
+            </vbox>
+        </split>
+    </layout>
+</window>

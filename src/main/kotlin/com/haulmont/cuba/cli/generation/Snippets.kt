@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.generation
 
-import com.haulmont.cuba.cli.PlatformVersion
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.Resources
 import java.nio.file.Files
 import java.nio.file.Path

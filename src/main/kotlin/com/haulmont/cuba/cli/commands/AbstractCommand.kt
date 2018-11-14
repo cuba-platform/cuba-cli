@@ -17,8 +17,8 @@
 package com.haulmont.cuba.cli.commands
 
 import com.haulmont.cuba.cli.CliContext
-import com.haulmont.cuba.cli.ProjectModel
-import com.haulmont.cuba.cli.ProjectStructure
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import com.haulmont.cuba.cli.kodein
 import org.kodein.di.generic.instance
 import java.nio.file.Files
@@ -31,11 +31,12 @@ abstract class AbstractCommand : CliCommand {
      * Returns project model if it already generated. Otherwise, it will raise an exception,
      * so call it only after [checkProjectExistence].
      */
-    protected val projectModel: ProjectModel by lazy {
-        if (context.hasModel(ProjectModel.MODEL_NAME)) {
-            context.getModel<ProjectModel>(ProjectModel.MODEL_NAME)
-        } else fail("No project module found")
-    }
+    protected val projectModel: ProjectModel
+        get() = run {
+            if (context.hasModel(ProjectModel.MODEL_NAME)) {
+                context.getModel(ProjectModel.MODEL_NAME)
+            } else fail("No project module found")
+        }
 
     /**
      * Is used to generation model saving and retrieving.
@@ -97,7 +98,7 @@ abstract class AbstractCommand : CliCommand {
      */
     @Throws(CommandExecutionException::class)
     protected fun ensureFileAbsence(file: Path, cause: String, silent: Boolean = false) {
-        if(Files.exists(file))
+        if (Files.exists(file))
             fail(cause, silent)
     }
 }

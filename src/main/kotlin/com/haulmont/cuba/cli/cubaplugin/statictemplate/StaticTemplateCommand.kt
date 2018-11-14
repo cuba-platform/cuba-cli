@@ -18,7 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.statictemplate
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.LatestVersion
+import com.haulmont.cuba.cli.cubaplugin.model.LatestVersion
 import com.haulmont.cuba.cli.WorkingDirectoryManager
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein

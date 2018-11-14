@@ -18,8 +18,8 @@ package com.haulmont.cuba.cli.cubaplugin.entity
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.*
-import com.haulmont.cuba.cli.ModuleStructure.Companion.CORE_MODULE
-import com.haulmont.cuba.cli.ModuleStructure.Companion.GLOBAL_MODULE
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.CORE_MODULE
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.commands.from
@@ -27,6 +27,7 @@ import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.generation.Properties
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import com.haulmont.cuba.cli.registration.EntityRegistrationHelper

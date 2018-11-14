@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.polymer
 
-import com.haulmont.cuba.cli.ProjectModel
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 
 class PolymerModel(projectModel: ProjectModel) {
     val home: String = projectModel.namespace.capitalize() + "Home"
