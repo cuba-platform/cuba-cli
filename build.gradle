@@ -20,7 +20,7 @@ buildscript {
 group 'com.haulmont.cuba.cli'
 version rootProject.hasProperty('buildVersion') ? rootProject['buildVersion'] : '2.0-SNAPSHOT'
 
-def apiVersion = 2
+def apiVersion = 3
 
 def moduleName = "com.haulmont.cuba.cli"
 

@@ -28,6 +28,7 @@ import com.haulmont.cuba.cli.cubaplugin.deploy.war.WarCommand
 import com.haulmont.cuba.cli.cubaplugin.entity.CreateEntityCommand
 import com.haulmont.cuba.cli.cubaplugin.entitylistener.CreateEntityListenerCommand
 import com.haulmont.cuba.cli.cubaplugin.enumeration.CreateEnumerationCommand
+import com.haulmont.cuba.cli.cubaplugin.gradle.GradleCommand
 import com.haulmont.cuba.cli.cubaplugin.installcomponent.AddComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectScanException
@@ -85,6 +86,7 @@ class CubaPlugin : CliPlugin {
                 command("war", WarCommand())
                 command("uberjar", UberJarCommand())
             }
+            command("gradle", GradleCommand())
         }
     }
 
