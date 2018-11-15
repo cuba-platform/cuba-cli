@@ -21,6 +21,7 @@ import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.commands.CommonParameters
 import com.haulmont.cuba.cli.kodein
 import org.fusesource.jansi.Ansi
+import org.jline.reader.EndOfFileException
 import org.jline.reader.LineReader
 import org.jline.reader.impl.completer.NullCompleter
 import org.kodein.di.generic.instance
@@ -111,7 +112,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
         return ask(answers, prompts)
     }
 
-    private fun read(prompt: String): String = reader.readLine(Ansi.ansi().render(prompt).toString()).trim()
+    private fun read(prompt: String): String = reader.readLine(Ansi.ansi().render(prompt).toString())?.trim() ?: throw EndOfFileException()
 
     fun askNonInteractive(): Answers {
         val answers = CommonParameters.nonInteractive.toMutableMap()
