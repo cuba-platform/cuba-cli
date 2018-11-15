@@ -20,6 +20,8 @@ class Entity(val fqn: String, code: String) {
     val name = Regex("@Entity\\((name *=)? *\"([^\n]*)\".*\\)")
             .find(code)?.groupValues?.get(2) ?: fqn.substringAfterLast(".")
 
+    val embeddable = code.contains("@Embeddable")
+
     val packageName: String = fqn.split('.').let {
         it.take(it.size - 1).joinToString(".")
     }

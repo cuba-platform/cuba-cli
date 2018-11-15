@@ -17,18 +17,17 @@
 package com.haulmont.cuba.cli.cubaplugin.entitylistener
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.CORE_MODULE
-import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
+import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
+import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.CORE_MODULE
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.generation.getChildElements
-import com.haulmont.cuba.cli.generation.parse
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
-import net.sf.practicalxml.DomUtil
 import org.kodein.di.generic.instance
 
 @Parameters(commandDescription = "Creates new entity listener")
@@ -37,20 +36,19 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
 
     private val resources by Resources.fromMyPlugin()
 
+    private val entitySearch: EntitySearch by cubaKodein.instance()
+
     override fun getModelName(): String = EntityListenerModel.MODEL_NAME
 
     override fun preExecute() = checkProjectExistence()
 
     override fun QuestionsList.prompting() {
-        val persistenceXml = projectStructure.getModule(GLOBAL_MODULE).persistenceXml
-        val entitiesList = parse(persistenceXml).documentElement
-                .let { DomUtil.getChild(it, "persistence-unit") }
-                .getChildElements()
-                .filter { element -> element.tagName == "class" }
-                .map { it.textContent.trim() }
+        val entitiesList = entitySearch.getAllEntities()
+                .filter { !it.embeddable }
+                .map { it.fqn }
 
         if (entitiesList.isEmpty())
-            fail("Project does not have any entities.")
+            fail("Project does not have any suitable entities.")
 
         question("className", "Listener name") {
             validate {

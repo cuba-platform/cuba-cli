@@ -38,9 +38,11 @@ abstract class EntityScreenCommandBase<out T : EntityScreenModel> : ScreenComman
     }
 
     override fun QuestionsList.prompting() {
-        val entitiesList = entitySearch.getAllEntities().map { it.fqn }
+        val entitiesList = entitySearch.getAllEntities()
+                .filter { !it.embeddable }
+                .map { it.fqn }
         if (entitiesList.isEmpty())
-            fail("Project does not have any entities.")
+            fail("Project does not have any suitable entities.")
 
         options("entityName", "Choose entity", entitiesList)
 
