@@ -18,15 +18,58 @@ package com.haulmont.cuba.cli.cubaplugin.gradle
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
+import com.haulmont.cuba.cli.WorkingDirectoryManager
 import com.haulmont.cuba.cli.commands.AbstractCommand
+import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
+import org.kodein.di.generic.instance
+import java.io.PrintWriter
+import java.nio.file.Files
+import java.nio.file.Path
 
 @Parameters(commandDescription = "Launches gradle command")
 class GradleCommand : AbstractCommand() {
+    private val workingDirectoryManager: WorkingDirectoryManager by cubaKodein.instance()
+
+    private val printWriter: PrintWriter by cubaKodein.instance()
+
     @Parameter(description = "Gradle command string", variableArity = true)
     var command: List<String> = mutableListOf()
         private set
 
     override fun run() {
-        GradleRunner().run(command)
+        run(command)
+    }
+
+    private fun run(commands: List<String>): Int {
+        val currentDir = workingDirectoryManager.absolutePath
+
+        val osName = System.getProperty("os.name").toLowerCase()
+        val gradleScriptName = when {
+            osName.indexOf("win") >= 0 -> "gradlew.bat"
+            else -> "gradlew"
+        }
+        val gradleScriptPath = currentDir.resolve(gradleScriptName).toFile().absolutePath
+
+        if (!Files.exists(Path.of(gradleScriptPath))) {
+            printWriter.println("Gradle wrapper not found")
+            fail("Gradle wrapper not found", silent = true)
+        }
+
+        val command: List<String> = when {
+            osName.indexOf("win") >= 0 -> arrayListOf("cmd", "/C", gradleScriptPath, *commands.toTypedArray())
+            else -> arrayListOf(gradleScriptPath, *commands.toTypedArray())
+        }
+
+        val processBuilder = ProcessBuilder(command)
+        processBuilder.directory(currentDir.toFile())
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT)
+        processBuilder.redirectInput(ProcessBuilder.Redirect.INHERIT)
+
+        processBuilder.environment().remove("JAVA_OPTS")
+
+        val process = processBuilder.start()
+
+        return process.waitFor()
     }
 }
