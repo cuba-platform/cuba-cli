@@ -76,8 +76,8 @@ module com.haulmont.cuba.cli {
     opens com.haulmont.cuba.cli.cubaplugin.deploy;
     opens com.haulmont.cuba.cli.cubaplugin.deploy.war;
     opens com.haulmont.cuba.cli.cubaplugin.deploy.uberjar;
-
     opens com.haulmont.cuba.cli.cubaplugin.gradle;
+    opens com.haulmont.cuba.cli.cubaplugin.idea;
 
     exports com.haulmont.cuba.cli;
     exports com.haulmont.cuba.cli.event;

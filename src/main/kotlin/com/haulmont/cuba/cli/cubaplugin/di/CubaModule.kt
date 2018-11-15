@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.di
 
+import com.haulmont.cuba.cli.cubaplugin.gradle.GradleRunner
 import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
 import com.haulmont.cuba.cli.cubaplugin.prifexchange.PrefixChanger
 import com.haulmont.cuba.cli.kodein
@@ -45,6 +46,10 @@ private val cubaModule = Kodein.Module {
 
     bind<EntitySearch>() with singleton {
         EntitySearch()
+    }
+
+    bind<GradleRunner>() with singleton {
+        GradleRunner()
     }
 }
 
