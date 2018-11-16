@@ -181,7 +181,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveI
     override fun createModel(answers: Answers): ProjectInitModel = ProjectInitModel(answers)
 
     override fun generate(bindings: Map<String, Any>) {
-        workingDirectoryManager.workingDirectory = Paths.get(model.projectName)
+        workingDirectoryManager.workingDirectory = workingDirectoryManager.workingDirectory.resolve(model.projectName)
         val cwd = workingDirectoryManager.workingDirectory
 
         Files.createDirectories(cwd)
