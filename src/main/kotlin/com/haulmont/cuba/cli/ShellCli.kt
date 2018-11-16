@@ -61,7 +61,7 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
             command("version", VersionCommand)
             command("exit", ExitCommand)
             command("cd", CdCommand()) {
-                completer(Completers.DirectoriesCompleter(workingDirectoryManager.workingDirectory))
+                completer(DirectoriesCompleter(workingDirectoryManager.workingDirectory))
             }
             command("parameters", ShowNonInteractiveParameters(commandsRegistry))
         }
