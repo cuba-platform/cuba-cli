@@ -71,7 +71,7 @@ internal class PluginLoader {
                 val plugin = pluginsIterator.next()
                 val version = getPluginVersion(plugin)
                 if (version != API_VERSION) {
-                    writer.println("Plugin's ${plugin.javaClass.name} version ($version) doesn't correspond current CUBA CLI version ($API_VERSION)".red())
+                    writer.println("Plugin's ${plugin.javaClass.name} version ($version) doesn't correspond current CUBA CLI version ($API_VERSION)".bgRed())
                     continue
                 }
                 if (plugin !is CubaPlugin && mode == CliMode.SHELL) {
