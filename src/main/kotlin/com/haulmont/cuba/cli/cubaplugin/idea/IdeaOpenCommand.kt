@@ -18,11 +18,12 @@ package com.haulmont.cuba.cli.cubaplugin.idea
 
 import com.beust.jcommander.Parameters
 import com.google.common.io.CharStreams
-import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.AbstractCommand
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.gradle.GradleRunner
-import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
+import com.haulmont.cuba.cli.green
+import com.haulmont.cuba.cli.kodein
 import org.kodein.di.generic.instance
 import java.io.IOException
 import java.io.InputStreamReader
@@ -30,6 +31,7 @@ import java.io.PrintWriter
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.nio.file.Path
 
 @Parameters(commandDescription = "Opens project in IntelliJ IDEA")
 class IdeaOpenCommand : AbstractCommand() {
@@ -41,6 +43,24 @@ class IdeaOpenCommand : AbstractCommand() {
     override fun preExecute() = checkProjectExistence()
 
     override fun run() {
+        val buildGradlePath = projectStructure.buildGradle.toAbsolutePath()
+
+        if (projectModel.platformVersion >= PlatformVersion("6.10")) {
+            if (!sendRequest("http://localhost:$NEW_PORT/?project=$buildGradlePath")) {
+                fail("Unable to connect to the IDE. Check if the IDE is running and CUBA Plugin is installed.")
+            }
+        } else if (!sendRequest("http://localhost:$NEW_PORT/?project=$buildGradlePath")) {
+            if (!sendRequest("http://localhost:$OLD_PORT/?project=${getIprPath()}")) {
+                fail("Unable to connect to the IDE. Check if the IDE is running and CUBA Plugin is installed.")
+            }
+        }
+    }
+
+    private fun getIprPath(): Path {
+        if (projectModel.platformVersion >= PlatformVersion.v7) {
+            return projectStructure.buildGradle.toAbsolutePath()
+        }
+
         val iprFileName = projectModel.name + ".ipr"
 
         val hasIpr = Files.exists(projectStructure.path.resolve(iprFileName))
@@ -53,14 +73,12 @@ class IdeaOpenCommand : AbstractCommand() {
             }
         }
 
-        val projectAbsolutePath = projectStructure.path.resolve(iprFileName).toAbsolutePath()
-        val url = URL("http://localhost:48561/?project=$projectAbsolutePath")
-        sendRequest(url)
+        return projectStructure.path.resolve(iprFileName).toAbsolutePath()
     }
 
-    private fun sendRequest(url: URL) {
+    private fun sendRequest(url: String): Boolean {
         try {
-            val connection = url.openConnection()
+            val connection = URL(url).openConnection()
             connection.connect()
             connection.connectTimeout = 20000
 
@@ -68,11 +86,17 @@ class IdeaOpenCommand : AbstractCommand() {
                 val response = CharStreams.toString(reader)
                 val firstLine = response.trim { it <= ' ' }.split("\\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
                 if (!firstLine.startsWith("OK")) {
-                    fail("Unable to connect to the IDE. Check if the IDE is running and CUBA Plugin is installed.")
+                    return false
                 }
             }
         } catch (e: IOException) {
-            fail("Unable to connect to the IDE. Check if the IDE is running and CUBA Plugin is installed.")
+            return false
         }
+        return true
+    }
+
+    companion object {
+        private const val OLD_PORT = 48562
+        private const val NEW_PORT = 48562
     }
 }

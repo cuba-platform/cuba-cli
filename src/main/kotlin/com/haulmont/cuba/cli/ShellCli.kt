@@ -92,7 +92,7 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
                 val args = parsedLine.words().toTypedArray()
                 commandParser.parseCommand(args)
             } catch (e: UserInterruptException) {
-                continue
+                return
             } catch (e: MissingCommandException) {
                 printHelper.unrecognizedCommand()
                 continue
