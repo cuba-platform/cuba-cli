@@ -18,12 +18,17 @@ package com.haulmont.cuba.cli.cubaplugin.screen.entityscreen
 
 import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
+import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.screen.ScreenCommandBase
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import org.kodein.di.generic.instance
+import java.io.PrintWriter
 
 abstract class EntityScreenCommandBase<out T : EntityScreenModel> : ScreenCommandBase<T>(), NonInteractiveInfo {
 
     protected val resources by Resources.fromMyPlugin()
+
+    protected val printWriter: PrintWriter by cubaKodein.instance()
 
     override fun getNonInteractiveParameters(): Map<String, String> = mapOf(
             "entityName" to "Fully qualified entity name",
@@ -41,8 +46,10 @@ abstract class EntityScreenCommandBase<out T : EntityScreenModel> : ScreenComman
         val entitiesList = entitySearch.getAllEntities()
                 .filter { !it.embeddable }
                 .map { it.fqn }
-        if (entitiesList.isEmpty())
-            fail("Project does not have any suitable entities.")
+        if (entitiesList.isEmpty()) {
+            printWriter.println("Project does not have any suitable entities.")
+            abort()
+        }
 
         options("entityName", "Choose entity", entitiesList)
 

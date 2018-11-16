@@ -29,6 +29,7 @@ import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
+import java.io.PrintWriter
 
 @Parameters(commandDescription = "Creates new entity listener")
 class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
@@ -37,6 +38,8 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
     private val resources by Resources.fromMyPlugin()
 
     private val entitySearch: EntitySearch by cubaKodein.instance()
+
+    private val printWriter: PrintWriter by cubaKodein.instance()
 
     override fun getModelName(): String = EntityListenerModel.MODEL_NAME
 
@@ -47,8 +50,10 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
                 .filter { !it.embeddable }
                 .map { it.fqn }
 
-        if (entitiesList.isEmpty())
-            fail("Project does not have any suitable entities.")
+        if (entitiesList.isEmpty()) {
+            printWriter.println("Project does not have any suitable entities.")
+            abort()
+        }
 
         question("className", "Listener name") {
             validate {
