@@ -20,8 +20,10 @@
                 <!--TODO specify fields to edit here-->
             </column>
         </form>
-        <fragment id="editActions"
-                  screen='editorActions'/>
+        <hbox id="editActions" spacing="true">
+            <button action="windowCommitAndClose"/>
+            <button action="windowClose"/>
+        </hbox>
     </layout>
 </window>
 
