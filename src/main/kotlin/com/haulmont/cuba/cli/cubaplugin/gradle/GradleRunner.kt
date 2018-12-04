@@ -57,15 +57,13 @@ class GradleRunner {
         processBuilder.directory(currentDir.toFile())
         processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
         processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT)
-        processBuilder.redirectInput(ProcessBuilder.Redirect.INHERIT)
 
         processBuilder.environment().remove("JAVA_OPTS")
 
-        val process = processBuilder.start()
+        val process = ProcessWrapper(processBuilder, terminal)
 
         thread {
-            process.waitFor()
-            terminal.raise(Terminal.Signal.INT)
+            process.start()
         }
 
         while (process.isAlive) {
@@ -73,12 +71,64 @@ class GradleRunner {
                 reader.readLine()
             } catch (e: UserInterruptException) {
                 process.destroy()
+                break
             } catch (e: EndOfFileException) {
                 process.destroy()
+                break
             }
         }
 
         return process.exitValue()
+    }
+}
+
+private class ProcessWrapper(val processBuilder: ProcessBuilder, val terminal: Terminal) {
+    val lock = Object()
+
+    private var running: Boolean = true
+    private var process: Process? = null
+
+    val isAlive: Boolean
+        get() = synchronized(lock) {
+            running
+        }
+
+    fun start() {
+        synchronized(lock) {
+            if (running && process == null) {
+                process = processBuilder.start()
+            }
+        }
+        process?.let {
+            it.waitFor()
+            synchronized(lock) {
+                if (running) {
+                    running = false
+                    terminal.raise(Terminal.Signal.INT)
+                }
+            }
+        }
+    }
+
+    fun destroy() {
+        synchronized(lock) {
+            if (running) {
+                process?.let {
+                    it.children().forEach { child -> child.destroyForcibly() }
+                    it.destroyForcibly()
+                    it.waitFor()
+                }
+                running = false
+            }
+        }
+    }
+
+    fun exitValue(): Int {
+        synchronized(lock) {
+            if (running) {
+                throw IllegalThreadStateException()
+            } else return process?.exitValue() ?: 1
+        }
     }
 }
 
