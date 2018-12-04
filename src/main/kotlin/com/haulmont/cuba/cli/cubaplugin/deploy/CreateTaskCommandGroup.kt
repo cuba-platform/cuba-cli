@@ -22,8 +22,8 @@ import com.haulmont.cuba.cli.kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
-@Parameters(commandDescription = "Deploy related commands")
-object DeployCommandGroup : AbstractCommand() {
+@Parameters(commandDescription = "Gradle tasks creation commands")
+object CreateTaskCommandGroup : AbstractCommand() {
 
     private val printWriter: PrintWriter by kodein.instance()
 

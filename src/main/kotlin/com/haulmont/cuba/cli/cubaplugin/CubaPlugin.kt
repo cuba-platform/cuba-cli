@@ -22,7 +22,7 @@ import com.haulmont.cuba.cli.commands.CdCommand
 import com.haulmont.cuba.cli.cubaplugin.appcomponentxml.AppComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.componentbean.CreateComponentBeanCommand
 import com.haulmont.cuba.cli.cubaplugin.config.ConfigCommand
-import com.haulmont.cuba.cli.cubaplugin.deploy.DeployCommandGroup
+import com.haulmont.cuba.cli.cubaplugin.deploy.CreateTaskCommandGroup
 import com.haulmont.cuba.cli.cubaplugin.deploy.uberjar.UberJarCommand
 import com.haulmont.cuba.cli.cubaplugin.deploy.war.WarCommand
 import com.haulmont.cuba.cli.cubaplugin.entity.CreateEntityCommand
@@ -83,7 +83,7 @@ class CubaPlugin : CliPlugin {
             command("update-script", UpdateScriptCommand())
             command("premium-repo", EnablePremiumRepoCommand())
             command("change-prefix", PrefixChangeCommand())
-            command("deploy", DeployCommandGroup) {
+            command("create-task", CreateTaskCommandGroup) {
                 command("war", WarCommand())
                 command("uberjar", UberJarCommand())
             }
