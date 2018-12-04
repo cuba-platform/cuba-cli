@@ -218,7 +218,3 @@ task restart(dependsOn: ['stop', ":${modulePrefix}-core:deploy", ":${modulePrefi
         start.execute()
     }
 }
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.10.2'
-}
