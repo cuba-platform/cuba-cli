@@ -24,7 +24,7 @@ import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
 
-@Parameters(commandDescription = "Changes module prefix")
+@Parameters(commandDescription = "Changes modules prefix")
 class PrefixChangeCommand : AbstractCommand() {
 
     private val printWriter: PrintWriter by cubaKodein.instance()
