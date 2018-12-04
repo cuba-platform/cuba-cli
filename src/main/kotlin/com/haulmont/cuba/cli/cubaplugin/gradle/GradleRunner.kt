@@ -18,12 +18,21 @@ package com.haulmont.cuba.cli.cubaplugin.gradle
 
 import com.haulmont.cuba.cli.WorkingDirectoryManager
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
+import org.jline.reader.EndOfFileException
+import org.jline.reader.LineReader
+import org.jline.reader.UserInterruptException
+import org.jline.reader.impl.completer.NullCompleter
+import org.jline.terminal.Terminal
 import org.kodein.di.generic.instance
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.concurrent.thread
 
 class GradleRunner {
     private val workingDirectoryManager: WorkingDirectoryManager by cubaKodein.instance()
+
+    private val reader: LineReader by cubaKodein.instance(arg = NullCompleter())
+    private val terminal: Terminal by cubaKodein.instance()
 
     fun run(vararg commands: String): Int {
         val currentDir = workingDirectoryManager.absolutePath
@@ -54,7 +63,22 @@ class GradleRunner {
 
         val process = processBuilder.start()
 
-        return process.waitFor()
+        thread {
+            process.waitFor()
+            terminal.raise(Terminal.Signal.INT)
+        }
+
+        while (process.isAlive) {
+            try {
+                reader.readLine()
+            } catch (e: UserInterruptException) {
+                process.destroy()
+            } catch (e: EndOfFileException) {
+                process.destroy()
+            }
+        }
+
+        return process.exitValue()
     }
 }
 
