@@ -67,7 +67,7 @@ class IdeaOpenCommand : AbstractCommand() {
         if (!hasIpr) {
             writer.println("Generating project files".green())
 
-            val (exitCode, _) = gradleRunner.run("idea")
+            val (exitCode) = gradleRunner.run("idea")
             if (exitCode != 0) {
                 fail("Unable to generate project files, gradlew exit code $exitCode")
             }

@@ -32,12 +32,10 @@ class RunCommand : AbstractCommand() {
         try {
             var runSetup = false
 
-            val (exitCode, properties) = gradleRunner.run("properties", silent = true)
-            if (properties == null) {
-                fail("Unable to determine tomcat directory")
-            }
+            printWriter.println("Determining tomcat directory...")
+            val (_, properties) = gradleRunner.run("properties", redirectOutput = false)
 
-            val tomcatPath = Regex("cuba: cuba\\.tomcat\\.dir: (.*)\n")
+            val tomcatPath = Regex("cuba: cuba\\.tomcat\\.dir: (.*)[\r\n]")
                     .find(properties)?.groupValues?.let {
                 if (it.size >= 2) {
                     it[1]

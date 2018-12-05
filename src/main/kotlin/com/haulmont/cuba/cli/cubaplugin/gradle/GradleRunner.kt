@@ -24,6 +24,7 @@ import org.jline.reader.UserInterruptException
 import org.jline.reader.impl.completer.NullCompleter
 import org.jline.terminal.Terminal
 import org.kodein.di.generic.instance
+import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.concurrent.thread
@@ -36,10 +37,10 @@ class GradleRunner {
 
     /**
      * Searches for gradle wrapper end execute [commands].
-     * If not [silent], the [Result] contains only exitCode,
+     * If [redirectOutput], the [Result] contains only exitCode,
      * and output and error streams are redirected to stdout and stderr respectively.
      */
-    fun run(vararg commands: String, silent: Boolean = false): Result {
+    fun run(vararg commands: String, redirectOutput: Boolean = true): Result {
         val currentDir = workingDirectoryManager.absolutePath
 
         val osName = System.getProperty("os.name").toLowerCase()
@@ -60,7 +61,7 @@ class GradleRunner {
 
         val processBuilder = ProcessBuilder(command)
         processBuilder.directory(currentDir.toFile())
-        if (!silent) {
+        if (redirectOutput) {
             processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
             processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT)
         }
@@ -85,19 +86,11 @@ class GradleRunner {
             }
         }
 
-        return buildResult(process, silent)
-    }
-
-    private fun buildResult(process: ProcessWrapper, silent: Boolean) : Result {
-        return if (silent) {
-            Result(process.exitValue(), process.output)
-        } else {
-            Result(process.exitValue(), null)
-        }
+        return Result(process.exitValue(), process.output, process.error)
     }
 }
 
-data class Result(val exitCode: Int, val output: String?)
+data class Result(val exitCode: Int, val output: String, val error: String)
 
 private class ProcessWrapper(val processBuilder: ProcessBuilder, val terminal: Terminal) {
     val lock = Object()
@@ -105,9 +98,18 @@ private class ProcessWrapper(val processBuilder: ProcessBuilder, val terminal: T
     private var running: Boolean = true
     private var process: Process? = null
 
-    val output: String? by lazy {
+    private val outputStream: ByteArrayOutputStream = ByteArrayOutputStream()
+    private val errorStream: ByteArrayOutputStream = ByteArrayOutputStream()
+
+    val output: String by lazy {
         synchronized(lock) {
-            return@lazy process?.inputStream?.reader()?.readText()
+            return@lazy outputStream.toString()
+        }
+    }
+
+    val error: String by lazy {
+        synchronized(lock) {
+            return@lazy errorStream.toString()
         }
     }
 
@@ -123,6 +125,8 @@ private class ProcessWrapper(val processBuilder: ProcessBuilder, val terminal: T
             }
         }
         process?.let {
+            it.inputStream.use { stream -> stream.transferTo(outputStream) }
+            it.errorStream.use { stream -> stream.transferTo(errorStream) }
             it.waitFor()
             synchronized(lock) {
                 if (running) {
