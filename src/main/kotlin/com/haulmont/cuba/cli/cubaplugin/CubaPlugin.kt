@@ -28,7 +28,9 @@ import com.haulmont.cuba.cli.cubaplugin.deploy.war.WarCommand
 import com.haulmont.cuba.cli.cubaplugin.entity.CreateEntityCommand
 import com.haulmont.cuba.cli.cubaplugin.entitylistener.CreateEntityListenerCommand
 import com.haulmont.cuba.cli.cubaplugin.enumeration.CreateEnumerationCommand
+import com.haulmont.cuba.cli.cubaplugin.gradle.BuildCommand
 import com.haulmont.cuba.cli.cubaplugin.gradle.GradleCommand
+import com.haulmont.cuba.cli.cubaplugin.gradle.RunCommand
 import com.haulmont.cuba.cli.cubaplugin.idea.IdeaOpenCommand
 import com.haulmont.cuba.cli.cubaplugin.installcomponent.AddComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
@@ -89,6 +91,8 @@ class CubaPlugin : CliPlugin {
             }
             command("gradle", GradleCommand())
             command("idea", IdeaOpenCommand())
+            command("build", BuildCommand())
+            command("run", RunCommand())
         }
     }
 

@@ -34,7 +34,12 @@ class GradleRunner {
     private val reader: LineReader by cubaKodein.instance(arg = NullCompleter())
     private val terminal: Terminal by cubaKodein.instance()
 
-    fun run(vararg commands: String): Int {
+    /**
+     * Searches for gradle wrapper end execute [commands].
+     * If not [silent], the [Result] contains only exitCode,
+     * and output and error streams are redirected to stdout and stderr respectively.
+     */
+    fun run(vararg commands: String, silent: Boolean = false): Result {
         val currentDir = workingDirectoryManager.absolutePath
 
         val osName = System.getProperty("os.name").toLowerCase()
@@ -55,8 +60,10 @@ class GradleRunner {
 
         val processBuilder = ProcessBuilder(command)
         processBuilder.directory(currentDir.toFile())
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
-        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT)
+        if (!silent) {
+            processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+            processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT)
+        }
 
         processBuilder.environment().remove("JAVA_OPTS")
 
@@ -78,15 +85,31 @@ class GradleRunner {
             }
         }
 
-        return process.exitValue()
+        return buildResult(process, silent)
+    }
+
+    private fun buildResult(process: ProcessWrapper, silent: Boolean) : Result {
+        return if (silent) {
+            Result(process.exitValue(), process.output)
+        } else {
+            Result(process.exitValue(), null)
+        }
     }
 }
+
+data class Result(val exitCode: Int, val output: String?)
 
 private class ProcessWrapper(val processBuilder: ProcessBuilder, val terminal: Terminal) {
     val lock = Object()
 
     private var running: Boolean = true
     private var process: Process? = null
+
+    val output: String? by lazy {
+        synchronized(lock) {
+            return@lazy process?.inputStream?.reader()?.readText()
+        }
+    }
 
     val isAlive: Boolean
         get() = synchronized(lock) {
