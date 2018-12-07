@@ -96,7 +96,7 @@ class IdeaOpenCommand : AbstractCommand() {
     }
 
     companion object {
-        private const val OLD_PORT = 48562
+        private const val OLD_PORT = 48561
         private const val NEW_PORT = 48562
     }
 }
