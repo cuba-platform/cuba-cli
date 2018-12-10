@@ -72,7 +72,7 @@ module com.haulmont.cuba.cli {
     opens com.haulmont.cuba.cli.cubaplugin.config;
     opens com.haulmont.cuba.cli.cubaplugin.updatescript;
     opens com.haulmont.cuba.cli.cubaplugin.premiumrepo;
-    opens com.haulmont.cuba.cli.cubaplugin.prifexchange;
+    opens com.haulmont.cuba.cli.cubaplugin.prefixchange;
     opens com.haulmont.cuba.cli.cubaplugin.deploy;
     opens com.haulmont.cuba.cli.cubaplugin.deploy.war;
     opens com.haulmont.cuba.cli.cubaplugin.deploy.uberjar;

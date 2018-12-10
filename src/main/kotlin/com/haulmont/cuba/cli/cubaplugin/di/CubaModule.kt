@@ -18,7 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.di
 
 import com.haulmont.cuba.cli.cubaplugin.gradle.GradleRunner
 import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
-import com.haulmont.cuba.cli.cubaplugin.prifexchange.PrefixChanger
+import com.haulmont.cuba.cli.cubaplugin.prefixchange.PrefixChanger
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.registration.EntityRegistrationHelper
 import com.haulmont.cuba.cli.registration.ScreenRegistrationHelper

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin.prifexchange
+package com.haulmont.cuba.cli.cubaplugin.prefixchange
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.AbstractCommand

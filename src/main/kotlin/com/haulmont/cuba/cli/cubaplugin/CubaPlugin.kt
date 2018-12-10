@@ -38,7 +38,7 @@ import com.haulmont.cuba.cli.cubaplugin.model.ProjectScanException
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import com.haulmont.cuba.cli.cubaplugin.polymer.CreatePolymerModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.premiumrepo.EnablePremiumRepoCommand
-import com.haulmont.cuba.cli.cubaplugin.prifexchange.PrefixChangeCommand
+import com.haulmont.cuba.cli.cubaplugin.prefixchange.PrefixChangeCommand
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
 import com.haulmont.cuba.cli.cubaplugin.screen.ScreenCommandsGroup
 import com.haulmont.cuba.cli.cubaplugin.service.CreateServiceCommand
