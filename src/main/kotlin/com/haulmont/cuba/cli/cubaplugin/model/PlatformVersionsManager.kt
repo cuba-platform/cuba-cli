@@ -41,6 +41,8 @@ class PlatformVersionsManager {
                     versions = loadInfoJson()
                             .let(::extractVersions)
                             .let(::filterVersions)
+                            .let { listOf("7.0.0") + it }
+                            .distinct()
                 } catch (e: Throwable) {
                     logger.log(Level.SEVERE, "Error during platform versions retrieving", e)
                 }
