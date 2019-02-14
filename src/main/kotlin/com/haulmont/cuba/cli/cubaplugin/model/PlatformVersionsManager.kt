@@ -41,7 +41,6 @@ class PlatformVersionsManager {
                     versions = loadInfoJson()
                             .let(::extractVersions)
                             .let(::filterVersions)
-                            .let { listOf("7.0.0") + it }
                             .distinct()
                 } catch (e: Throwable) {
                     logger.log(Level.SEVERE, "Error during platform versions retrieving", e)
@@ -75,7 +74,8 @@ class PlatformVersionsManager {
                 SpecificVersion(6, 9),
                 SpecificVersion(6, 10),
                 SpecificVersion(6, 11),
-                SpecificVersion(7, 0)
+                SpecificVersion(7, 0),
+                SpecificVersion(7, 1)
         )
 
         val supportedVersionRanges = (0 until borders.size - 1).map {
