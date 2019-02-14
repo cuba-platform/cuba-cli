@@ -23,6 +23,8 @@ import com.haulmont.cuba.cli.event.InitPluginEvent
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.lang.module.ModuleFinder
+import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 import java.util.logging.Level
@@ -43,25 +45,44 @@ internal class PluginLoader {
 
         val pluginsDir = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "plugins")
 
-        val bootLayer = ModuleLayer.boot()
+        loadPluginsByDir(pluginsDir, mode)
 
-        val pluginModulesFinder = ModuleFinder.of(pluginsDir)
-        val pluginModules = pluginModulesFinder.findAll().map {
-            it.descriptor().name()
-        }
+        Files.walk(pluginsDir, 1)
+                .filter { it != pluginsDir }
+                .filter { Files.isDirectory(it) }
+                .forEach { loadPluginsByDir(it, mode) }
 
-        val configuration = bootLayer.configuration().resolve(pluginModulesFinder, ModuleFinder.of(), pluginModules)
-
-        val pluginsLayer = ModuleLayer.defineModulesWithOneLoader(
-                configuration,
-                mutableListOf(bootLayer),
-                ClassLoader.getSystemClassLoader()
-        ).layer()
-
-        loadPlugins(pluginsLayer, commandsRegistry, mode)
+        log.log(Level.INFO, "InitPluginEvent")
+        bus.post(InitPluginEvent(commandsRegistry, mode))
     }
 
-    private fun loadPlugins(pluginsLayer: ModuleLayer?, commandsRegistry: CommandsRegistry, mode: CliMode) {
+    private fun loadPluginsByDir(pluginsDir: Path, mode: CliMode) {
+
+        val pluginsLayer = try {
+            val bootLayer = ModuleLayer.boot()
+
+            val pluginModulesFinder = ModuleFinder.of(pluginsDir)
+            val pluginModules = pluginModulesFinder.findAll().map {
+                it.descriptor().name()
+            }
+
+            val configuration = bootLayer.configuration().resolve(pluginModulesFinder, ModuleFinder.of(), pluginModules)
+
+            ModuleLayer.defineModulesWithOneLoader(
+                    configuration,
+                    mutableListOf(bootLayer),
+                    ClassLoader.getSystemClassLoader()
+            ).layer()
+        } catch (e: Exception) {
+            log.log(Level.WARNING, "Error during loading module layer from directory $pluginsDir", e)
+            writer.println("Error during loading module layer from directory $pluginsDir".bgRed())
+            return
+        }
+
+        loadPlugins(pluginsLayer, mode)
+    }
+
+    private fun loadPlugins(pluginsLayer: ModuleLayer, mode: CliMode) {
         log.log(Level.INFO, "Start loading plugins")
 
         val pluginsIterator = ServiceLoader.load(pluginsLayer, CliPlugin::class.java).iterator()
@@ -69,6 +90,10 @@ internal class PluginLoader {
         while (pluginsIterator.hasNext()) {
             try {
                 val plugin = pluginsIterator.next()
+
+                if (plugin.javaClass in context.plugins.map { it.javaClass })
+                    continue
+
                 val version = getPluginVersion(plugin)
                 if (version != API_VERSION) {
                     writer.println("Plugin's ${plugin.javaClass.name} version ($version) doesn't correspond current CUBA CLI version ($API_VERSION)".bgRed())
@@ -84,9 +109,6 @@ internal class PluginLoader {
                 writer.println(e.message)
             }
         }
-
-        log.log(Level.INFO, "InitPluginEvent")
-        bus.post(InitPluginEvent(commandsRegistry, mode))
     }
 
     private fun getPluginVersion(plugin: CliPlugin): Int {

@@ -26,7 +26,7 @@ import org.jline.terminal.Terminal
 import org.kodein.di.generic.instance
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
-import java.nio.file.Path
+import java.nio.file.Paths
 import kotlin.concurrent.thread
 
 class GradleRunner {
@@ -50,7 +50,7 @@ class GradleRunner {
         }
         val gradleScriptPath = currentDir.resolve(gradleScriptName).toFile().absolutePath
 
-        if (!Files.exists(Path.of(gradleScriptPath))) {
+        if (!Files.exists(Paths.get(gradleScriptPath))) {
             throw WrapperNotFoundException
         }
 
