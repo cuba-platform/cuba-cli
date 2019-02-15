@@ -20,9 +20,12 @@ import com.beust.jcommander.MissingCommandException
 import com.beust.jcommander.ParameterException
 import com.google.common.eventbus.EventBus
 import com.haulmont.cuba.cli.commands.*
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.ErrorEvent
+import org.fusesource.jansi.Ansi
 import org.jline.builtins.Completers
 import org.jline.builtins.Completers.TreeCompleter.Node
 import org.jline.builtins.Completers.TreeCompleter.node
@@ -82,7 +85,7 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
 
                 (lineReader as? LineReaderImpl)?.completer = createCommandsCompleter(commandsRegistry)
 
-                val line = lineReader.readLine(PROMPT).also {
+                val line = lineReader.readLine(buildPrompt()).also {
                     it != null || return
                 }.takeIf {
                     it.isNotBlank()
@@ -115,6 +118,15 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
                 else -> evalCommand(command)
             }
         }
+    }
+
+    private fun buildPrompt(): String = try {
+        val projectNameGreen = Ansi.ansi()
+                .fgGreen().render(ProjectModel(ProjectStructure()).name).fgDefault()
+                .toString()
+        "($projectNameGreen) $PROMPT"
+    } catch (e: Exception) {
+        PROMPT
     }
 
     private fun evalCommand(command: CliCommand) {
