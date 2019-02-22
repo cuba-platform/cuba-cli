@@ -47,10 +47,12 @@ internal class PluginLoader {
 
         loadPluginsByDir(pluginsDir, mode)
 
-        Files.walk(pluginsDir, 1)
-                .filter { it != pluginsDir }
-                .filter { Files.isDirectory(it) }
-                .forEach { loadPluginsByDir(it, mode) }
+        if(Files.exists(pluginsDir)) {
+            Files.walk(pluginsDir, 1)
+                    .filter { it != pluginsDir }
+                    .filter { Files.isDirectory(it) }
+                    .forEach { loadPluginsByDir(it, mode) }
+        }
 
         log.log(Level.INFO, "InitPluginEvent")
         bus.post(InitPluginEvent(commandsRegistry, mode))
