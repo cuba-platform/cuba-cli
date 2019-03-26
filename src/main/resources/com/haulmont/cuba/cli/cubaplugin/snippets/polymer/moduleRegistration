@@ -1,1 +1,1 @@
-project(":${modulePrefix}-polymer-client").projectDir = new File(settingsDir, 'modules/polymer-client')
+project(":${modulePrefix}-front").projectDir = new File(settingsDir, 'modules/front')

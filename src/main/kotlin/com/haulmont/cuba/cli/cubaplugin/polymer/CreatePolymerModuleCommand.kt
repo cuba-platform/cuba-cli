@@ -46,7 +46,7 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
         checkProjectExistence()
 
         val alreadyContainsModule = projectStructure.settingsGradle.toFile()
-                .readText().contains("polymer-client")
+                .readText().contains("front")
 
         !alreadyContainsModule || fail(messages["moduleExistsError"])
     }
@@ -63,7 +63,7 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
 
 
     override fun generate(bindings: Map<String, Any>) {
-        val destinationDir = projectStructure.path.resolve("modules/polymer-client")
+        val destinationDir = projectStructure.path.resolve("modules/front")
 
         val maybeHints = TemplateProcessor(resources.getTemplate("polymer"), bindings) {
             templatePath.walk(1).filter {
@@ -91,7 +91,7 @@ class CreatePolymerModuleCommand : GeneratorCommand<PolymerModel>() {
                 if (it.startsWith("include(")) {
                     it.replace(Regex("include\\((.*)\\)")) {
                         val modules = it.groupValues[1].split(",")
-                        (modules + "\":\${modulePrefix}-polymer-client\"").joinToString(" ,", "include(", ")")
+                        (modules + "\":\${modulePrefix}-front\"").joinToString(" ,", "include(", ")")
                     }
                 } else it
             } + snippets["moduleRegistration"]

@@ -23,9 +23,6 @@ task buildWar(type: CubaWarBuilding) {
     includeContextXml = true
 #end
     appProperties = ['cuba.automaticDatabaseUpdate' : true]
-#if( ${war.includeTomcatContextXml} )
-    includeContextXml = true
-#end
     appHome = '${war.appHome}'
 #if( ${war.includeJdbcDriver} )
     includeJdbcDriver = true
