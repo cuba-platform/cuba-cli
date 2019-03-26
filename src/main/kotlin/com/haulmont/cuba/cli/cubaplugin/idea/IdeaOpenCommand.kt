@@ -46,13 +46,11 @@ class IdeaOpenCommand : AbstractCommand() {
         val buildGradlePath = projectStructure.buildGradle.toAbsolutePath()
 
         if (projectModel.platformVersion >= PlatformVersion("6.10")) {
-            if (!sendRequest("http://localhost:$NEW_PORT/?project=$buildGradlePath")) {
-                fail("Unable to connect to the IDE. Check if the IDE is running and CUBA Plugin is installed.")
+            if (!sendRequest("http://localhost:$INTEGRATION_PORT/?project=$buildGradlePath")) {
+                fail("Unable to connect to the IDE. Check if the IDE is running and CUBA Plugin is installed. Also check \"Old studio integration enabled\" option in CUBA plugin settings.")
             }
-        } else if (!sendRequest("http://localhost:$NEW_PORT/?project=$buildGradlePath")) {
-            if (!sendRequest("http://localhost:$OLD_PORT/?project=${getIprPath()}")) {
-                fail("Unable to connect to the IDE. Check if the IDE is running and CUBA Plugin is installed.")
-            }
+        } else if (!sendRequest("http://localhost:$INTEGRATION_PORT/?project=${getIprPath()}")) {
+            fail("Unable to connect to the IDE. Check if the IDE is running and CUBA Plugin is installed.")
         }
     }
 
@@ -96,7 +94,6 @@ class IdeaOpenCommand : AbstractCommand() {
     }
 
     companion object {
-        private const val OLD_PORT = 48561
-        private const val NEW_PORT = 48562
+        private const val INTEGRATION_PORT = 48561
     }
 }
