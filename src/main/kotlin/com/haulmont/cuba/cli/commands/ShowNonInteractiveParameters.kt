@@ -24,8 +24,12 @@ import com.haulmont.cuba.cli.kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
-@Parameters(commandDescription = "Prints commandPath parameters for non interactive mode")
-class ShowNonInteractiveParameters(private val commandsRegistry: CommandsRegistry) : AbstractCommand() {
+@Parameters(commandDescription = "Prints specified command parameters for non interactive mode")
+class ShowNonInteractiveParameters(private val commandsRegistry: CommandsRegistry) : AbstractCommand(), UsageProvider {
+    override fun printUsage(): String = """
+        Prints specified command parameters for non interactive mode
+        Usage: parameters command
+    """.trimIndent()
 
     @Parameter(variableArity = true)
     private var commandPath: List<String> = mutableListOf()
@@ -33,6 +37,11 @@ class ShowNonInteractiveParameters(private val commandsRegistry: CommandsRegistr
     private val printWriter: PrintWriter by kodein.instance()
 
     override fun run() {
+        if (commandPath.isEmpty()) {
+            printWriter.println("You should specify command to print parameters for. Use --help option to get help.")
+            return
+        }
+
         val currentPath = mutableListOf<String>()
 
         commandsRegistry.traverse(object : CommandVisitor {

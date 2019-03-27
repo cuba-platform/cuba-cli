@@ -62,8 +62,12 @@ class CommandParser(private val commandsRegistry: CommandsRegistry, private val 
         writer.println()
     }
 
-    fun printHelp(command: CliCommand) = findRoute(command)
-            .let {
+    fun printHelp(command: CliCommand) {
+        if (command is UsageProvider) {
+            writer.println(command.printUsage())
+        } else {
+            val route: List<JCommander> = findRoute(command)
+            route.let {
                 buildString {
                     if (it.size > 1) {
                         val commandName = it.last().programName
@@ -76,6 +80,8 @@ class CommandParser(private val commandsRegistry: CommandsRegistry, private val 
             }.let {
                 writer.println(it)
             }
+        }
+    }
 
     fun reset() {
         CommonParameters.reset()
