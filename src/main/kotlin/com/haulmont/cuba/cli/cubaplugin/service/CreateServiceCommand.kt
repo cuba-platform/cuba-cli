@@ -17,13 +17,13 @@
 package com.haulmont.cuba.cli.cubaplugin.service
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.CORE_MODULE
-import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
+import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.CORE_MODULE
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import com.haulmont.cuba.cli.registration.ServiceRegistrationHelper
@@ -34,7 +34,7 @@ class CreateServiceCommand : GeneratorCommand<ServiceModel>(), NonInteractiveInf
 
     private val resources by Resources.fromMyPlugin()
 
-    private val serviceRegistrationHelper: ServiceRegistrationHelper by kodein.instance()
+    private val serviceRegistrationHelper: ServiceRegistrationHelper by cubaKodein.instance()
 
     override fun getModelName(): String = ServiceModel.MODEL_NAME
 
