@@ -25,6 +25,7 @@ import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
@@ -91,11 +92,17 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>(), NonInteractiveInfo 
             append(namesUtils.entityNameToTableName(entityName))
         }
 
+        val sep = if(projectModel.platformVersion < PlatformVersion.v7)
+            "$"
+        else
+            "_"
+
         return EntityModel(
                 entityName,
                 "packageName" from answers,
                 "entityType" from answers,
-                tableName
+                tableName,
+                sep
         )
     }
 

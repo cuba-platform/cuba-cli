@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.entity
 
-data class EntityModel(val name: String, val packageName: String, val type: String, val tableName: String) {
+data class EntityModel(val name: String, val packageName: String, val type: String, val tableName: String, val sep:String = "$") {
     companion object {
         const val MODEL_NAME = "entity"
     }

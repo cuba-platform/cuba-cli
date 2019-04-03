@@ -18,12 +18,12 @@ import com.haulmont.cuba.core.entity.BaseUuidEntity;
 
 #if( ${entity.type} == "Persistent" )
 @Table(name = "${entity.tableName}")
-@Entity(name = "${project.namespace}$${entity.name}")
+@Entity(name = "${project.namespace}${entity.sep}${entity.name}")
 #elseif (${entity.type} == "Persistent embedded")
-@MetaClass(name = "${project.namespace}$${entity.name}")
+@MetaClass(name = "${project.namespace}${entity.sep}${entity.name}")
 @Embeddable
 #else
-@MetaClass(name = "${project.namespace}$${entity.name}")
+@MetaClass(name = "${project.namespace}${entity.sep}${entity.name}")
 #end
 public class ${entity.name} extends $superclass {
     private static final long serialVersionUID = 6323743611817286101L;
