@@ -64,7 +64,7 @@ class DatabaseModel(answers: Answers) {
             databases[0] -> {
                 schema = "jdbc:hsqldb:hsql:"
                 driver = "org.hsqldb.jdbc.JDBCDriver"
-                driverDependency = "'org.hsqldb:hsqldb:2.2.9'"
+                driverDependency = "'org.hsqldb:hsqldb:2.4.1'"
                 driverDependencyName = "hsql"
                 username = "sa"
                 password = ""
