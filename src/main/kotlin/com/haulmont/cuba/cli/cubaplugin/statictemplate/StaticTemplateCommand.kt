@@ -82,7 +82,7 @@ class StaticTemplateCommand : GeneratorCommand<Answers>() {
         for (question in template.questions) {
             when (question) {
                 is PlainQuestion -> question(question.name, question.caption)
-                is OptionsQuestion -> options(question.name, question.caption, question.options)
+                is OptionsQuestion -> textOptions(question.name, question.caption, question.options)
             }
         }
     }

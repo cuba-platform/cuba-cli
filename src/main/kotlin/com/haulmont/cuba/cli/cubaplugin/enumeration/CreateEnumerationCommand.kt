@@ -49,7 +49,7 @@ class CreateEnumerationCommand : GeneratorCommand<EnumerationModel>() {
             }
         }
 
-        options("idType", "Id type", listOf("String", "Integer"))
+        textOptions("idType", "Id type", listOf("String", "Integer"))
 
         repeating("values", "Add value?") {
             question("name", "Value name")

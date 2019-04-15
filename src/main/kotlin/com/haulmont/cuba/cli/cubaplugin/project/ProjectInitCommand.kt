@@ -78,7 +78,7 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveI
 
     override fun QuestionsList.prompting() {
 
-        options("repo", "Repository to be used in project.", REPOS) {
+        textOptions("repo", "Repository to be used in project.", REPOS) {
             default(0)
         }
 
@@ -142,13 +142,13 @@ class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveI
 
         val databaseOptions = databasesAliases.takeIf { isNonInteractiveMode() } ?: databases
 
-        options("database", "Choose database", databaseOptions) {
+        textOptions("database", "Choose database", databaseOptions) {
             default(0)
         }
     }
 
     private fun QuestionsList.askVersion() {
-        options("predefinedPlatformVersion", "Platform version", platformVersionsManager.versions + CUSTOM_VERSION) {
+        textOptions("predefinedPlatformVersion", "Platform version", platformVersionsManager.versions + CUSTOM_VERSION) {
             askIf {
                 "customPlatformVersion" !in it
             }

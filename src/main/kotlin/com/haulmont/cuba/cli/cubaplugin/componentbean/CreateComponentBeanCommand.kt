@@ -54,7 +54,7 @@ class CreateComponentBeanCommand : GeneratorCommand<ComponentBeanModel>(), NonIn
         question("beanName", "Bean name") {
             default { projectModel.namespace + "_" + it["name"] }
         }
-        options("module", "Target module", listOf("web", "core"))
+        textOptions("module", "Target module", listOf("web", "core"))
     }
 
     override fun createModel(answers: Answers): ComponentBeanModel = ComponentBeanModel(answers)

@@ -34,7 +34,7 @@ class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {
     override fun preExecute() = checkProjectExistence()
 
     override fun QuestionsList.prompting() {
-        options("screen", "Which screen to extend?", listOf("login", "main"))
+        textOptions("screen", "Which screen to extend?", listOf("login", "main"))
         question("packageName", "Package name") {
             default(projectModel.rootPackage + ".web.screens")
         }

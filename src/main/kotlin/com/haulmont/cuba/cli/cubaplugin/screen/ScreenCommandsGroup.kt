@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.screen
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.AbstractCommand
+import com.haulmont.cuba.cli.commands.CliCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.screen.entityscreen.CreateBrowseScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.screen.entityscreen.CreateEditScreenCommand
@@ -37,54 +38,40 @@ object ScreenCommandsGroup : AbstractCommand(), NonInteractiveInfo {
     override fun run() {
 
         val answers = Prompts.create {
-            optionsWithDescription("type", "Select screen type", getScreenTypes())
+            options("screen", "Select screen type", getScreenTypes())
         }.ask()
 
-        val type: String by answers
+        val screen: CliCommand by answers
 
-        val command = getCommandsMap()[type]!!
-
-        command.execute()
+        screen.execute()
     }
 
-    private fun getScreenTypes(): List<Option> {
+    private fun getScreenTypes(): List<ScreenOption> {
         val v7 = projectModel.platformVersion >= PlatformVersion.v7
+        val legacyVersion = PlatformVersion("6.10.0")
+
 
         val result = mutableListOf(
-                Option("browse", "Create new browse screen"),
-                Option("edit", "Create new edit screen")
+                ScreenOption("Create new browse screen", CreateBrowseScreenCommand()),
+                ScreenOption("Create new edit screen", CreateEditScreenCommand())
         )
 
         if (v7) {
-            result.add(Option("master_detail", "Create new master-detail screen"))
+            result.add(ScreenOption("Create new master-detail screen", MasterDetailScreenCommand()))
         }
 
-        result.add(Option("custom", "Create new blank screen"))
+        result.add(ScreenOption("Create new blank screen", CreateScreenCommand()))
 
         if (v7) {
-            result.add(Option("browse_legacy", "Create new legacy browse screen"))
-            result.add(Option("edit_legacy", "Create new legacy edit screen"))
-            result.add(Option("custom_legacy", "Create new legacy blank screen"))
+            result.add(ScreenOption("Create new legacy browse screen", CreateBrowseScreenCommand(forceVersion = legacyVersion)))
+            result.add(ScreenOption("Create new legacy edit screen", CreateEditScreenCommand(forceVersion = legacyVersion)))
+            result.add(ScreenOption("Create new legacy blank screen", CreateScreenCommand(forceVersion = legacyVersion)))
         }
 
-        result.add(Option("extend", "Extend login and main screens"))
+        result.add(ScreenOption("Extend login and main screens", ExtendDefaultScreenCommand()))
 
         return result
     }
 
-    private fun getCommandsMap(): Map<String, ScreenCommandBase<Any>> {
-        val legacyVersion = PlatformVersion("6.10.0")
-
-        return mapOf(
-                "custom" to CreateScreenCommand(),
-                "extend" to ExtendDefaultScreenCommand(),
-                "master_detail" to MasterDetailScreenCommand(),
-                "browse_legacy" to CreateBrowseScreenCommand(forceVersion = legacyVersion),
-                "edit_legacy" to CreateEditScreenCommand(forceVersion = legacyVersion),
-                "custom_legacy" to CreateScreenCommand(forceVersion = legacyVersion),
-                "browse" to CreateBrowseScreenCommand(),
-                "edit" to CreateEditScreenCommand()
-        )
-    }
-
+    private class ScreenOption(description: String, command: CliCommand): Option<CliCommand>("", description, command)
 }

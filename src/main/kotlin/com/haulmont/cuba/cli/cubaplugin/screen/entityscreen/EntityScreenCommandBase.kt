@@ -51,7 +51,7 @@ abstract class EntityScreenCommandBase<out T : EntityScreenModel> : ScreenComman
             abort()
         }
 
-        options("entityName", "Choose entity", entitiesList)
+        textOptions("entityName", "Choose entity", entitiesList)
 
         question("packageName", "Package name") {
             validate {

@@ -60,7 +60,7 @@ class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
                 checkIsClass()
             }
         }
-        options("entityType", "Select entity", entitiesList)
+        textOptions("entityType", "Select entity", entitiesList)
         question("packageName", "Listener package") {
             default(projectModel.rootPackage + ".listener")
             validate {

@@ -78,7 +78,7 @@ class CreateEntityCommand : GeneratorCommand<EntityModel>(), NonInteractiveInfo 
             }
         }
 
-        options("entityType", "Entity type", entityTypes) {
+        textOptions("entityType", "Entity type", entityTypes) {
             default(0)
         }
     }

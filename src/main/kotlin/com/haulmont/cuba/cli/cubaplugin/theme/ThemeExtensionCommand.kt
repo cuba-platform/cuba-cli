@@ -76,7 +76,7 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
 
     override fun QuestionsList.prompting() {
         if (themesToExtend.size > 1) {
-            options("themeName", "Choose theme to extend", themesToExtend)
+            textOptions("themeName", "Choose theme to extend", themesToExtend)
         } else {
             writer.println("Only ${themesToExtend.first()} theme can be extended.")
         }

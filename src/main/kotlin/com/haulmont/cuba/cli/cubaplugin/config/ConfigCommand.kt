@@ -44,7 +44,7 @@ class ConfigCommand : GeneratorCommand<ConfigModel>() {
             }
         }
 
-        options("module", "Module", listOf(GLOBAL_MODULE, CORE_MODULE, WEB_MODULE))
+        textOptions("module", "Module", listOf(GLOBAL_MODULE, CORE_MODULE, WEB_MODULE))
 
         question("packageName", "Package name") {
             default(projectModel.rootPackage + ".config")
@@ -54,7 +54,7 @@ class ConfigCommand : GeneratorCommand<ConfigModel>() {
             }
         }
 
-        options("sourceType", "Source type", listOf("SYSTEM", "APP", "DATABASE"))
+        textOptions("sourceType", "Source type", listOf("SYSTEM", "APP", "DATABASE"))
     }
 
     override fun createModel(answers: Answers): ConfigModel = ConfigModel(answers)

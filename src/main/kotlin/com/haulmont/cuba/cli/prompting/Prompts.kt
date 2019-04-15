@@ -19,15 +19,15 @@ package com.haulmont.cuba.cli.prompting
 import com.haulmont.cuba.cli.bgRed
 import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.commands.CommonParameters
-import com.haulmont.cuba.cli.kodein
 import org.fusesource.jansi.Ansi
 import org.jline.reader.EndOfFileException
 import org.jline.reader.LineReader
 import org.jline.reader.impl.completer.NullCompleter
+import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
-class Prompts internal constructor(private val questionsList: QuestionsList) {
+class Prompts internal constructor(private val questionsList: QuestionsList, private val throwValidation: Boolean = false, kodein: Kodein = com.haulmont.cuba.cli.kodein) {
 
     private val reader: LineReader by kodein.instance(arg = NullCompleter())
     private val writer: PrintWriter by kodein.instance()
@@ -53,7 +53,9 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
             }
 
             answers[question.name] = when (question) {
-                is PlainQuestion<*> -> question.ask(rootAnswers(answers))
+                is StringQuestion -> question.ask(rootAnswers(answers))
+                is ConfirmationQuestion -> question.ask(rootAnswers(answers))
+                is OptionsQuestion<*> -> question.ask(rootAnswers(answers))
                 is RepeatingQuestion -> question.ask {
                     rootAnswers(answers) + (question.name to it)
                 }
@@ -67,6 +69,9 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
             return answers.also { validation(it, rootAnswers(it)) }
         } catch (e: ValidationException) {
             writer.println(e.message.bgRed())
+
+            if(throwValidation)
+                throw e
         }
 
         return this.ask(rootAnswers)
@@ -83,7 +88,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
         return answersList
     }
 
-    private tailrec fun <T : Any> PlainQuestion<T>.ask(answers: Answers, prompts: String = printPrompts(answers)): T {
+    private tailrec fun StringQuestion.ask(answers: Answers, prompts: String = printPrompts(answers)): String {
         try {
             return read(prompts).let {
                 if (it.isNotEmpty()) return@let it.read()
@@ -95,18 +100,68 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
                 }
             }.also {
                 validation(it, answers)
-            }.let {
-                @Suppress("UNCHECKED_CAST")
-                when {
-                    this is OptionsQuestion -> this.options[it as Int].name as T
-                    else -> it
-                }
             }
         } catch (e: Exception) {
             when (e) {
                 is ValidationException, is ReadException -> e.message?.let { writer.println(it.bgRed()) }
                 else -> throw e
             }
+
+            if(throwValidation)
+                throw e
+        }
+
+        return ask(answers, prompts)
+    }
+
+    private tailrec fun <T : Any> OptionsQuestion<T>.ask(answers: Answers, prompts: String = printPrompts(answers)): T {
+        try {
+            return read(prompts).let {
+                if (it.isNotEmpty()) return@let it.read()
+                val defaultValue = defaultValue
+                when (defaultValue) {
+                    is PlainValue -> defaultValue.value
+                    is CalculatedValue -> defaultValue.function(answers)
+                    else -> it.read()
+                }
+            }.let {
+                options[it]
+            }.value.also {
+                validation(it, answers)
+            }
+        } catch (e: Exception) {
+            when (e) {
+                is ValidationException, is ReadException -> e.message?.let { writer.println(it.bgRed()) }
+                else -> throw e
+            }
+
+            if(throwValidation)
+                throw e
+        }
+
+        return ask(answers, prompts)
+    }
+private tailrec fun ConfirmationQuestion.ask(answers: Answers, prompts: String = printPrompts(answers)): Boolean {
+        try {
+            return read(prompts).let {
+                if (it.isNotEmpty()) return@let it.read()
+                val defaultValue = defaultValue
+                when (defaultValue) {
+                    is PlainValue -> defaultValue.value
+                    is CalculatedValue -> defaultValue.function(answers)
+                    else -> it.read()
+                }
+            }.also {
+                validation(it, answers)
+            }
+        } catch (e: Exception) {
+            when (e) {
+                is ValidationException, is ReadException -> e.message?.let { writer.println(it.bgRed()) }
+                else -> throw e
+            }
+
+            if(throwValidation)
+                throw e
         }
 
         return ask(answers, prompts)
@@ -141,10 +196,17 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
             val value = answers[question.name] as String
 
             when (question) {
-                is OptionsQuestion -> value in question ||
-                        throw ValidationException("Invalid value $value for parameter ${question.name}. Available values are ${question.options.map { it.name }}.")
+                is OptionsQuestion<*> -> value in question ||
+                        throw ValidationException("Invalid value $value for parameter ${question.name}. Available values are ${question.options.map { it.id }}.")
 
-                else -> question.run {
+                is StringQuestion -> (question as StringQuestion).run {
+                    validation(value.read(), answers)
+                    answers[question.name] = question.run {
+                        value.read()
+                    }
+                }
+
+                is ConfirmationQuestion -> (question as ConfirmationQuestion).run {
                     validation(value.read(), answers)
                     answers[question.name] = question.run {
                         value.read()
@@ -160,8 +222,8 @@ class Prompts internal constructor(private val questionsList: QuestionsList) {
                 is CalculatedValue -> answers[question.name] = defaultValue.function(answers)
             }
 
-            if (question is OptionsQuestion)
-                answers[question.name] = question.options[answers[question.name] as Int].name
+            if (question is OptionsQuestion<*>)
+                answers[question.name] = question.options[answers[question.name] as Int].id
         }
     }
 

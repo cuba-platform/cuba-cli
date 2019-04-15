@@ -24,7 +24,7 @@ sealed class Question(val name: String) : Conditional {
     fun shouldAsk(answers: Answers) = askCondition(answers)
 }
 
-abstract class PlainQuestion<T : Any>(name: String, val caption: String) : Question(name), Print<T>, Read<T>, WithValidation<T>, HasDefault<T> {
+sealed class PlainQuestion<T : Any>(name: String, val caption: String) : Question(name), Print<T>, Read<T>, HasDefault<T> {
     open fun printPrompts(answers: Answers): String =
             "?".green() + """ $caption ${printDefaultValue(answers)}> """
 
@@ -58,31 +58,41 @@ class QuestionsList(name: String, setup: QuestionsList.() -> Unit) : Iterable<Qu
     }
 
     fun question(name: String, caption: String, configuration: (StringQuestionConfigurationScope.() -> Unit)? = null) {
-        StringQuestion(name, caption).apply {
-            configuration?.let { this.it() }
-            questions.add(this)
-        }
+        val question = StringQuestion(name, caption)
+
+        if (configuration != null)
+            configuration(question)
+
+        questions.add(question)
     }
 
-    fun options(name: String, caption: String, options: List<String>, configuration: (DefaultValueConfigurable<Int>.() -> Unit)? = null) {
-        OptionsQuestion(name, caption, options.map { Option(it) }).apply {
-            configuration?.let { this.it() }
-            questions.add(this)
-        }
+    fun textOptions(name: String, caption: String, strOptions: List<String>, configuration: (DefaultValueConfigurable<Int>.() -> Unit)? = null) {
+        val options = strOptions.map { StringOption(it) }
+
+        val question = OptionsQuestion(name, caption, options)
+
+        if (configuration != null)
+            configuration(question)
+
+        questions.add(question)
     }
 
-    fun optionsWithDescription(name: String, caption: String, options: List<Option>, configuration: (DefaultValueConfigurable<Int>.() -> Unit)? = null) {
-        OptionsQuestion(name, caption, options).apply {
-            configuration?.let { this.it() }
-            questions.add(this)
-        }
+    fun <T : Any> options(name: String, caption: String, options: List<Option<T>>, configuration: (DefaultValueConfigurable<Int>.() -> Unit)? = null) {
+        val question = OptionsQuestion(name, caption, options)
+
+        if (configuration != null)
+            configuration(question)
+
+        questions.add(question)
     }
 
     fun confirmation(name: String, caption: String, configuration: (ConfirmationQuestionConfigurationScope.() -> Unit)? = null) {
-        ConfirmationQuestion(name, caption).apply {
-            configuration?.let { this.it() }
-            questions.add(this)
-        }
+        val question = ConfirmationQuestion(name, caption)
+
+        if (configuration != null)
+            configuration(question)
+
+        questions.add(question)
     }
 
     fun repeating(name: String, offer: String, configuration: QuestionsList.() -> Unit) {
@@ -118,27 +128,17 @@ class StringQuestion(name: String, caption: String) :
 
 interface StringQuestionConfigurationScope : DefaultValueConfigurable<String>, ValidationConfigurable<String>, Conditional
 
-class OptionsQuestion(name: String, caption: String, val options: List<Option>) :
+class OptionsQuestion<T : Any>(name: String, caption: String, val options: List<Option<T>>) :
         PlainQuestion<Int>(name, caption),
         HasDefault<Int>,
-        WithValidation<Int>,
+        WithValidation<T>,
         OptionsQuestionConfigurationScope {
 
     override var defaultValue: DefaultValue<Int> = None
 
-    override var validation: (Int, Answers) -> Unit = { value, answers ->
-        ValidationHelper(value, answers).run {
-            try {
-                if (value in (0 until options.size))
-                    return@run
-            } catch (e: NumberFormatException) {
-            }
+    override var validation: (T, Answers) -> Unit = acceptAll
 
-            fail("Input 1-${options.size}")
-        }
-    }
-
-    operator fun contains(option: String): Boolean = option in options.map { it.name }
+    operator fun contains(option: String): Boolean = option in options.map { it.id }
 
     init {
         check(options.isNotEmpty())
@@ -146,10 +146,12 @@ class OptionsQuestion(name: String, caption: String, val options: List<Option>) 
 
     override fun String.read(): Int {
         try {
-            return this.toInt() - 1
-        } catch (e: Exception) {
-            throw ReadException("Input 1-${options.size}")
-        }
+            val value = this.toInt() - 1
+            if (value in (0 until options.size))
+                return value
+        } catch (e: NumberFormatException) {}
+
+        throw ReadException("Input 1-${options.size}")
     }
 
     override fun Int.print(): String = (this + 1).toString()
@@ -166,11 +168,16 @@ class OptionsQuestion(name: String, caption: String, val options: List<Option>) 
     }
 }
 
-data class Option(val name: String, val description: String? = null) {
+/**
+ * [id] is unique identifier of an option to be used in non interactive mode
+ */
+open class Option<T>(val id: String, val description: String? = null, val value: T) {
     override fun toString(): String {
-        return description ?: name
+        return description ?: id
     }
 }
+
+class StringOption(name: String, description: String? = null): Option<Any>(name, description, name)
 
 interface OptionsQuestionConfigurationScope : DefaultValueConfigurable<Int>, Conditional
 
@@ -178,7 +185,8 @@ interface ConfirmationQuestionConfigurationScope : DefaultValueConfigurable<Bool
 
 class ConfirmationQuestion(name: String, caption: String) :
         PlainQuestion<Boolean>(name, caption),
-        ConfirmationQuestionConfigurationScope {
+        ConfirmationQuestionConfigurationScope,
+        WithValidation<Boolean> {
 
     override var defaultValue: DefaultValue<Boolean> = None
     override var validation: (Boolean, Answers) -> Unit = acceptAll
