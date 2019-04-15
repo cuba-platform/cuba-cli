@@ -19,21 +19,21 @@ package com.haulmont.cuba.cli.cubaplugin.screen.screenextension
 import com.haulmont.cuba.cli.prompting.Answers
 
 class ScreenExtensionModel(answers: Answers) {
-    val screen: String by answers
+    internal val screen: ExtendDefaultScreenCommand.ScreenToExtend by answers
     val packageName: String by answers
     val id: String
     val descriptorName: String
     val controllerName: String
 
     init {
-        if (screen == "login") {
-            id = answers["screenId"] as String? ?: "loginWindow"
-            descriptorName = answers["descriptorName"] as String? ?: "ext-loginWindow"
-            controllerName = answers["controllerName"] as String? ?: "ExtAppLoginWindow"
+        if (screen.type == ExtendDefaultScreenCommand.Type.LOGIN) {
+            id = answers["screenId"] as String? ?: screen.defaultId
+            descriptorName = answers["descriptorName"] as String? ?: screen.defaultDescriptor
+            controllerName = answers["controllerName"] as String? ?: screen.defaultController
         } else {
-            id = answers["screenId"] as String? ?: "mainWindow"
-            descriptorName = answers["descriptorName"] as String? ?: "ext-mainwindow"
-            controllerName = answers["controllerName"] as String? ?: "ExtAppMainWindow"
+            id = answers["screenId"] as String? ?: screen.defaultId
+            descriptorName = answers["descriptorName"] as String? ?: screen.defaultDescriptor
+            controllerName = answers["controllerName"] as String? ?: screen.defaultController
         }
     }
 

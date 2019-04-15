@@ -29,7 +29,7 @@ class PlatformVersionsManager {
 
     private val logger by thisClassLogger()
 
-    val supportedVersionsRange = SpecificVersion(6, 8, 0)..SpecificVersion(7, 1, 0)
+    val supportedVersionsRange = SpecificVersion(6, 8, 0)..SpecificVersion(7, 2, 0)
 
     var versions: List<String> = messages["platformVersions"].split(",").map { it.trim() }
         private set
@@ -75,7 +75,8 @@ class PlatformVersionsManager {
                 SpecificVersion(6, 10),
                 SpecificVersion(6, 11),
                 SpecificVersion(7, 0),
-                SpecificVersion(7, 1)
+                SpecificVersion(7, 1),
+                SpecificVersion(7, 2)
         )
 
         val supportedVersionRanges = (0 until borders.size - 1).map {

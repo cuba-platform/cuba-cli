@@ -34,6 +34,8 @@ class Properties private constructor(private val propertiesConfiguration: Proper
         propertiesConfiguration.setProperty(key, update(propertiesConfiguration.getString(key)))
     }
 
+    fun remove(key:String) = propertiesConfiguration.clearProperty(key)
+
     operator fun get(key: String): String? = propertiesConfiguration.getString(key)
 
     fun save() {

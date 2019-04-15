@@ -17,34 +17,53 @@
 package com.haulmont.cuba.cli.cubaplugin.screen.screenextension
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.Resources
+import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.WEB_MODULE
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.screen.ScreenCommandBase
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
+import com.haulmont.cuba.cli.prompting.Option
 import com.haulmont.cuba.cli.prompting.QuestionsList
 
 @Parameters(commandDescription = "Extends login and main screens")
 class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {
     private val resources by Resources.fromMyPlugin()
 
+    private val screens by lazy {
+
+        val options: MutableList<ScreenToExtend> = mutableListOf()
+
+        if (projectModel.platformVersion < PlatformVersion.v7_1) {
+            options.add(ScreenToExtend("loginWindow", "Login screen", "login", "ExtAppLoginWindow", "ext-loginWindow", Type.LOGIN))
+            options.add(ScreenToExtend("mainWindow", "Main screen with top menu", "mainTop", "ExtAppMainWindow", "ext-mainwindow", Type.MAIN))
+        } else {
+            options.add(ScreenToExtend("login", "Login screen", "login", "ExtLoginScreen", "ext-login-screen", Type.LOGIN))
+            options.add(ScreenToExtend("topMenuMainScreen", "Main screen with top menu", "mainTop", "ExtMainScreen", "ext-main-screen", Type.MAIN))
+            options.add(ScreenToExtend("main", "Main screen with side menu", "mainSide", "ExtMainScreen", "ext-main-screen", Type.MAIN))
+        }
+
+        return@lazy options.map(::ScreenToExtendOption)
+    }
+
     override fun getModelName(): String = ScreenExtensionModel.MODEL_NAME
 
     override fun preExecute() = checkProjectExistence()
 
     override fun QuestionsList.prompting() {
-        textOptions("screen", "Which screen to extend?", listOf("login", "main"))
+        options("screen", "Which screen to extend?", screens)
         question("packageName", "Package name") {
             default(projectModel.rootPackage + ".web.screens")
         }
         question("screenId", "Screen with default id already exists. Specify new id.") {
-            askIf {
-                if (it["screen"] == "login") {
-                    screenRegistrationHelper.isScreenIdExists("loginWindow")
-                } else {
-                    screenRegistrationHelper.isScreenIdExists("mainWindow")
-                }
+            askIf { answers ->
+                if (projectModel.platformVersion >= PlatformVersion.v7_1)
+                    return@askIf false
+
+                val screen: ScreenToExtend by answers
+
+                screenRegistrationHelper.isScreenIdExists(screen.defaultId)
             }
             validate {
                 screenIdDoesNotExists(value)
@@ -52,12 +71,10 @@ class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {
         }
 
         question("descriptorName", "Descriptor name") {
-            askIf {
-                if (it["screen"] == "login") {
-                    screenRegistrationHelper.isDescriptorExists(it["packageName"] as String, "ext-loginWindow")
-                } else {
-                    screenRegistrationHelper.isDescriptorExists(it["packageName"] as String, "ext-mainwindow")
-                }
+            askIf { answers ->
+                val screen: ScreenToExtend by answers
+
+                screenRegistrationHelper.isDescriptorExists(answers["packageName"] as String, screen.defaultDescriptor)
             }
             validate {
                 checkIsScreenDescriptor()
@@ -66,12 +83,10 @@ class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {
         }
 
         question("controllerName", "Controller name") {
-            askIf {
-                if (it["screen"] == "login") {
-                    screenRegistrationHelper.isControllerExists(it["packageName"] as String, "ExtAppLoginWindow")
-                } else {
-                    screenRegistrationHelper.isDescriptorExists(it["packageName"] as String, "ExtAppMainWindow")
-                }
+            askIf { answers ->
+                val screen: ScreenToExtend by answers
+
+                screenRegistrationHelper.isControllerExists(answers["packageName"] as String, screen.defaultController)
             }
             validate {
                 checkIsClass()
@@ -80,25 +95,53 @@ class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {
         }
     }
 
-    override fun createModel(answers: Answers): ScreenExtensionModel = ScreenExtensionModel(answers)
+    override fun createModel(answers: Answers): ScreenExtensionModel {
+        return ScreenExtensionModel(answers)
+    }
 
     override fun beforeGeneration() {
         checkScreenId(model.id)
-        checkExistence(model.packageName, descriptor = model.screen)
+        checkExistence(model.packageName, descriptor = model.descriptorName)
     }
 
     override fun generate(bindings: Map<String, Any>) {
-        TemplateProcessor(resources.getTemplate("screenExtension/" + model.screen), bindings) {
+        TemplateProcessor(resources.getTemplate("screenExtension/" + model.screen.path), bindings) {
             transformWhole()
         }
 
         val webModule = projectStructure.getModule(WEB_MODULE)
 
-        addToScreensXml(model.id, model.packageName, model.descriptorName)
+        if (projectModel.platformVersion < PlatformVersion.v7_1) {
+            addToScreensXml(model.id, model.packageName, model.descriptorName)
+        } else if (model.screen.type == Type.MAIN) {
+            registerMainScreen()
+        }
 
         val messages = webModule.resolvePackagePath(model.packageName).resolve("messages.properties")
 
         Properties(messages).save()
     }
+
+    private fun registerMainScreen() {
+        val webAppProperties = projectStructure.getModule(WEB_MODULE)
+                .rootPackageDirectory
+                .resolve("web-app.properties")
+
+        Properties.modify(webAppProperties) {
+            if (model.id == "main") {
+                remove("cuba.web.mainScreenId")
+            } else {
+                this["cuba.web.mainScreenId"] = "topMenuMainScreen"
+            }
+        }
+    }
+
+    internal enum class Type {
+        LOGIN, MAIN
+    }
+
+    internal data class ScreenToExtend(val defaultId: String, val name: String, val path: String, val defaultController: String, val defaultDescriptor: String, val type: Type)
+
+    private class ScreenToExtendOption(screenToExtend: ScreenToExtend) : Option<ScreenToExtend>("", screenToExtend.name, screenToExtend)
 }
 

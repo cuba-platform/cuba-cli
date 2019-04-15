@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/screen/window.xsd"
+        extends="/com/haulmont/cuba/web/app/login/login-screen.xml"
+        messagesPack="${screen.packageName}">
+    <layout>
+        <!--TODO add your layout here-->
+    </layout>
+</window>

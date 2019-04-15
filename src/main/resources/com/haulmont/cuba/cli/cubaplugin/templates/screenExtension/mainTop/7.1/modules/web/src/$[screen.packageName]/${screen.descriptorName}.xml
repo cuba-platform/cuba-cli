@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/screen/window.xsd"
+        caption="mainMsg://application.caption">
+
+    <layout expand="workArea">
+        <hbox id="titleBar"
+              stylename="c-app-menubar"
+              expand="mainMenu"
+              width="100%"
+              spacing="true"
+              margin="false;false;false;true">
+
+            <image id="logoImage"
+                   align="MIDDLE_LEFT"
+                   scaleMode="SCALE_DOWN"
+                   stylename="c-app-icon"/>
+
+            <menu id="mainMenu"
+                  align="MIDDLE_LEFT"/>
+
+            <ftsField id="ftsField"
+                      align="MIDDLE_LEFT"/>
+
+            <userIndicator id="userIndicator"
+                           align="MIDDLE_LEFT"/>
+
+            <timeZoneIndicator id="timeZoneIndicator"
+                               align="MIDDLE_LEFT"/>
+
+            <hbox id="mainButtonsBox"
+                  stylename="c-main-buttons"
+                  align="MIDDLE_LEFT">
+                <newWindowButton id="newWindowButton"
+                                 icon="app/images/new-window.png"
+                                 description="msg://newWindowBtnDescription"/>
+
+                <logoutButton id="logoutButton"
+                              icon="app/images/exit.png"
+                              description="msg://logoutBtnDescription"/>
+            </hbox>
+        </hbox>
+
+        <workArea id="workArea"
+                  width="100%">
+            <initialLayout spacing="true" margin="true">
+
+            </initialLayout>
+        </workArea>
+    </layout>
+</window>
