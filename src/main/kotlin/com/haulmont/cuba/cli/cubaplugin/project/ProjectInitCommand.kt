@@ -20,12 +20,14 @@ import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
+import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionParseException
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.nio.file.Files
@@ -35,7 +37,7 @@ import java.util.*
 import java.util.logging.Level
 
 @Parameters(commandDescription = "Creates new project")
-class ProjectInitCommand : GeneratorCommand<ProjectInitModel>(), NonInteractiveInfo {
+class ProjectInitCommand(override val kodein: Kodein = cubaKodein) : GeneratorCommand<ProjectInitModel>(), NonInteractiveInfo {
     private val logger by thisClassLogger()
 
     private val messages by localMessages()

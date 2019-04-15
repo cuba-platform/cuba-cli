@@ -22,7 +22,6 @@ import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.AbstractCommand
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.Snippets
-import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Prompts
 import org.kodein.di.generic.instance

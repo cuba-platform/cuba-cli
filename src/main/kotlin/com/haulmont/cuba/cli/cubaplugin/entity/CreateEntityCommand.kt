@@ -32,12 +32,13 @@ import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import com.haulmont.cuba.cli.registration.EntityRegistrationHelper
+import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import java.nio.file.Files
 import java.util.*
 
 @Parameters(commandDescription = "Creates new entity")
-class CreateEntityCommand : GeneratorCommand<EntityModel>(), NonInteractiveInfo {
+class CreateEntityCommand(override val kodein: Kodein = cubaKodein) : GeneratorCommand<EntityModel>(), NonInteractiveInfo {
     private val entityTypes = listOf("Persistent", "Persistent embedded", "Not persistent")
 
     private val namesUtils: NamesUtils by kodein.instance()

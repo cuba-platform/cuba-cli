@@ -28,11 +28,12 @@ import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.kodein
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
 @Parameters(commandDescription = "Creates new entity listener")
-class CreateEntityListenerCommand : GeneratorCommand<EntityListenerModel>() {
+class CreateEntityListenerCommand(override val kodein: Kodein = cubaKodein) : GeneratorCommand<EntityListenerModel>() {
     private val printHelper: PrintHelper by kodein.instance()
 
     private val resources by Resources.fromMyPlugin()

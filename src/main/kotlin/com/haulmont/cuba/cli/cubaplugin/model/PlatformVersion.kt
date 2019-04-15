@@ -134,6 +134,15 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
 
 object LatestVersion : PlatformVersion() {
     override fun toString(): String = "Latest version"
+
+    override fun equals(other: Any?): Boolean {
+        return this === other
+    }
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
+
 }
 
 class SpecificVersion(val versionNumbers: List<Int>) : PlatformVersion() {
@@ -144,6 +153,21 @@ class SpecificVersion(val versionNumbers: List<Int>) : PlatformVersion() {
         get() = versionNumbers.dropLastWhile { it == 0 }
 
     override fun toString(): String = versionNumbers.joinToString(separator = ".")
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as SpecificVersion
+
+        if (versionNumbers != other.versionNumbers) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return versionNumbers.hashCode()
+    }
 }
 
 class PlatformVersionParseException : Exception {

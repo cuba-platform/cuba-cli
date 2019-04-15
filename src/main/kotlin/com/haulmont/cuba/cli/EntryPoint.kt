@@ -78,11 +78,11 @@ val kodein = Kodein {
 
     bind<CliContext>() with singleton { CliContext() }
 
-    bind<EventBus>() with instance(bus)
+    bind<EventBus>() with singleton { bus }
 
     bind<NamesUtils>() with instance(NamesUtils())
 
-    bind<WorkingDirectoryManager>() with instance(WorkingDirectoryManager())
+    bind<WorkingDirectoryManager>() with singleton { WorkingDirectoryManager() }
 
     bind<PlatformVersionsManager>() with singleton { PlatformVersionsManager() }
 }

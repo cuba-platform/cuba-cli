@@ -37,7 +37,7 @@ class BigQuestionsTest : QuestionsTestBase() {
         appendInputLine("24r")
         appendInputLine("24")
 
-        val answers = interactivePrompts(throwValidation = false) {
+        val answers = interactivePrompts {
             question("name", "Enter name")
 
             questionList("location") {
@@ -75,6 +75,7 @@ class BigQuestionsTest : QuestionsTestBase() {
 
         assertTrue(addresses[1]["street"] == "Moskovskoe shosse")
         assertTrue(addresses[1]["houseNumber"] == "45")
-
     }
+
+    override fun throwValidation(): Boolean = false
 }

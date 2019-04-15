@@ -63,9 +63,11 @@ class Resources(private val cliPlugin: CliPlugin) {
         fun getResourcePath(resourceName: String, clazz: Class<Any>): Path? {
             if (jrtFileSystem != null) {
                 val moduleName = clazz.module.name
-                val jrtPath = jrtFileSystem.getPath("/modules", moduleName, resourceName)
-                if (Files.exists(jrtPath)) {
-                    return jrtPath
+                if (moduleName != null) { // check for tests
+                    val jrtPath = jrtFileSystem.getPath("/modules", moduleName, resourceName)
+                    if (Files.exists(jrtPath)) {
+                        return jrtPath
+                    }
                 }
             }
 

@@ -27,7 +27,8 @@ import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
-class Prompts internal constructor(private val questionsList: QuestionsList, private val throwValidation: Boolean = false, kodein: Kodein = com.haulmont.cuba.cli.kodein) {
+class Prompts internal constructor(private val questionsList: QuestionsList, kodein: Kodein = com.haulmont.cuba.cli.kodein) {
+    private val throwValidation: Boolean by kodein.instance(tag = "throwValidation")
 
     private val reader: LineReader by kodein.instance(arg = NullCompleter())
     private val writer: PrintWriter by kodein.instance()
@@ -70,7 +71,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList, pri
         } catch (e: ValidationException) {
             writer.println(e.message.bgRed())
 
-            if(throwValidation)
+            if (throwValidation)
                 throw e
         }
 
@@ -107,7 +108,7 @@ class Prompts internal constructor(private val questionsList: QuestionsList, pri
                 else -> throw e
             }
 
-            if(throwValidation)
+            if (throwValidation)
                 throw e
         }
 
@@ -135,13 +136,14 @@ class Prompts internal constructor(private val questionsList: QuestionsList, pri
                 else -> throw e
             }
 
-            if(throwValidation)
+            if (throwValidation)
                 throw e
         }
 
         return ask(answers, prompts)
     }
-private tailrec fun ConfirmationQuestion.ask(answers: Answers, prompts: String = printPrompts(answers)): Boolean {
+
+    private tailrec fun ConfirmationQuestion.ask(answers: Answers, prompts: String = printPrompts(answers)): Boolean {
         try {
             return read(prompts).let {
                 if (it.isNotEmpty()) return@let it.read()
@@ -160,14 +162,15 @@ private tailrec fun ConfirmationQuestion.ask(answers: Answers, prompts: String =
                 else -> throw e
             }
 
-            if(throwValidation)
+            if (throwValidation)
                 throw e
         }
 
         return ask(answers, prompts)
     }
 
-    private fun read(prompt: String): String = reader.readLine(Ansi.ansi().render(prompt).toString())?.trim() ?: throw EndOfFileException()
+    private fun read(prompt: String): String = reader.readLine(Ansi.ansi().render(prompt).toString())?.trim()
+            ?: throw EndOfFileException()
 
     fun askNonInteractive(): Answers {
         val answers = CommonParameters.nonInteractive.toMutableMap()
@@ -228,7 +231,7 @@ private tailrec fun ConfirmationQuestion.ask(answers: Answers, prompts: String =
     }
 
     companion object {
-        fun create(init: QuestionsList.() -> Unit) = Prompts(QuestionsList("", init))
+        fun create(kodein: Kodein = com.haulmont.cuba.cli.kodein, init: QuestionsList.() -> Unit) = Prompts(QuestionsList("", init), kodein = kodein)
     }
 }
 

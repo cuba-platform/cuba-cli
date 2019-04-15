@@ -46,7 +46,7 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
         }
 
     override fun run() {
-        val model = Prompts.create { prompting() }
+        val model = Prompts.create(kodein) { prompting() }
                 .let(Prompts::ask)
                 .let(this::createModel)
 

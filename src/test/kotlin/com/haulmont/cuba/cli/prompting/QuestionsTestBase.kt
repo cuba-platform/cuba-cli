@@ -61,14 +61,18 @@ open class QuestionsTestBase {
             }
 
             bind<PrintHelper>() with singleton { PrintHelper() }
+
+            bind<Boolean>(tag = "throwValidation") with instance(throwValidation())
         }
     }
+
+    protected open fun throwValidation(): Boolean = true
 
     fun appendEmptyLine() = "\n".toByteArray().let(outputStream::write)
     fun appendInputLine(str: String) = "$str\n".toByteArray().let(outputStream::write)
 
-    fun interactivePrompts(throwValidation: Boolean = true, setup: QuestionsList.() -> Unit): Answers =
-            Prompts(QuestionsList("test", setup), kodein = kodein, throwValidation = throwValidation).askInteractive()
+    fun interactivePrompts(setup: QuestionsList.() -> Unit): Answers =
+            Prompts(QuestionsList("test", setup), kodein = kodein).askInteractive()
 
     private fun createTerminal(): Terminal {
         outputStream = PipedOutputStream()

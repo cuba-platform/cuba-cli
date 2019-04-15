@@ -58,4 +58,6 @@ val terminalModule = Kodein.Module {
     bind<PrintHelper>() with singleton { PrintHelper() }
 
     bind<GenerationProgressPrinter>() with singleton { kodein.direct.instance<PrintHelper>() }
+
+    bind<Boolean>(tag = "throwValidation") with instance(false)
 }
