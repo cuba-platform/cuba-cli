@@ -28,6 +28,7 @@ import com.haulmont.cuba.cli.cubaplugin.deploy.war.WarCommand
 import com.haulmont.cuba.cli.cubaplugin.entity.CreateEntityCommand
 import com.haulmont.cuba.cli.cubaplugin.entitylistener.CreateEntityListenerCommand
 import com.haulmont.cuba.cli.cubaplugin.enumeration.CreateEnumerationCommand
+import com.haulmont.cuba.cli.cubaplugin.front.CreateFrontCommand
 import com.haulmont.cuba.cli.cubaplugin.gradle.BuildCommand
 import com.haulmont.cuba.cli.cubaplugin.gradle.GradleCommand
 import com.haulmont.cuba.cli.cubaplugin.gradle.RunCommand
@@ -36,7 +37,6 @@ import com.haulmont.cuba.cli.cubaplugin.installcomponent.AddComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectScanException
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
-import com.haulmont.cuba.cli.cubaplugin.polymer.CreatePolymerModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.premiumrepo.EnablePremiumRepoCommand
 import com.haulmont.cuba.cli.cubaplugin.prefixchange.PrefixChangeCommand
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
@@ -80,7 +80,7 @@ class CubaPlugin : CliPlugin {
             command("create-enumeration", CreateEnumerationCommand())
             command("extend-theme", ThemeExtensionCommand())
             command("add-component", AddComponentCommand())
-            command("create-polymer-module", CreatePolymerModuleCommand())
+            command("create-front-module", CreateFrontCommand())
             command("create-config", ConfigCommand())
             command("create-update-script", UpdateScriptCommand())
             command("enable-premium-repo", EnablePremiumRepoCommand())

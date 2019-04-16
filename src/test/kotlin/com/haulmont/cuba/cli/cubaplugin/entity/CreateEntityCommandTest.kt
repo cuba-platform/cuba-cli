@@ -22,6 +22,7 @@ import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.prompting.ValidationException
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -55,6 +56,57 @@ internal class CreateEntityCommandTest : CommandTestBase() {
         assertTrue(entitySearch.getAllEntities()[0].className == "TestEntity")
     }
 
+    @Test
+    fun testOldSeparator() {
+        createProject(namespace = "ts", version = PlatformVersion("6.10"))
+
+        appendInputLine("TestEntity")
+        appendEmptyLine()
+        appendEmptyLine()
+
+        executeCommand(CreateEntityCommand(kodein = kodein))
+
+        assertNoErrorEvents()
+
+        val entitySearch = EntitySearch(kodein)
+
+        assertTrue(entitySearch.getAllEntities()[0].name == "ts\$TestEntity")
+    }
+
+    @Test
+    fun testNewSeparator() {
+        createProject(namespace = "ts", version = PlatformVersion.v7)
+
+        appendInputLine("TestEntity")
+        appendEmptyLine()
+        appendEmptyLine()
+
+        executeCommand(CreateEntityCommand(kodein = kodein))
+
+        assertNoErrorEvents()
+
+        val entitySearch = EntitySearch(kodein)
+
+        assertTrue(entitySearch.getAllEntities()[0].name == "ts_TestEntity")
+    }
+
+    @Test
+    fun testCreateNonPersistentEntity() {
+        createProject()
+
+        appendInputLine("TestEntity")
+        appendEmptyLine()
+        appendInputLine("3")
+
+        executeCommand(CreateEntityCommand(kodein = kodein))
+
+        assertNoErrorEvents()
+
+        val entitySearch = EntitySearch(kodein)
+
+//        now, entitySearch searches only for persistent entities
+        assertTrue(entitySearch.getAllEntities().isEmpty())
+    }
 
     @Test
     fun testCreateEntityWithoutProject() {

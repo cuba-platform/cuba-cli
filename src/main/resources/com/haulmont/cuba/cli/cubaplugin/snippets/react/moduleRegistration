@@ -1,0 +1,1 @@
+project(":${modulePrefix}-front").projectDir = new File(settingsDir, 'modules/front')

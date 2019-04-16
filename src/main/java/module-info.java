@@ -68,7 +68,9 @@ module com.haulmont.cuba.cli {
     opens com.haulmont.cuba.cli.cubaplugin.statictemplate;
     opens com.haulmont.cuba.cli.cubaplugin.theme;
     opens com.haulmont.cuba.cli.cubaplugin.installcomponent;
-    opens com.haulmont.cuba.cli.cubaplugin.polymer;
+    opens com.haulmont.cuba.cli.cubaplugin.front;
+    opens com.haulmont.cuba.cli.cubaplugin.front.polymer;
+    opens com.haulmont.cuba.cli.cubaplugin.front.react;
     opens com.haulmont.cuba.cli.cubaplugin.config;
     opens com.haulmont.cuba.cli.cubaplugin.updatescript;
     opens com.haulmont.cuba.cli.cubaplugin.premiumrepo;

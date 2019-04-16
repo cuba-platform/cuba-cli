@@ -1,27 +1,27 @@
-configure(polymerClientModule) {
+configure(frontModule) {
     apply(plugin: 'cuba')
     apply(plugin: 'idea')
-
     apply(plugin: 'war')
     apply(plugin: 'maven')
+
+    buildDir = 'build-gradle'
 
     def frontAppDir = "${modulePrefix}-front"
     def mainBuildDir = 'build/es6-unbundled'
 
     task installBowerPackages(type: NodeTask, dependsOn: npmInstall) {
         script = file("node_modules/bower/bin/bower")
-        args = ['install','-F']
+        args = ['install', '-F']
         inputs.file "bower.json"
         outputs.dir "bower_components"
     }
 
-    task buildPolymer(type: NodeTask, dependsOn: installBowerPackages) {
-        script = file("node_modules/polymer-cli/bin/polymer")
-        args = ['build']
+    task buildPolymer(type: NpmTask, dependsOn: installBowerPackages) {
+        args = ['run', 'build']
         inputs.files fileTree('./') {
-        exclude 'build'
-    }
-    outputs.dir "build"
+            exclude 'build'
+        }
+        outputs.dir "build"
     }
 
     assemble.dependsOn buildPolymer

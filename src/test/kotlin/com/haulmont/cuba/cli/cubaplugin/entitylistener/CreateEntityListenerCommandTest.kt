@@ -34,7 +34,7 @@ class CreateEntityListenerCommandTest : CommandTestBase() {
 
 
     override fun Kodein.MainBuilder.manageDependencies() {
-        bind<Boolean>(tag = "throwValidation", overrides = true) with instance(true)
+        stopExecutionOnValidationError()
     }
 
     @Test

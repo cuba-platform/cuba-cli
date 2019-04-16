@@ -1,0 +1,1 @@
+task undeploy(type: Delete, dependsOn: ":${modulePrefix}-web:cleanConf") {

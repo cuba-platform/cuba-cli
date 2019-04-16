@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin.polymer
+import * as React from "react";
 
-import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
+class HomePage extends React.Component {
 
-class PolymerModel(projectModel: ProjectModel) {
-    val home: String = projectModel.namespace.capitalize() + "Home"
-    val localeSelect: String = projectModel.namespace.capitalize() + "LocaleSelect"
-    val userMenu: String = projectModel.namespace.capitalize() + "UserMenu"
-    val shellMenu: String = projectModel.namespace.capitalize() + "ShellMenu"
-    val login: String = projectModel.namespace.capitalize() + "Login"
-    val menu: String = projectModel.namespace.capitalize() + "Menu"
+  render() {
+    return(
+      <div>
+        Welcome to ${project.name}!
+      </div>
+    )
+  }
 }
+
+export default HomePage;

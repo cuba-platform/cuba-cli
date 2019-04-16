@@ -45,7 +45,7 @@ import java.nio.file.Path
 
 open class CommandTestBase {
 
-    private var testDir: Path? = null
+    private lateinit var testDir: Path
 
     @Suppress("MemberVisibilityCanBePrivate")
     lateinit var context: CliContext
@@ -87,17 +87,8 @@ open class CommandTestBase {
 
         val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
 
-        testDir?.let {
-            if (Files.exists(it)) {
-                deleteDirectoryRecursion(it)
-            }
-            workingDirectoryManager.workingDirectory = it
-        }
-
-        if (testDir == null) {
-            workingDirectoryManager.workingDirectory = workingDirectoryManager.workingDirectory.resolve("test-dir")
-            testDir = workingDirectoryManager.workingDirectory
-        }
+        workingDirectoryManager.workingDirectory = workingDirectoryManager.workingDirectory.resolve("build/test-run")
+        testDir = workingDirectoryManager.workingDirectory
 
         Files.createDirectories(workingDirectoryManager.workingDirectory)
 
@@ -106,12 +97,19 @@ open class CommandTestBase {
 
     @After
     fun tearDown() {
+        val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
+        workingDirectoryManager.workingDirectory = testDir.parent
+
         context.clearModels()
-        deleteDirectoryRecursion(testDir!!)
+        deleteDirectoryRecursion(testDir)
     }
 
     protected open fun Kodein.MainBuilder.manageDependencies() {
 
+    }
+
+    protected fun Kodein.MainBuilder.stopExecutionOnValidationError() {
+        bind<Boolean>(tag = "throwValidation", overrides = true) with instance(true)
     }
 
     protected open fun doSetup() {
