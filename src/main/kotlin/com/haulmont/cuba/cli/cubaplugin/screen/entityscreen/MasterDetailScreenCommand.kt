@@ -17,6 +17,7 @@
 package com.haulmont.cuba.cli.cubaplugin.screen.entityscreen
 
 import com.beust.jcommander.Parameters
+import com.haulmont.cuba.cli.cubaplugin.model.Entity
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.TemplateProcessor
@@ -26,13 +27,13 @@ import com.haulmont.cuba.cli.prompting.Answers
 class MasterDetailScreenCommand : EntityScreenCommandBase<EntityScreenModel>() {
     override fun getModelName(): String = EntityScreenModel.MODEL_NAME
 
-    override fun createModel(answers: Answers): EntityScreenModel = EntityScreenModel(answers, entitySearch)
+    override fun createModel(answers: Answers): EntityScreenModel = EntityScreenModel(answers)
 
-    override fun getDefaultScreenId(entityName: String) = projectModel.namespace + "$" + entityName.split('.').last() + ".browse"
+    override fun getDefaultScreenId(entityName: String) = "$entityName.browse"
 
-    override fun getDefaultControllerName(entityName: String) = entityName.split('.').last() + "Browse"
+    override fun getDefaultControllerName(entity: Entity) = entity.className + "Browse"
 
-    override fun getDefaultDescriptorName(entityName: String) = entityName.split('.').last().toLowerCase() + "-browse"
+    override fun getDefaultDescriptorName(entity: Entity) = entity.className.toLowerCase() + "-browse"
 
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(resources.getTemplate("masterDetailScreen"), bindings) {

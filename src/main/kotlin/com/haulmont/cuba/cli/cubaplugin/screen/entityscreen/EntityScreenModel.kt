@@ -20,11 +20,11 @@ import com.haulmont.cuba.cli.cubaplugin.model.Entity
 import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
 import com.haulmont.cuba.cli.prompting.Answers
 
-class EntityScreenModel(answers: Answers, entitySearch: EntitySearch) {
+class EntityScreenModel(answers: Answers) {
     val screenId: String by answers
     val descriptorName: String by answers
     val packageName: String by answers
-    val entity: Entity = entitySearch.findEntity(answers["entityName"] as String)!!
+    val entity: Entity by answers
     val controllerName: String by answers
 
     companion object {
