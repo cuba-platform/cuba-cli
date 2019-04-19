@@ -32,6 +32,7 @@ import com.haulmont.cuba.cli.walk
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
+import java.nio.file.Files
 import java.nio.file.Files.isRegularFile
 
 @Parameters(commandDescription = "Creates React module")
@@ -74,6 +75,8 @@ class CreateReactModuleCommand(override val kodein: Kodein = cubaKodein) : Gener
                     transform(it, to = destinationDir)
                 }
             }
+
+            Files.move(destinationDir.resolve("gitignore"), destinationDir.resolve(".gitignore"))
         }
 
         projectStructure.buildGradle.toFile().apply {
