@@ -3,7 +3,7 @@
 
 <p align="center">
 <a href="http://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat" alt="license" title=""></a>
-<a href="https://www.cuba-platform.com/tools/"><img src="https://img.shields.io/badge/Download-blue.svg" alt="download" title=""></a>
+<a href="https://www.cuba-platform.com/tools/"><img src="https://img.shields.io/badge/releases-Download-purple.svg" alt="download" title=""></a>
 <a href="https://travis-ci.org/cuba-platform/cuba-cli"><img src="https://travis-ci.org/cuba-platform/cuba-cli.svg?branch=master" alt="Build Status" title=""></a>
 </p>
 
