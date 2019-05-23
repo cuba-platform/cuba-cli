@@ -129,7 +129,8 @@ open class CommandTestBase {
         val projectInitCommand = ProjectInitCommand()
 
         context.addModel(projectInitCommand.getModelName(), initModel)
-        projectInitCommand.generate(context.getModels())
+        val bindings = context.getModels().toMutableMap() + ("gitignore" to ".gitignore")
+        projectInitCommand.generate(bindings)
         context.clearModels()
     }
 
