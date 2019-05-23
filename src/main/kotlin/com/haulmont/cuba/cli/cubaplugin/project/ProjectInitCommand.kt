@@ -189,11 +189,9 @@ class ProjectInitCommand(override val kodein: Kodein = cubaKodein) : GeneratorCo
         Files.createDirectories(cwd)
 
         val templateTips = TemplateProcessor(resources.getTemplate("project"), bindings, PlatformVersion(model.platformVersion)) {
-            listOf("modules", "build.gradle", "settings.gradle").forEach {
+            listOf("modules", "build.gradle", "settings.gradle", "\${gitignore}").forEach {
                 transform(it)
             }
-            copy("gitignore")
-            Files.move(cwd.resolve("gitignore"), cwd.resolve(".gitignore"))
 
             listOf("gradle", "gradlew", "gradlew.bat").forEach {
                 copy(it)

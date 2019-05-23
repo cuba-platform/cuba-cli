@@ -54,7 +54,9 @@ abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
 
         beforeGeneration()
 
-        generate(context.getModels())
+        val bindings = context.getModels().toMutableMap()
+        bindings += ("gitignore" to ".gitignore")
+        generate(bindings)
     }
 
     fun isNonInteractiveMode() = CommonParameters.nonInteractive.isNotEmpty()

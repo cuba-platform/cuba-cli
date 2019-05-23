@@ -75,8 +75,6 @@ class CreateReactModuleCommand(override val kodein: Kodein = cubaKodein) : Gener
                     transform(it, to = destinationDir)
                 }
             }
-
-            Files.move(destinationDir.resolve("gitignore"), destinationDir.resolve(".gitignore"))
         }
 
         projectStructure.buildGradle.toFile().apply {
