@@ -20,6 +20,9 @@ import com.haulmont.cuba.cli.CliPlugin
 import com.haulmont.cuba.cli.command.CommandTestBase
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
+import org.junit.Assert
 import org.junit.Test
 import org.kodein.di.Kodein
 
@@ -35,8 +38,10 @@ class AddComponentCommandTest : CommandTestBase() {
     fun testPolymerCreation() {
         createProject()
 
-        appendInputLine("com.haulmont:test-addon:0.1-SNAPSHOT")
+        appendInputLine("com.haulmont.test:test-addon:0.1-SNAPSHOT")
         executeCommand(AddComponentCommand(kodein))
+
+        Assert.assertTrue(ProjectModel(ProjectStructure()).appComponents.contains("com.haulmont.test"))
 
         assertNoErrorEvents()
     }

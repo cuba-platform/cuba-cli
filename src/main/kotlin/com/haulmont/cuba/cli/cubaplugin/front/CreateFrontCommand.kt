@@ -52,10 +52,12 @@ class CreateFrontCommand(override val kodein: Kodein = cubaKodein) : AbstractCom
         val answers = Prompts.create(kodein) {
             options("command", "Select frontend type", commands)
 
-            if (!hasRest && !v7_1_plus) {
-                confirmation("addRest", "For correct work front module need rest addon added. Add rest addon?")
+            if (!hasRest && v7_1_plus) {
+                confirmation("addRest", "For correct work front module need rest addon added. Add rest addon?") {
+                    default(true)
+                }
 
-                question("restVersion", "Specify rest addon version.") {
+                question("restVersion", "Specify rest addon version. You can see list of available versions on addon github page https://github.com/cuba-platform/restapi.") {
                     askIf("addRest")
 
                     default("0.1-SNAPSHOT")
@@ -69,7 +71,7 @@ class CreateFrontCommand(override val kodein: Kodein = cubaKodein) : AbstractCom
 
         if ("addRest" in answers && answers["addRest"] as Boolean) {
             val restVersion: String by answers
-            projectService.registerAppComponent(restVersion)
+            projectService.registerAppComponent("com.haulmont.addon.restapi:restapi-global:$restVersion")
         }
     }
 

@@ -23,6 +23,8 @@ import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import com.haulmont.cuba.cli.generation.updateXml
 import com.haulmont.cuba.cli.generation.xpath
 import org.kodein.di.generic.instance
+import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 
 class ProjectServiceImpl : ProjectService {
@@ -44,8 +46,16 @@ class ProjectServiceImpl : ProjectService {
         }
         printHelper.fileModified(projectStructure.buildGradle)
 
-        val webXml = projectStructure.getModule(ModuleStructure.WEB_MODULE).path
-                .resolve(Paths.get("web", "WEB-INF", "web.xml"))
+        for (module in listOf(ModuleStructure.WEB_MODULE, ModuleStructure.CORE_MODULE)) {
+            val webXml = projectStructure.getModule(module).path
+                    .resolve(Paths.get("web", "WEB-INF", "web.xml"))
+            if (Files.exists(webXml)) {
+                registerAppComponentInWebXml(webXml, coordinates)
+            }
+        }
+    }
+
+    private fun registerAppComponentInWebXml(webXml: Path, coordinates: String) {
         updateXml(webXml) {
             val registeredComponentsElement = xpath("//context-param[param-name[text()='appComponents']]/param-value").first()
             registeredComponentsElement.textContent = registeredComponentsElement.textContent + " " + coordinates.split(':')[0]
