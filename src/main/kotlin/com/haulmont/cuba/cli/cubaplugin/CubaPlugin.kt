@@ -54,7 +54,7 @@ import java.io.PrintWriter
 class CubaPlugin : CliPlugin {
     override val apiVersion: Int = API_VERSION
 
-    override val resources: ResourcesPath = HasResources("/com/haulmont/cuba/cli/cubaplugin/")
+    override val resources: ResourcesPath = HasResources(RESOURCES_PATH)
 
     private val context: CliContext by kodein.instance()
 
@@ -65,6 +65,8 @@ class CubaPlugin : CliPlugin {
     private val printHelper: PrintHelper by kodein.instance()
 
     private val messages by localMessages()
+
+    private val versionUtils: VersionUtils = VersionUtils()
 
     @Subscribe
     fun onInit(event: InitPluginEvent) {
@@ -103,6 +105,7 @@ class CubaPlugin : CliPlugin {
         }
 
         context.addModel("names", namesUtils)
+        context.addModel("versions", versionUtils)
 
         val projectStructure = try {
             ProjectStructure()
@@ -117,5 +120,9 @@ class CubaPlugin : CliPlugin {
 
             printHelper.saveStacktrace(e)
         }
+    }
+
+    companion object {
+        const val RESOURCES_PATH = "/com/haulmont/cuba/cli/cubaplugin/"
     }
 }

@@ -22,6 +22,7 @@ import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.CliPlugin
 import com.haulmont.cuba.cli.WorkingDirectoryManager
 import com.haulmont.cuba.cli.commands.CliCommand
+import com.haulmont.cuba.cli.cubaplugin.VersionUtils
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitModel
@@ -129,7 +130,9 @@ open class CommandTestBase {
         val projectInitCommand = ProjectInitCommand()
 
         context.addModel(projectInitCommand.getModelName(), initModel)
-        val bindings = context.getModels().toMutableMap() + ("gitignore" to ".gitignore")
+        val bindings = context.getModels().toMutableMap() +
+                ("gitignore" to ".gitignore") +
+                ("versions" to VersionUtils())
         projectInitCommand.generate(bindings)
         context.clearModels()
     }

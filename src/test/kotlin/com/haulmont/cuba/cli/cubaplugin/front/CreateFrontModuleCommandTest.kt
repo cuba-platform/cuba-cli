@@ -110,6 +110,21 @@ class CreateFrontModuleCommandTest : CommandTestBase() {
         assertErrorEvent<ReadException>()
     }
 
+    @Test
+    fun testAddRestComponent() {
+        createProject(version = PlatformVersion.v7_1)
+
+        appendInputLine("2")
+        appendInputLine("y")
+        appendInputLine("0.1-SNAPSHOT")
+        executeCommand(CreateFrontCommand(kodein))
+
+        assertTrue(hasFrontModule())
+
+        assertNoErrorEvents()
+
+    }
+
     private fun hasFrontModule() = ProjectStructure().settingsGradle.toFile()
             .readText().contains("front")
 }
