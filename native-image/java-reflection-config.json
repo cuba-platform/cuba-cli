@@ -1,0 +1,50 @@
+[
+  {
+    "name" : "java.lang.Class",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "java.util.Map",
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true
+  },
+  {
+    "name" : "com.sun.org.apache.xml.internal.res.XMLErrorResources",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true
+  },
+  {
+    "name" : "java.security.PrivilegedAction",
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true
+  },
+  {
+    "name" : "jdk.xml.internal.SecuritySupport",
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true
+  },
+  {
+    "name" : "com.sun.org.apache.xml.internal.utils.FastStringBuffer",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true
+  }
+]

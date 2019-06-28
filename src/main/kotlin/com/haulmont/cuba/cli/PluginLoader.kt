@@ -41,20 +41,26 @@ internal class PluginLoader {
     private val bus: EventBus by kodein.instance()
 
     internal fun loadPlugins(commandsRegistry: CommandsRegistry, mode: CliMode) {
-        log.log(Level.INFO, "Creating plugins module layer")
+//        log.log(Level.INFO, "Creating plugins module layer")
+//
+//        val pluginsDir = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "plugins")
+//
+//        loadPluginsByDir(pluginsDir, mode)
+//
+//        if(Files.exists(pluginsDir)) {
+//            Files.walk(pluginsDir, 1)
+//                    .filter { it != pluginsDir }
+//                    .filter { Files.isDirectory(it) }
+//                    .forEach { loadPluginsByDir(it, mode) }
+//        }
+//
+//        log.log(Level.INFO, "InitPluginEvent")
 
-        val pluginsDir = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "plugins")
+        val cubaPlugin = CubaPlugin()
+        bus.register(cubaPlugin)
+        context.registerPlugin(cubaPlugin)
+//        cubaPlugin.onInit(InitPluginEvent(commandsRegistry, mode))
 
-        loadPluginsByDir(pluginsDir, mode)
-
-        if(Files.exists(pluginsDir)) {
-            Files.walk(pluginsDir, 1)
-                    .filter { it != pluginsDir }
-                    .filter { Files.isDirectory(it) }
-                    .forEach { loadPluginsByDir(it, mode) }
-        }
-
-        log.log(Level.INFO, "InitPluginEvent")
         bus.post(InitPluginEvent(commandsRegistry, mode))
     }
 

@@ -146,9 +146,15 @@ class TemplateProcessor(templateBasePath: Path, private val bindings: Map<String
     }
 
     private fun getField(obj: Any, name: String): Any {
-        val kClass = obj::class
 
-        return kClass.memberProperties.first { it.name == name }.getter.call(obj)!!
+        return obj::class.java.declaredMethods.first { it.name == "get${name.capitalize()}" }
+                .invoke(obj)
+
+//        val kClass = obj::class
+//
+//        println(kClass.memberProperties.map { it.name })
+//
+//        return kClass.memberProperties.first { it.name == name  || it.name == "$name\$delegate"}.getter.call(obj)!!
     }
 
     fun copy(subPath: Path, to: Path = projectRoot) {

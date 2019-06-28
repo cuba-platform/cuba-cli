@@ -16,12 +16,17 @@
 
 package com.haulmont.cuba.cli
 
+import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 
 class WorkingDirectoryManager {
-    var workingDirectory: Path = Paths.get(System.getProperty("user.dir"))
+    lateinit var workingDirectory: Path //Paths.get(System.getProperty("user.dir"))
 
     val absolutePath: Path
         get() = workingDirectory.toAbsolutePath()
+
+    init {
+        workingDirectory = Paths.get(File(".").absolutePath)
+    }
 }

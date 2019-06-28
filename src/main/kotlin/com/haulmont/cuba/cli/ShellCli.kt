@@ -98,9 +98,11 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
                 return
             } catch (e: MissingCommandException) {
                 printHelper.unrecognizedCommand()
+                printHelper.saveStacktrace(e)
                 continue
             } catch (e: ParameterException) {
                 printHelper.unrecognizedParameters(e)
+                printHelper.saveStacktrace(e)
                 continue
             } catch (e: EndOfFileException) {
                 return

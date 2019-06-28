@@ -1,0 +1,8 @@
+{
+  "resources": [
+    {"pattern": "com.haulmont.cuba.*$"},
+    {"pattern": "org.jline.*$"},
+    {"pattern": "index$"},
+    {"pattern": "kotlin.*$"}
+  ]
+}

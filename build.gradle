@@ -1,3 +1,6 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+
 buildscript {
     ext.kotlin_version = '1.2.71'
 
@@ -114,6 +117,10 @@ compileJava {
 jar {
     // do not permit duplicates in JAR
     duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.FAIL
+
+    manifest {
+        attributes 'Main-Class': 'com.haulmont.cuba.cli.EntryPointKt'
+    }
 }
 
 // disable automatic building of ZIP and TAR
@@ -179,6 +186,7 @@ startScripts {
 def bundlePlatform = project.hasProperty('targetOsPlatform') ? '-' + project.property('targetOsPlatform') : '';
 
 def bundlesDir = file("bundles")
+def nativeImageDir = file("native-image")
 def modulesDir = file("${project.buildDir}/modules")
 def bundleOutput = file("${buildDir}/bundle" + bundlePlatform)
 def installedLibsDir = file("${buildDir}/install/cuba-cli/lib")
@@ -414,6 +422,59 @@ task buildWinSetup(dependsOn: bundle, group: 'distribution', description: 'Build
             }
         } else {
             throw new GradleException('Only for Windows targetOsPlatform')
+        }
+    }
+}
+
+task buildResourceIndex(dependsOn: processResources, group: 'native') {
+    def resourcesOutput = new File(new File(project.buildDir, 'native'), 'resources')
+    resourcesOutput.mkdirs()
+
+    inputs.files processResources.outputs.files
+    outputs.dir resourcesOutput
+
+    doLast {
+        def basePath = Paths.get(processResources.outputs.files.asPath)
+        def resources = Files.walk(basePath).collect {
+            def prefix = "/"
+            if(Files.isDirectory(it))
+                prefix = "+/"
+
+            return prefix + basePath.relativize(it).toString()
+        }.join("\n")
+
+        def indexFile = new File(resourcesOutput, "index")
+        def writer = indexFile.newWriter()
+        writer.write(resources)
+        writer.close()
+    }
+
+}
+
+task nativeImage(dependsOn: [classes, buildResourceIndex], group: 'native') {
+    inputs.files classes.outputs.files
+    inputs.dir nativeImageDir
+
+    outputs.dir new File(project.buildDir, 'native')
+
+    doLast {
+        exec {
+            workingDir "build/native"
+            executable "/home/shustanov/Downloads/graalvm-ee-1.0.0-rc15/bin/native-image"
+            args = ['--verbose', '-H:Name=cuba-cli-native',
+                    '--allow-incomplete-classpath', '--report-unsupported-elements-at-runtime',
+
+                    '--enable-url-protocols=http',
+                    '-H:RerunClassInitialization=java.io.File',
+//                    '--delay-class-initialization-to-runtime=com.haulmont.cuba.cli.WorkingDirectoryManager',
+                    '-H:ResourceConfigurationFiles=' + project.projectDir.toString() + '/native-image/resource-config.json',
+                    '-H:ReflectionConfigurationFiles=' + project.projectDir.toString() + '/native-image/cli-reflection-config.json',
+                    '-H:ReflectionConfigurationFiles=' + project.projectDir.toString() + '/native-image/java-reflection-config.json',
+                    '-H:ReflectionConfigurationFiles=' + project.projectDir.toString() + '/native-image/kotlin-reflection-config.json',
+                    '-H:IncludeResourceBundles=com.sun.org.apache.xml.internal.res.XMLErrorResources',
+                    '-H:+ReportExceptionStackTraces',
+                    '-H:Log=registerResource:',
+                    '-cp', sourceSets.main.runtimeClasspath.asPath + ':' + new File(project.buildDir, 'native/resources').path, mainClassName]
         }
     }
 }

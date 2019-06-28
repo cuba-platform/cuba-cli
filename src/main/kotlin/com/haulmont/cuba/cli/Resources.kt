@@ -53,7 +53,8 @@ class Resources(private val cliPlugin: CliPlugin) {
                 val context = kodein.direct.instance<CliContext>()
 
                 val plugin = context.plugins.find {
-                    it.javaClass.module == thisRef.javaClass.module
+//                    it.javaClass.module == thisRef.javaClass.module
+                    true
                 }!!
 
                 return Resources(plugin)
@@ -61,13 +62,20 @@ class Resources(private val cliPlugin: CliPlugin) {
         }
 
         fun getResourcePath(resourceName: String, clazz: Class<Any>): Path? {
-            if (jrtFileSystem != null) {
-                val moduleName = clazz.module.name
-                if (moduleName != null) { // check for tests
-                    val jrtPath = jrtFileSystem.getPath("/modules", moduleName, resourceName)
-                    if (Files.exists(jrtPath)) {
-                        return jrtPath
-                    }
+//            if (jrtFileSystem != null) {
+//                val moduleName = clazz.module.name
+//                if (moduleName != null) { // check for tests
+//                    val jrtPath = jrtFileSystem.getPath("/modules", moduleName, resourceName)
+//                    if (Files.exists(jrtPath)) {
+//                        return jrtPath
+//                    }
+//                }
+//            }
+
+            if (resourcesFileSystem != null) {
+                val path = resourcesFileSystem.getPath(resourceName)
+                if (Files.exists(path)) {
+                    return path
                 }
             }
 
@@ -94,5 +102,7 @@ class Resources(private val cliPlugin: CliPlugin) {
         } catch (e: Exception) {
             null
         }
+
+        private val resourcesFileSystem: FileSystem? = NativeImageFileSystemProvider().getFileSystem(null)
     }
 }

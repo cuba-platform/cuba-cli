@@ -38,9 +38,12 @@ class SingleCommandCli(private val args: Array<String>, commandsRegistry: Comman
             commandParser.parseCommand(args)
         } catch (e: MissingCommandException) {
             printHelper.unrecognizedCommand()
+            printHelper.saveStacktrace(e)
             return
         } catch (e: ParameterException) {
             printHelper.unrecognizedParameters(e)
+            printHelper.saveStacktrace(e)
+
             return
         }
 

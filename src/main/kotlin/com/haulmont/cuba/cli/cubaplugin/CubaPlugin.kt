@@ -37,8 +37,8 @@ import com.haulmont.cuba.cli.cubaplugin.installcomponent.AddComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectScanException
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
-import com.haulmont.cuba.cli.cubaplugin.premiumrepo.EnablePremiumRepoCommand
 import com.haulmont.cuba.cli.cubaplugin.prefixchange.PrefixChangeCommand
+import com.haulmont.cuba.cli.cubaplugin.premiumrepo.EnablePremiumRepoCommand
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
 import com.haulmont.cuba.cli.cubaplugin.screen.ScreenCommandsGroup
 import com.haulmont.cuba.cli.cubaplugin.service.CreateServiceCommand
@@ -49,6 +49,8 @@ import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.InitPluginEvent
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
+import java.util.logging.Level
+import java.util.logging.Logger
 
 @Suppress("UNUSED_PARAMETER")
 class CubaPlugin : CliPlugin {
@@ -67,6 +69,8 @@ class CubaPlugin : CliPlugin {
     private val messages by localMessages()
 
     private val versionUtils: VersionUtils = VersionUtils()
+
+    private val log: Logger = Logger.getLogger(CliPlugin::class.java.name)
 
     @Subscribe
     fun onInit(event: InitPluginEvent) {
@@ -113,9 +117,17 @@ class CubaPlugin : CliPlugin {
             return
         }
 
+        val projectModel = try {
+            ProjectModel(projectStructure)
+        } catch (e: Exception) {
+            log.log(Level.WARNING, "Exception during project structure exploring", e)
+        }
+
         try {
-            context.addModel(ProjectModel.MODEL_NAME, ProjectModel(projectStructure))
+            context.addModel(ProjectModel.MODEL_NAME, projectModel)
         } catch (e: ProjectScanException) {
+            log.log(Level.WARNING, "Exception during project model parsing", e)
+
             writer.println(messages["projectParsingError"].attention())
 
             printHelper.saveStacktrace(e)

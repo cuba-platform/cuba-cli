@@ -25,8 +25,11 @@ import org.jline.reader.impl.completer.NullCompleter
 import org.jline.terminal.Terminal
 import org.kodein.di.generic.instance
 import java.io.ByteArrayOutputStream
+import java.io.InputStream
+import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.*
 import kotlin.concurrent.thread
 
 class GradleRunner {
@@ -125,8 +128,8 @@ private class ProcessWrapper(val processBuilder: ProcessBuilder, val terminal: T
             }
         }
         process?.let {
-            it.inputStream.use { stream -> stream.transferTo(outputStream) }
-            it.errorStream.use { stream -> stream.transferTo(errorStream) }
+            it.inputStream.use { stream -> transferTo(stream, outputStream) }
+            it.errorStream.use { stream -> transferTo(stream, errorStream) }
             it.waitFor()
             synchronized(lock) {
                 if (running) {
@@ -134,6 +137,21 @@ private class ProcessWrapper(val processBuilder: ProcessBuilder, val terminal: T
                     terminal.raise(Terminal.Signal.INT)
                 }
             }
+        }
+    }
+
+    private fun transferTo(stream: InputStream, outputStream: ByteArrayOutputStream) {
+        Objects.requireNonNull<OutputStream>(outputStream, "out")
+        var transferred: Long = 0
+        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+        var read: Int
+        while (true) {
+            read = stream.read(buffer, 0, DEFAULT_BUFFER_SIZE)
+            if (read < 0)
+                break
+
+            outputStream.write(buffer, 0, read)
+            transferred += read.toLong()
         }
     }
 
