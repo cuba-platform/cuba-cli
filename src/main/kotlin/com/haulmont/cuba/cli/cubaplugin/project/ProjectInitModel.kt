@@ -34,6 +34,8 @@ class ProjectInitModel(answers: Answers) {
     } as String
     val rootPackageDirectory: String = rootPackage.replace('.', '/')
     val database: DatabaseModel = DatabaseModel(answers)
+    val kotlinSupport: Boolean by answers.withDefault { false }
+    val kotlinVersion: String by answers.withDefault { "1.3.41" }
 }
 
 class DatabaseModel(answers: Answers) {

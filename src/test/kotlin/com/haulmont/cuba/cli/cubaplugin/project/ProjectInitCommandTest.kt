@@ -21,9 +21,7 @@ import com.haulmont.cuba.cli.command.CommandTestBase
 import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
-import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
-import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
-import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
+import com.haulmont.cuba.cli.cubaplugin.model.*
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.kodein.di.Kodein
@@ -37,6 +35,12 @@ class ProjectInitCommandTest : CommandTestBase() {
 
     override fun Kodein.MainBuilder.manageDependencies() {
         bind<Boolean>(tag = "throwValidation", overrides = true) with instance(true)
+
+        bind<PlatformVersionsManager>(overrides = true) with instance(object : PlatformVersionsManager {
+            override val supportedVersionsRange: VersionRange = SpecificVersion(6, 8, 0)..SpecificVersion(7, 2, 0)
+            override val versions: List<String> = listOf("6.8.0", "7.0")
+            override fun load() {}
+        })
     }
 
     @Test
@@ -48,7 +52,7 @@ class ProjectInitCommandTest : CommandTestBase() {
             test-project
             tp
             com.company.tp
-            5
+            3
             7.1-SNAPSHOT
             1
         """.trimIndent())

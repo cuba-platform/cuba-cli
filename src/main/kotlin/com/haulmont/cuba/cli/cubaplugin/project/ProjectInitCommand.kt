@@ -21,10 +21,11 @@ import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionParseException
-import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManagerImpl
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.Kodein
@@ -72,7 +73,7 @@ class ProjectInitCommand(override val kodein: Kodein = cubaKodein) : GeneratorCo
         !context.hasModel("project") || fail("There is an existing project found in current directory.")
 
         try {
-            platformVersionsManager.loadThread.join(20_000)
+            (platformVersionsManager as? PlatformVersionsManagerImpl)?.loadThread?.join(20_000)
         } catch (e: Exception) {
             logger.log(Level.SEVERE, e) { "" }
         }
@@ -141,18 +142,28 @@ class ProjectInitCommand(override val kodein: Kodein = cubaKodein) : GeneratorCo
             askCustomVersion()
         }
 
-
         val databaseOptions = databasesAliases.takeIf { isNonInteractiveMode() } ?: databases
 
         textOptions("database", "Choose database", databaseOptions) {
             default(0)
         }
+
+        confirmation("kotlinSupport", "Support kotlin?") {
+            askIf {answers ->
+                PlatformVersion((answers[PLATFORM_VERSION] ?: answers[PREDEFINED_PLATFORM_VERSION]) as String) >= PlatformVersion.v7_2
+            }
+        }
+
+        question("kotlinVersion", "Kotlin version") {
+            default("1.3.41")
+            askIf("kotlinSupport")
+        }
     }
 
     private fun QuestionsList.askVersion() {
-        textOptions("predefinedPlatformVersion", "Platform version", platformVersionsManager.versions + CUSTOM_VERSION) {
+        textOptions(PREDEFINED_PLATFORM_VERSION, "Platform version", platformVersionsManager.versions + CUSTOM_VERSION) {
             askIf {
-                "customPlatformVersion" !in it
+                PLATFORM_VERSION !in it
             }
 
             default(0)
@@ -160,9 +171,9 @@ class ProjectInitCommand(override val kodein: Kodein = cubaKodein) : GeneratorCo
     }
 
     private fun QuestionsList.askCustomVersion() {
-        question("platformVersion", "Platform version") {
+        question(PLATFORM_VERSION, "Platform version") {
             askIf {
-                (it["predefinedPlatformVersion"] == CUSTOM_VERSION) || isNonInteractiveMode()
+                (it[PREDEFINED_PLATFORM_VERSION] == CUSTOM_VERSION) || isNonInteractiveMode()
             }
 
             validate {
@@ -214,9 +225,12 @@ class ProjectInitCommand(override val kodein: Kodein = cubaKodein) : GeneratorCo
     }
 
     companion object {
+        private const val PREDEFINED_PLATFORM_VERSION = "predefinedPlatformVersion"
+        private const val CUSTOM_VERSION = "another version"
+        private const val PLATFORM_VERSION = "platformVersion"
+
         private val ANIMALS: List<String> = listOf("phoenix", "centaur", "mermaid", "leviathan", "dragon", "pegasus", "siren", "hydra", "sphinx", "unicorn", "wyvern", "behemoth", "griffon", "dodo", "mammoth")
         private val ADJECTIVES: List<String> = listOf("great", "cool", "ambitious", "generous", "cute", "dear", "nice", "reliable", "solid", "trusty", "simple", "pure", "brave", "manly", "fearless", "artful", "vivid", "utopic", "lucid", "radiant")
-        private const val CUSTOM_VERSION = "another version"
 
         private val REPOS = listOf("https://dl.bintray.com/cuba-platform/main", "https://repo.cuba-platform.com/content/groups/work")
 
