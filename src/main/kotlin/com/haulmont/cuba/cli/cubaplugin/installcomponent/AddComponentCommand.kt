@@ -17,25 +17,22 @@
 package com.haulmont.cuba.cli.cubaplugin.installcomponent
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.WEB_MODULE
-import com.haulmont.cuba.cli.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
-import com.haulmont.cuba.cli.generation.updateXml
-import com.haulmont.cuba.cli.generation.xpath
-import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.cubaplugin.ProjectService
+import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
+import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
-import java.nio.file.Paths
 
 @Parameters(commandDescription = "Adds CUBA application component to the project")
-class AddComponentCommand : GeneratorCommand<ComponentModel>() {
+class AddComponentCommand(override val kodein: Kodein = cubaKodein) : GeneratorCommand<ComponentModel>() {
 
     private val messages by localMessages()
 
-    private val printHelper: PrintHelper by kodein.instance()
+    private val projectService: ProjectService by kodein.instance()
 
     override fun getModelName(): String = ComponentModel.MODEL_NAME
 
@@ -50,31 +47,6 @@ class AddComponentCommand : GeneratorCommand<ComponentModel>() {
     override fun createModel(answers: Answers): ComponentModel = ComponentModel("artifactCoordinates" from answers)
 
     override fun generate(bindings: Map<String, Any>) {
-        registerInGradle()
-        registerInWebXml()
-    }
-
-    private fun registerInGradle() {
-        projectStructure.buildGradle.toFile().apply {
-            val text = readText()
-            val firstAppComponent = Regex("appComponent\\([^\n]*\\)")
-                    .find(text)!!
-                    .groupValues[0]
-
-            val withNewComponent = text.replace(
-                    firstAppComponent,
-                    "$firstAppComponent\n    appComponent(\"${model.artifactCoordinates}\")")
-            writeText(withNewComponent)
-        }
-        printHelper.fileModified(projectStructure.buildGradle)
-    }
-
-    private fun registerInWebXml() {
-        val webXml = projectStructure.getModule(WEB_MODULE).path
-                .resolve(Paths.get("web", "WEB-INF", "web.xml"))
-        updateXml(webXml) {
-            val registeredComponentsElement = xpath("//context-param[param-name[text()='appComponents']]/param-value").first()
-            registeredComponentsElement.textContent = registeredComponentsElement.textContent + " " + model.artifactCoordinates.split(':')[0]
-        }
+        projectService.registerAppComponent(model.artifactCoordinates)
     }
 }

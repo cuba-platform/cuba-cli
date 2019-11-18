@@ -1,6 +1,9 @@
 #set( $bintray = $project.repo.contains("bintray"))
 buildscript {
     ext.cubaVersion = '${project.platformVersion}'
+#if ( $project.kotlinSupport )
+    ext.kotlinVersion = '${project.kotlinVersion}'
+#end
     repositories {
 
         maven {
@@ -19,6 +22,10 @@ buildscript {
     }
     dependencies {
         classpath "com.haulmont.gradle:cuba-plugin:$cubaVersion"
+#if ( $project.kotlinSupport )
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+#end
     }
 }
 
@@ -33,6 +40,9 @@ def servletApi = 'javax.servlet:javax.servlet-api:3.1.0'
 
 apply(plugin: 'idea')
 apply(plugin: 'cuba')
+#if ( $project.kotlinSupport )
+apply(plugin: 'org.jetbrains.kotlin.jvm')
+#end
 
 cuba {
     artifact {
@@ -57,9 +67,15 @@ configure([globalModule, coreModule, webModule]) {
     apply(plugin: 'maven')
     apply(plugin: 'idea')
     apply(plugin: 'cuba')
+#if ( $project.kotlinSupport )
+    apply(plugin: 'org.jetbrains.kotlin.jvm')
+#end
 
     dependencies {
         testCompile('junit:junit:4.12')
+#if ( $project.kotlinSupport )
+        compile ("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
+#end
     }
 
     task sourceJar(type: Jar) {

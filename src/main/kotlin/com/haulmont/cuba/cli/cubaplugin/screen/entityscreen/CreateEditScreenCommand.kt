@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.screen.entityscreen
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
+import com.haulmont.cuba.cli.cubaplugin.model.Entity
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.generation.Properties
@@ -31,13 +32,13 @@ class CreateEditScreenCommand(private val forceVersion: PlatformVersion? = null)
 
     override fun getModelName(): String = EntityScreenModel.MODEL_NAME
 
-    override fun createModel(answers: Answers): EntityScreenModel = EntityScreenModel(answers, entitySearch)
+    override fun createModel(answers: Answers): EntityScreenModel = EntityScreenModel(answers)
 
-    override fun getDefaultScreenId(entityName: String) = projectModel.namespace + "$" + entityName.split('.').last() + ".edit"
+    override fun getDefaultScreenId(entityName: String) = "$entityName.edit"
 
-    override fun getDefaultControllerName(entityName: String) = entityName.split('.').last() + "Edit"
+    override fun getDefaultControllerName(entity: Entity) = entity.className + "Edit"
 
-    override fun getDefaultDescriptorName(entityName: String) = entityName.split('.').last().toLowerCase() + "-edit"
+    override fun getDefaultDescriptorName(entity: Entity) = entity.className.toLowerCase() + "-edit"
 
     override fun generate(bindings: Map<String, Any>) {
         TemplateProcessor(resources.getTemplate("editScreen"), bindings, version) {

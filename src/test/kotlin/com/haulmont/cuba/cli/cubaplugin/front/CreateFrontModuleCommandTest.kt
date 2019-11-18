@@ -20,16 +20,20 @@ import com.haulmont.cuba.cli.CliPlugin
 import com.haulmont.cuba.cli.command.CommandTestBase
 import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
+import com.haulmont.cuba.cli.cubaplugin.ProjectService
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.front.polymer.CreatePolymerModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.front.react.CreateReactModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
+import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import com.haulmont.cuba.cli.prompting.ReadException
+import org.junit.Assert
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.kodein.di.Kodein
+import org.kodein.di.generic.instance
 
 class CreateFrontModuleCommandTest : CommandTestBase() {
     override val plugins: List<CliPlugin> = listOf(CubaPlugin())
@@ -109,6 +113,62 @@ class CreateFrontModuleCommandTest : CommandTestBase() {
 
         assertErrorEvent<ReadException>()
     }
+
+    @Test
+    fun testAddRestComponent() {
+        createProject(version = PlatformVersion.v7_1)
+
+        appendInputLine("2")
+        appendInputLine("y")
+        appendInputLine("0.1-SNAPSHOT")
+        appendInputLine("y")
+
+        executeCommand(CreateFrontCommand(kodein))
+
+        assertTrue(ProjectModel(ProjectStructure()).appComponents.contains("com.haulmont.addon.restapi"))
+
+        assertTrue(hasFrontModule())
+
+        assertNoErrorEvents()
+    }
+
+    @Test
+    fun testDiscardRestComponent() {
+        createProject(version = PlatformVersion.v7_1)
+
+        appendInputLine("2")
+        appendInputLine("n")
+        appendInputLine("y")
+
+        executeCommand(CreateFrontCommand(kodein))
+
+        assertTrue(!ProjectModel(ProjectStructure()).appComponents.contains("com.haulmont.addon.restapi"))
+
+        assertTrue(hasFrontModule())
+
+        assertNoErrorEvents()
+    }
+
+    @Test
+    fun testNotAskForRestComponentAsItIsAlreadyAdded() {
+        createProject(version = PlatformVersion.v7_1)
+
+        val projectService: ProjectService by kodein.instance()
+
+        projectService.registerAppComponent("com.haulmont.addon.restapi:restapi-global:0.1-SNAPSHOT")
+
+        appendInputLine("2")
+        appendInputLine("y")
+
+        executeCommand(CreateFrontCommand(kodein))
+
+        assertTrue(ProjectModel(ProjectStructure()).appComponents.contains("com.haulmont.addon.restapi"))
+
+        assertTrue(hasFrontModule())
+
+        assertNoErrorEvents()
+    }
+
 
     private fun hasFrontModule() = ProjectStructure().settingsGradle.toFile()
             .readText().contains("front")

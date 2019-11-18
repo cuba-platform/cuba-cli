@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.cubaplugin.screen.entityscreen
+package com.haulmont.cuba.cli.cubaplugin
 
-import com.haulmont.cuba.cli.cubaplugin.model.Entity
-import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
-import com.haulmont.cuba.cli.prompting.Answers
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 
-class EntityScreenModel(answers: Answers) {
-    val screenId: String by answers
-    val descriptorName: String by answers
-    val packageName: String by answers
-    val entity: Entity by answers
-    val controllerName: String by answers
-
-    companion object {
-        const val MODEL_NAME = "screen"
+class VersionUtils {
+    fun compareVersions(one: String, two: String): Int {
+        return PlatformVersion(one).compareTo(PlatformVersion(two))
     }
 }

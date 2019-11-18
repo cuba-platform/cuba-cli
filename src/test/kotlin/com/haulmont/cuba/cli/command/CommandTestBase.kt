@@ -22,6 +22,7 @@ import com.haulmont.cuba.cli.CliContext
 import com.haulmont.cuba.cli.CliPlugin
 import com.haulmont.cuba.cli.WorkingDirectoryManager
 import com.haulmont.cuba.cli.commands.CliCommand
+import com.haulmont.cuba.cli.cubaplugin.VersionUtils
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitModel
@@ -39,6 +40,8 @@ import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
@@ -129,7 +132,10 @@ open class CommandTestBase {
         val projectInitCommand = ProjectInitCommand()
 
         context.addModel(projectInitCommand.getModelName(), initModel)
-        projectInitCommand.generate(context.getModels())
+        val bindings = context.getModels().toMutableMap() +
+                ("gitignore" to ".gitignore") +
+                ("versions" to VersionUtils())
+        projectInitCommand.generate(bindings)
         context.clearModels()
     }
 

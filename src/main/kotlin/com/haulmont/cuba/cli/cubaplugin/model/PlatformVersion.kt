@@ -129,6 +129,7 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
 
         val v7 = PlatformVersion("7.0")
         val v7_1 = PlatformVersion("7.1")
+        val v7_2 = PlatformVersion("7.2")
     }
 }
 

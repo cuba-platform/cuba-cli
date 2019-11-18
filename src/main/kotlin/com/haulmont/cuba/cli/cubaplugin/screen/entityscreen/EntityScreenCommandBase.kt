@@ -19,7 +19,9 @@ package com.haulmont.cuba.cli.cubaplugin.screen.entityscreen
 import com.haulmont.cuba.cli.Resources
 import com.haulmont.cuba.cli.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
+import com.haulmont.cuba.cli.cubaplugin.model.Entity
 import com.haulmont.cuba.cli.cubaplugin.screen.ScreenCommandBase
+import com.haulmont.cuba.cli.prompting.Option
 import com.haulmont.cuba.cli.prompting.QuestionsList
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
@@ -45,13 +47,12 @@ abstract class EntityScreenCommandBase<out T : EntityScreenModel> : ScreenComman
     override fun QuestionsList.prompting() {
         val entitiesList = entitySearch.getAllEntities()
                 .filter { !it.embeddable }
-                .map { it.fqn }
         if (entitiesList.isEmpty()) {
             printWriter.println("Project does not have any suitable entities.")
             abort()
         }
 
-        textOptions("entityName", "Choose entity", entitiesList)
+        options("entity", "Choose entity", entitiesList.map { Option("", it.fqn, it) })
 
         question("packageName", "Package name") {
             validate {
@@ -59,18 +60,18 @@ abstract class EntityScreenCommandBase<out T : EntityScreenModel> : ScreenComman
             }
 
             default { answers ->
-                val entityName: String by answers
+                val entity: Entity by answers
 
-                val packageParts = entityName.split('.').filter { it != "entity" }
-                packageParts.take(packageParts.lastIndex).joinToString(".") + ".web." + packageParts.last().toLowerCase()
+                val packageParts = entity.packageName.split('.').filter { it != "entity" }
+                packageParts.joinToString(".") + ".web." + entity.className.toLowerCase()
             }
         }
 
         question("screenId", "Screen id") {
             default { answers ->
-                val entityName: String by answers
+                val entity: Entity by answers
 
-                getDefaultScreenId(entityName)
+                getDefaultScreenId(entity.name)
             }
 
             validate {
@@ -80,9 +81,9 @@ abstract class EntityScreenCommandBase<out T : EntityScreenModel> : ScreenComman
 
         question("descriptorName", "Descriptor name") {
             default { answers ->
-                val entityName: String by answers
+                val entity: Entity by answers
 
-                getDefaultDescriptorName(entityName)
+                getDefaultDescriptorName(entity)
             }
 
             validate {
@@ -94,8 +95,8 @@ abstract class EntityScreenCommandBase<out T : EntityScreenModel> : ScreenComman
 
         question("controllerName", "Controller name") {
             default { answers ->
-                val entityName: String by answers
-                getDefaultControllerName(entityName)
+                val entity: Entity by answers
+                getDefaultControllerName(entity)
             }
 
             validate {
@@ -106,9 +107,9 @@ abstract class EntityScreenCommandBase<out T : EntityScreenModel> : ScreenComman
         }
     }
 
-    protected abstract fun getDefaultControllerName(entityName: String): String
+    protected abstract fun getDefaultControllerName(entity: Entity): String
 
-    protected abstract fun getDefaultDescriptorName(entityName: String): String
+    protected abstract fun getDefaultDescriptorName(entity: Entity): String
 
     protected abstract fun getDefaultScreenId(entityName: String) : String
 
