@@ -95,6 +95,11 @@ module com.haulmont.cuba.cli {
 //    may be needed by plugins
     requires java.sql;
 
+//    requires by sdk plugin
+    requires java.desktop;
+    requires java.management;
+    requires java.naming;
+
 //    jansi support workaround
     provides JansiSupport with JansiSupportWorkAround;
 }
