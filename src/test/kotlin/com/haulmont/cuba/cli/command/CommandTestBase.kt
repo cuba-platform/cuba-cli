@@ -38,13 +38,11 @@ import org.kodein.di.Kodein
 import org.kodein.di.direct
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
-import java.io.PrintWriter
-import java.io.StringWriter
+import java.io.*
 import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
+import java.util.Comparator
 
 open class CommandTestBase {
 
@@ -153,14 +151,10 @@ open class CommandTestBase {
     }
 
     private fun deleteDirectoryRecursion(path: Path) {
-        if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-            Files.newDirectoryStream(path).use { entries ->
-                for (entry in entries) {
-                    deleteDirectoryRecursion(entry)
-                }
-            }
-        }
-        Files.delete(path)
+        Files.walk(path)
+                .sorted(Comparator.reverseOrder())
+                .map { obj: Path -> obj.toFile() }
+                .forEach { obj: File -> obj.delete() }
     }
 
     private fun createTerminal(): Terminal {
