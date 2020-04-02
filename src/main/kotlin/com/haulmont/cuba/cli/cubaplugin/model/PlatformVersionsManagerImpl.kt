@@ -76,7 +76,8 @@ class PlatformVersionsManagerImpl : PlatformVersionsManager {
                 SpecificVersion(6, 11),
                 SpecificVersion(7, 0),
                 SpecificVersion(7, 1),
-                SpecificVersion(7, 2)
+                SpecificVersion(7, 2),
+                SpecificVersion(7, 3)
         )
 
         val supportedVersionRanges = (0 until borders.size - 1).map {
