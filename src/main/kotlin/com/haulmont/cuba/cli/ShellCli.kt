@@ -20,12 +20,9 @@ import com.beust.jcommander.MissingCommandException
 import com.beust.jcommander.ParameterException
 import com.google.common.eventbus.EventBus
 import com.haulmont.cuba.cli.commands.*
-import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
-import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
 import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
 import com.haulmont.cuba.cli.event.ErrorEvent
-import org.fusesource.jansi.Ansi
 import org.jline.builtins.Completers
 import org.jline.builtins.Completers.TreeCompleter.Node
 import org.jline.builtins.Completers.TreeCompleter.node
@@ -38,6 +35,8 @@ import org.jline.terminal.Terminal
 import org.jline.terminal.impl.DumbTerminal
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
+import java.nio.charset.StandardCharsets
+import java.util.*
 
 class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
 
@@ -54,6 +53,18 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
     private val bus: EventBus by kodein.instance()
 
     private val messages by localMessages()
+
+    private val applicationProperties by lazy {
+        val properties = Properties()
+
+        val propertiesInputStream = Cli::class.java.getResourceAsStream("application.properties")
+        propertiesInputStream.use {
+            val inputStreamReader = java.io.InputStreamReader(propertiesInputStream, StandardCharsets.UTF_8)
+            properties.load(inputStreamReader)
+        }
+
+        properties
+    }
 
     private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
 
@@ -75,7 +86,6 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
     private val lineReader: LineReader by kodein.instance(arg = createCommandsCompleter(commandsRegistry))
 
     override fun run() {
-        printWelcome()
 
         while (true) {
             CommonParameters.reset()
@@ -121,10 +131,7 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
     }
 
     private fun buildPrompt(): String = try {
-        val projectNameGreen = Ansi.ansi()
-                .fgGreen().render(ProjectModel(ProjectStructure()).name).fgDefault()
-                .toString()
-        "($projectNameGreen) $PROMPT"
+        applicationProperties["prompt"] as String
     } catch (e: Exception) {
         PROMPT
     }
@@ -141,15 +148,6 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
         }
         bus.post(AfterCommandExecutionEvent(command))
         cliContext.clearModels()
-    }
-
-    private fun printWelcome() {
-        if (terminal !is DumbTerminal) {
-            writer.println(messages["welcomeMessage"].trimMargin())
-        } else {
-            writer.println(messages["welcomeMessageDumb"].trimMargin())
-        }
-        writer.println(messages["interactiveModeHint"])
     }
 
     companion object {

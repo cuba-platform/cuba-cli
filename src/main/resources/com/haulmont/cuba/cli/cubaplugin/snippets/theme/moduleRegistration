@@ -1,1 +1,0 @@
-project(":${modulePrefix}-web-themes").projectDir = new File(settingsDir, 'modules/web/themes')

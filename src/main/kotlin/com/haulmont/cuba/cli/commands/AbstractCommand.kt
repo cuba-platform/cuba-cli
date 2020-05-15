@@ -17,8 +17,6 @@
 package com.haulmont.cuba.cli.commands
 
 import com.haulmont.cuba.cli.CliContext
-import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
-import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import java.nio.file.Files
@@ -27,19 +25,6 @@ import java.nio.file.Path
 abstract class AbstractCommand(kodein: Kodein = com.haulmont.cuba.cli.kodein) : CliCommand {
     @Suppress("CanBePrimaryConstructorProperty")
     protected open val kodein: Kodein = kodein
-
-    protected val projectStructure: ProjectStructure by lazy { ProjectStructure() }
-
-    /**
-     * Returns project model if it already generated. Otherwise, it will raise an exception,
-     * so call it only after [checkProjectExistence].
-     */
-    protected val projectModel: ProjectModel
-        get() = run {
-            if (context.hasModel(ProjectModel.MODEL_NAME)) {
-                context.getModel(ProjectModel.MODEL_NAME)
-            } else fail("No project module found")
-        }
 
     /**
      * Is used to generation model saving and retrieving.
@@ -68,18 +53,6 @@ abstract class AbstractCommand(kodein: Kodein = com.haulmont.cuba.cli.kodein) : 
      * Invokes after [run].
      */
     protected open fun postExecute() {}
-
-    /**
-     * It is implied, that method invokes in [preExecute] to fail fast, if command is started outside of CUBA Platform project.
-     *
-     * @throws CommandExecutionException - if command is started outside of CUBA Platform project.
-     */
-    @Throws(CommandExecutionException::class)
-    protected fun checkProjectExistence() {
-        if (!context.hasModel("project")) {
-            fail("Command should be started in project directory")
-        }
-    }
 
     /**
      * Throws CommandExecutionException with [cause] message.

@@ -1,6 +1,0 @@
-{
-  "name": "${project.name}-generation",
-  "devDependencies": {
-    "@cuba-platform/front-generator": "^1.1.2"
-  }
-}

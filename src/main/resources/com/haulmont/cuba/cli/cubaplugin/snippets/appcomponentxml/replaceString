@@ -1,7 +1,0 @@
-configure(globalModule) {
-    jar {
-        manifest {
-            attributes('App-Component-Id': cuba.artifact.group)
-            attributes('App-Component-Version': cuba.artifact.version + (cuba.artifact.isSnapshot ? '-SNAPSHOT' : ''))
-        }
-    }

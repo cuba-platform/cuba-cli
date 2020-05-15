@@ -18,7 +18,6 @@ package com.haulmont.cuba.cli
 
 import com.google.common.eventbus.EventBus
 import com.haulmont.cuba.cli.commands.CommandsRegistry
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.event.InitPluginEvent
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
@@ -101,7 +100,7 @@ internal class PluginLoader {
                     writer.println("Plugin's ${plugin.javaClass.name} version ($version) doesn't correspond current CUBA CLI version ($API_VERSION)".bgRed())
                     continue
                 }
-                if (plugin !is CubaPlugin && mode == CliMode.SHELL) {
+                if (mode == CliMode.SHELL) {
                     writer.println("Loaded plugin @|green ${plugin.javaClass.name}|@.")
                 }
                 bus.register(plugin)

@@ -31,22 +31,6 @@ class Resources(private val cliPlugin: CliPlugin) {
                 ?: throw RuntimeException("Plugin ${cliPlugin.javaClass} doesn't support resources")
     }
 
-
-    fun getTemplate(templateName: String): Path {
-        return getResourcePath(resourcesBasePath + "templates/" + templateName)
-                ?: throw RuntimeException("Template $templateName not found in ${cliPlugin.javaClass} plugin")
-    }
-
-    fun getSnippets(snippetsBasePath: String): Path {
-        return getResourcePath(resourcesBasePath + "snippets/" + snippetsBasePath)
-                ?: throw RuntimeException("Snippets $snippetsBasePath not found in ${cliPlugin.javaClass} plugin")
-
-    }
-
-    fun getResourcePath(resourceName: String): Path? {
-        return getResourcePath(resourceName, cliPlugin.javaClass)
-    }
-
     companion object {
         fun fromMyPlugin(): ReadOnlyProperty<CliCommand, Resources> = object : ReadOnlyProperty<CliCommand, Resources> {
             override fun getValue(thisRef: CliCommand, property: KProperty<*>): Resources {

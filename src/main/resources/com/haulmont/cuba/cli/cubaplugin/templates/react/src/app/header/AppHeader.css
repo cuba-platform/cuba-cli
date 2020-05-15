@@ -1,9 +1,0 @@
-.AppHeader {
-  display: flex;
-  justify-content: space-between;
-  color: #CCCCCC;
-}
-
-.AppHeader .user-info > * {
-  margin: 6px;
-}

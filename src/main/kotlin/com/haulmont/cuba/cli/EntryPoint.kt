@@ -20,12 +20,9 @@ import com.beust.jcommander.JCommander
 import com.google.common.eventbus.EventBus
 import com.haulmont.cuba.cli.commands.CommandsRegistry
 import com.haulmont.cuba.cli.commands.LaunchOptions
-import com.haulmont.cuba.cli.cubaplugin.NamesUtils
-import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
 import com.haulmont.cuba.cli.di.terminalModule
 import com.haulmont.cuba.cli.event.DestroyPluginEvent
 import com.haulmont.cuba.cli.event.ErrorEvent
-import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManagerImpl
 import org.kodein.di.Kodein
 import org.kodein.di.direct
 import org.kodein.di.generic.bind
@@ -81,11 +78,8 @@ val kodein = Kodein {
 
     bind<EventBus>() with singleton { bus }
 
-    bind<NamesUtils>() with instance(NamesUtils())
-
     bind<WorkingDirectoryManager>() with singleton { WorkingDirectoryManager() }
 
-    bind<PlatformVersionsManager>() with singleton { PlatformVersionsManagerImpl() }
 }
 
 private val writer: PrintWriter by kodein.instance()
@@ -98,9 +92,6 @@ fun main(args: Array<String>) {
         parseLaunchOptions(args)
         setupLogger()
     }
-
-    val versionManager = kodein.direct.instance<PlatformVersionsManager>()
-    versionManager.load()
 
     val commandsRegistry = CommandsRegistry()
 

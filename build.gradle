@@ -2,6 +2,8 @@ buildscript {
     ext.kotlin_version = '1.2.71'
 
     repositories {
+        mavenLocal()
+
         if (rootProject.hasProperty('haulmontRepoUrl')) {
             maven {
                 url rootProject['haulmontRepoUrl']
@@ -53,6 +55,7 @@ sourceCompatibility = 11
 targetCompatibility = 11
 
 repositories {
+    mavenLocal()
     if (rootProject.hasProperty('haulmontRepoUrl')) {
         maven {
             url rootProject['haulmontRepoUrl']
@@ -77,6 +80,7 @@ repositories {
 }
 
 dependencies {
+//    implementation "com.haulmont.cuba.cli:cuba-cli-core:2.1-SNAPSHOT"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
@@ -168,7 +172,7 @@ task generatePom(group: 'distribution', description: 'Generates POM file for upl
 
         pom {
             project {
-                name 'cuba-cli'
+                name 'cuba-cli-core'
                 description 'CUBA Platform Development Command-Line Interface'
                 inceptionYear '2018'
                 licenses {
