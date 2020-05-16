@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin
 
-import com.haulmont.cuba.cli.core.PrintHelper
+import com.haulmont.cli.core.PrintHelper
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure

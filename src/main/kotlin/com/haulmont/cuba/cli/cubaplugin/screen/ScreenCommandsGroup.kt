@@ -18,16 +18,16 @@ package com.haulmont.cuba.cli.cubaplugin.screen
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.AbstractCubaCommand
-import com.haulmont.cuba.cli.core.commands.CliCommand
-import com.haulmont.cuba.cli.core.commands.NonInteractiveInfo
+import com.haulmont.cli.core.commands.CliCommand
+import com.haulmont.cli.core.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.screen.entityscreen.CreateBrowseScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.screen.entityscreen.CreateEditScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.screen.blankscreen.CreateScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.screen.entityscreen.MasterDetailScreenCommand
 import com.haulmont.cuba.cli.cubaplugin.screen.screenextension.ExtendDefaultScreenCommand
-import com.haulmont.cuba.cli.core.prompting.Option
-import com.haulmont.cuba.cli.core.prompting.Prompts
+import com.haulmont.cli.core.prompting.Option
+import com.haulmont.cli.core.prompting.Prompts
 
 @Parameters(commandDescription = "Create new CUBA screen")
 object ScreenCommandsGroup : AbstractCubaCommand(), NonInteractiveInfo {

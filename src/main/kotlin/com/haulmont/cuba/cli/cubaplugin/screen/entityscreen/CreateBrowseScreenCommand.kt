@@ -17,13 +17,13 @@
 package com.haulmont.cuba.cli.cubaplugin.screen.entityscreen
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.core.commands.NonInteractiveInfo
+import com.haulmont.cli.core.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.model.Entity
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.Answers
 import com.haulmont.cuba.cli.getTemplate
 
 @Parameters(commandDescription = "Creates new browse screen")

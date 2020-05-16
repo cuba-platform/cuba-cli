@@ -18,15 +18,15 @@ package com.haulmont.cuba.cli.cubaplugin.front
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.AbstractCubaCommand
-import com.haulmont.cuba.cli.core.commands.CliCommand
+import com.haulmont.cli.core.commands.CliCommand
 import com.haulmont.cuba.cli.cubaplugin.ProjectService
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.front.polymer.CreatePolymerModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.front.react.CreateReactModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
-import com.haulmont.cuba.cli.core.localMessages
-import com.haulmont.cuba.cli.core.prompting.Option
-import com.haulmont.cuba.cli.core.prompting.Prompts
+import com.haulmont.cli.core.localMessages
+import com.haulmont.cli.core.prompting.Option
+import com.haulmont.cli.core.prompting.Prompts
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 

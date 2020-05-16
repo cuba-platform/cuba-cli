@@ -18,10 +18,10 @@ package com.haulmont.cuba.cli.registration
 
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
-import com.haulmont.cuba.cli.core.commands.CommandExecutionException
+import com.haulmont.cli.core.commands.CommandExecutionException
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.generation.*
-import com.haulmont.cuba.cli.core.kodein
+import com.haulmont.cli.core.kodein
 import org.kodein.di.generic.instance
 import java.nio.file.Files
 import java.nio.file.Path

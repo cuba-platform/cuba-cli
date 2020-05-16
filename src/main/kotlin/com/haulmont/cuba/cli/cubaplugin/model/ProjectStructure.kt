@@ -16,12 +16,12 @@
 
 package com.haulmont.cuba.cli.cubaplugin.model
 
-import com.haulmont.cuba.cli.core.WorkingDirectoryManager
+import com.haulmont.cli.core.WorkingDirectoryManager
 import com.haulmont.cuba.cli.generation.get
 import com.haulmont.cuba.cli.generation.parse
 import com.haulmont.cuba.cli.generation.xpath
-import com.haulmont.cuba.cli.core.kodein
-import com.haulmont.cuba.cli.core.resolve
+import com.haulmont.cli.core.kodein
+import com.haulmont.cli.core.resolve
 import org.kodein.di.direct
 import org.kodein.di.generic.instance
 import org.w3c.dom.Element

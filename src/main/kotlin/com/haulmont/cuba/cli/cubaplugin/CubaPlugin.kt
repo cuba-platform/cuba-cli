@@ -17,8 +17,8 @@
 package com.haulmont.cuba.cli.cubaplugin
 
 import com.google.common.eventbus.Subscribe
-import com.haulmont.cuba.cli.core.*
-import com.haulmont.cuba.cli.core.commands.CdCommand
+import com.haulmont.cli.core.*
+import com.haulmont.cli.core.commands.CdCommand
 import com.haulmont.cuba.cli.cubaplugin.appcomponentxml.AppComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.componentbean.CreateComponentBeanCommand
 import com.haulmont.cuba.cli.cubaplugin.config.ConfigCommand
@@ -45,8 +45,8 @@ import com.haulmont.cuba.cli.cubaplugin.service.CreateServiceCommand
 import com.haulmont.cuba.cli.cubaplugin.statictemplate.StaticTemplateCommand
 import com.haulmont.cuba.cli.cubaplugin.theme.ThemeExtensionCommand
 import com.haulmont.cuba.cli.cubaplugin.updatescript.UpdateScriptCommand
-import com.haulmont.cuba.cli.core.event.BeforeCommandExecutionEvent
-import com.haulmont.cuba.cli.core.event.InitPluginEvent
+import com.haulmont.cli.core.event.BeforeCommandExecutionEvent
+import com.haulmont.cli.core.event.InitPluginEvent
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
 import org.jline.terminal.Terminal

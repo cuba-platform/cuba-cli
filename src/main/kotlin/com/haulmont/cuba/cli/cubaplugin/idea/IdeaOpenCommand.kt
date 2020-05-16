@@ -22,7 +22,7 @@ import com.haulmont.cuba.cli.commands.AbstractCubaCommand
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.gradle.GradleRunner
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
-import com.haulmont.cuba.cli.core.green
+import com.haulmont.cli.core.green
 import org.kodein.di.generic.instance
 import java.io.IOException
 import java.io.InputStreamReader

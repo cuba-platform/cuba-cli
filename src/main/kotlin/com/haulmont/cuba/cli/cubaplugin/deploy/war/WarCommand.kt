@@ -17,13 +17,13 @@
 package com.haulmont.cuba.cli.cubaplugin.deploy.war
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.core.*
+import com.haulmont.cli.core.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.deploy.ContextXmlParams
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.core.prompting.Answers
-import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.QuestionsList
 import com.haulmont.cuba.cli.getTemplate
 import org.kodein.di.generic.instance
 import java.io.PrintWriter

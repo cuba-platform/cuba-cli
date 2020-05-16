@@ -18,7 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.deploy.uberjar
 
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 import com.haulmont.cuba.cli.cubaplugin.deploy.ContextXmlParams
-import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.Answers
 
 class UberJarModel(answers: Answers, projectModel: ProjectModel) {
     val singleUberJar: Boolean by answers

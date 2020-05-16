@@ -16,9 +16,9 @@
 
 package com.haulmont.cuba.cli.cubaplugin.front
 
-import com.haulmont.cuba.cli.core.CliPlugin
+import com.haulmont.cli.core.CliPlugin
 import com.haulmont.cuba.cli.command.CommandTestBase
-import com.haulmont.cuba.cli.core.commands.CommandExecutionException
+import com.haulmont.cli.core.commands.CommandExecutionException
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.ProjectService
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
@@ -27,7 +27,7 @@ import com.haulmont.cuba.cli.cubaplugin.front.react.CreateReactModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
-import com.haulmont.cuba.cli.core.prompting.ReadException
+import com.haulmont.cli.core.prompting.ReadException
 import org.junit.Assert
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

@@ -18,12 +18,12 @@ package com.haulmont.cuba.cli.cubaplugin.updatescript
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
-import com.haulmont.cuba.cli.core.PrintHelper
+import com.haulmont.cli.core.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.core.kodein
-import com.haulmont.cuba.cli.core.prompting.Answers
-import com.haulmont.cuba.cli.core.prompting.QuestionsList
-import com.haulmont.cuba.cli.core.resolve
+import com.haulmont.cli.core.kodein
+import com.haulmont.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.QuestionsList
+import com.haulmont.cli.core.resolve
 import org.kodein.di.generic.instance
 import java.nio.file.Files
 import java.util.*

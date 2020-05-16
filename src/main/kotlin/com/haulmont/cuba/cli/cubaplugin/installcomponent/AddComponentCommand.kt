@@ -21,9 +21,9 @@ import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.ProjectService
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
-import com.haulmont.cuba.cli.core.localMessages
-import com.haulmont.cuba.cli.core.prompting.Answers
-import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cli.core.localMessages
+import com.haulmont.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.QuestionsList
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 

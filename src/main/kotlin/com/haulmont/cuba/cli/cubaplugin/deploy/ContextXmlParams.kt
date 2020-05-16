@@ -17,8 +17,8 @@
 package com.haulmont.cuba.cli.cubaplugin.deploy
 
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
-import com.haulmont.cuba.cli.core.prompting.Answers
-import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.QuestionsList
 
 class ContextXmlParams(answers: Answers, projectModel: ProjectModel) {
     val dbUser: String by answers

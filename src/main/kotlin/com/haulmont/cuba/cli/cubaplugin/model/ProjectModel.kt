@@ -21,7 +21,7 @@ import com.haulmont.cuba.cli.generation.parse
 import com.haulmont.cuba.cli.generation.xpath
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.GLOBAL_MODULE
-import com.haulmont.cuba.cli.core.resolve
+import com.haulmont.cli.core.resolve
 import net.sf.practicalxml.DomUtil
 import org.w3c.dom.Element
 import java.nio.file.Path

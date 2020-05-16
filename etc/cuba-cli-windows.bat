@@ -16,4 +16,4 @@
 
 set JLINK_VM_OPTIONS=
 set DIR=%~dp0
-"%DIR%\..\native-windows\bin\java" %JLINK_VM_OPTIONS% -m com.haulmont.cuba.cli.core/com.haulmont.cuba.cli.core.EntryPointKt %*
+"%DIR%\..\native-windows\bin\java" %JLINK_VM_OPTIONS% -m com.haulmont.cli.core/com.haulmont.cli.core.EntryPointKt %*

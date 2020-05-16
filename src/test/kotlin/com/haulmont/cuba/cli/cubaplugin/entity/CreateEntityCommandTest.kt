@@ -16,14 +16,14 @@
 
 package com.haulmont.cuba.cli.cubaplugin.entity
 
-import com.haulmont.cuba.cli.core.CliPlugin
+import com.haulmont.cli.core.CliPlugin
 import com.haulmont.cuba.cli.command.CommandTestBase
-import com.haulmont.cuba.cli.core.commands.CommandExecutionException
+import com.haulmont.cli.core.commands.CommandExecutionException
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
-import com.haulmont.cuba.cli.core.prompting.ValidationException
+import com.haulmont.cli.core.prompting.ValidationException
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.kodein.di.Kodein

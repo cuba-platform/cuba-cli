@@ -1,6 +1,6 @@
 package com.haulmont.cuba.cli
 
-import com.haulmont.cuba.cli.core.Resources
+import com.haulmont.cli.core.Resources
 import java.nio.file.Path
 
     fun Resources.getTemplate(templateName: String): Path {

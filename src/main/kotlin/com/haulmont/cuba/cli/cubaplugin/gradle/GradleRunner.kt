@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.gradle
 
-import com.haulmont.cuba.cli.core.WorkingDirectoryManager
+import com.haulmont.cli.core.WorkingDirectoryManager
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import org.jline.reader.EndOfFileException
 import org.jline.reader.LineReader

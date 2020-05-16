@@ -17,13 +17,13 @@
 package com.haulmont.cuba.cli.cubaplugin.premiumrepo
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.core.PrintHelper
-import com.haulmont.cuba.cli.core.Resources
+import com.haulmont.cli.core.PrintHelper
+import com.haulmont.cli.core.Resources
 import com.haulmont.cuba.cli.commands.AbstractCubaCommand
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.Snippets
-import com.haulmont.cuba.cli.core.localMessages
-import com.haulmont.cuba.cli.core.prompting.Prompts
+import com.haulmont.cli.core.localMessages
+import com.haulmont.cli.core.prompting.Prompts
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.nio.file.Files

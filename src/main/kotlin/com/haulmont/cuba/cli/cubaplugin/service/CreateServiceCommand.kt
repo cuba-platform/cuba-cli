@@ -17,15 +17,15 @@
 package com.haulmont.cuba.cli.cubaplugin.service
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.core.Resources
+import com.haulmont.cli.core.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.core.commands.NonInteractiveInfo
+import com.haulmont.cli.core.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.core.prompting.Answers
-import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.QuestionsList
 import com.haulmont.cuba.cli.getTemplate
 import com.haulmont.cuba.cli.registration.ServiceRegistrationHelper
 import org.kodein.di.generic.instance

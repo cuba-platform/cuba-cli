@@ -21,7 +21,7 @@ import com.haulmont.cuba.cli.cubaplugin.ProjectServiceImpl
 import com.haulmont.cuba.cli.cubaplugin.gradle.GradleRunner
 import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
 import com.haulmont.cuba.cli.cubaplugin.prefixchange.PrefixChanger
-import com.haulmont.cuba.cli.core.kodein
+import com.haulmont.cli.core.kodein
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManagerImpl
 import com.haulmont.cuba.cli.registration.EntityRegistrationHelper

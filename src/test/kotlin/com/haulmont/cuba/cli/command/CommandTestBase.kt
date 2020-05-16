@@ -18,17 +18,17 @@ package com.haulmont.cuba.cli.command
 
 import com.google.common.eventbus.EventBus
 import com.google.common.eventbus.Subscribe
-import com.haulmont.cuba.cli.core.CliContext
-import com.haulmont.cuba.cli.core.CliPlugin
-import com.haulmont.cuba.cli.core.WorkingDirectoryManager
-import com.haulmont.cuba.cli.core.commands.CliCommand
+import com.haulmont.cli.core.CliContext
+import com.haulmont.cli.core.CliPlugin
+import com.haulmont.cli.core.WorkingDirectoryManager
+import com.haulmont.cli.core.commands.CliCommand
 import com.haulmont.cuba.cli.cubaplugin.VersionUtils
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitModel
-import com.haulmont.cuba.cli.core.event.AfterCommandExecutionEvent
-import com.haulmont.cuba.cli.core.event.BeforeCommandExecutionEvent
-import com.haulmont.cuba.cli.core.event.ErrorEvent
+import com.haulmont.cli.core.event.AfterCommandExecutionEvent
+import com.haulmont.cli.core.event.BeforeCommandExecutionEvent
+import com.haulmont.cli.core.event.ErrorEvent
 import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
 import org.junit.After

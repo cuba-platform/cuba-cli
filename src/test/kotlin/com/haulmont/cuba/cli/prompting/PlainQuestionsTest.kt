@@ -16,8 +16,8 @@
 
 package com.haulmont.cuba.cli.prompting
 
-import com.haulmont.cuba.cli.core.prompting.Option
-import com.haulmont.cuba.cli.core.prompting.ValidationException
+import com.haulmont.cli.core.prompting.Option
+import com.haulmont.cli.core.prompting.ValidationException
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

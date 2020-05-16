@@ -16,13 +16,13 @@
 
 package com.haulmont.cuba.cli.cubaplugin.screen.entityscreen
 
-import com.haulmont.cuba.cli.core.Resources
-import com.haulmont.cuba.cli.core.commands.NonInteractiveInfo
+import com.haulmont.cli.core.Resources
+import com.haulmont.cli.core.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.Entity
 import com.haulmont.cuba.cli.cubaplugin.screen.ScreenCommandBase
-import com.haulmont.cuba.cli.core.prompting.Option
-import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cli.core.prompting.Option
+import com.haulmont.cli.core.prompting.QuestionsList
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 

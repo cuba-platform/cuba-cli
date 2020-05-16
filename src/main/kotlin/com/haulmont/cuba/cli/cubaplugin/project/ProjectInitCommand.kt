@@ -17,17 +17,17 @@
 package com.haulmont.cuba.cli.cubaplugin.project
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.core.*
+import com.haulmont.cli.core.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.core.commands.NonInteractiveInfo
+import com.haulmont.cli.core.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionParseException
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManagerImpl
-import com.haulmont.cuba.cli.core.prompting.Answers
-import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.QuestionsList
 import com.haulmont.cuba.cli.getTemplate
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance

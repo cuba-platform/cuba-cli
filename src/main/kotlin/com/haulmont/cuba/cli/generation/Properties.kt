@@ -16,9 +16,9 @@
 
 package com.haulmont.cuba.cli.generation
 
-import com.haulmont.cuba.cli.core.PrintHelper
+import com.haulmont.cli.core.PrintHelper
 import com.haulmont.cuba.cli.generation.properties.MessagesWriter
-import com.haulmont.cuba.cli.core.kodein
+import com.haulmont.cli.core.kodein
 import org.apache.commons.configuration.PropertiesConfiguration
 import org.kodein.di.generic.instance
 import java.io.Writer

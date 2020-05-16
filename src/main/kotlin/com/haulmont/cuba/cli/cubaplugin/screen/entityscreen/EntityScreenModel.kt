@@ -18,7 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.screen.entityscreen
 
 import com.haulmont.cuba.cli.cubaplugin.model.Entity
 import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
-import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.Answers
 
 class EntityScreenModel(answers: Answers) {
     val screenId: String by answers

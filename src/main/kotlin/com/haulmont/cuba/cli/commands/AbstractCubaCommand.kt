@@ -16,13 +16,13 @@
 
 package com.haulmont.cuba.cli.commands
 
-import com.haulmont.cuba.cli.core.commands.AbstractCommand
-import com.haulmont.cuba.cli.core.commands.CommandExecutionException
+import com.haulmont.cli.core.commands.AbstractCommand
+import com.haulmont.cli.core.commands.CommandExecutionException
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import org.kodein.di.Kodein
 
-abstract class AbstractCubaCommand(kodein: Kodein = com.haulmont.cuba.cli.core.kodein) : AbstractCommand(kodein) {
+abstract class AbstractCubaCommand(kodein: Kodein = com.haulmont.cli.core.kodein) : AbstractCommand(kodein) {
 
     protected val projectStructure: ProjectStructure by lazy { ProjectStructure() }
 

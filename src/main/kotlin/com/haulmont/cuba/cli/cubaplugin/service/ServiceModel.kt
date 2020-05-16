@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.service
 
-import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.Answers
 
 class ServiceModel(answers: Answers) {
     val interfaceName: String by answers

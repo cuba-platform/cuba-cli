@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.event
 
-import com.haulmont.cuba.cli.core.event.CliEvent
+import com.haulmont.cli.core.event.CliEvent
 
 interface CubaCliEvent: CliEvent
 

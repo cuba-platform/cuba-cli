@@ -17,12 +17,12 @@
 package com.haulmont.cuba.cli.cubaplugin.componentbean
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.core.Resources
+import com.haulmont.cli.core.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.core.commands.NonInteractiveInfo
+import com.haulmont.cli.core.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.core.prompting.Answers
-import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.QuestionsList
 import com.haulmont.cuba.cli.getTemplate
 
 @Parameters(commandDescription = "Creates new Spring bean")

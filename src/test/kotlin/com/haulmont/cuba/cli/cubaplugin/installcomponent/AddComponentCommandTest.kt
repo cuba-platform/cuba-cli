@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.installcomponent
 
-import com.haulmont.cuba.cli.core.CliPlugin
+import com.haulmont.cli.core.CliPlugin
 import com.haulmont.cuba.cli.command.CommandTestBase
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein

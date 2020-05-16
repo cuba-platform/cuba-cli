@@ -16,11 +16,11 @@
 
 package com.haulmont.cuba.cli.prompting
 
-import com.haulmont.cuba.cli.core.ColoredWriter
-import com.haulmont.cuba.cli.core.PrintHelper
-import com.haulmont.cuba.cli.core.prompting.Answers
-import com.haulmont.cuba.cli.core.prompting.Prompts
-import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cli.core.ColoredWriter
+import com.haulmont.cli.core.PrintHelper
+import com.haulmont.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.Prompts
+import com.haulmont.cli.core.prompting.QuestionsList
 import org.jline.reader.Completer
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder

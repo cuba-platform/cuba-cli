@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-module com.haulmont.cuba.cli.core {
+module com.haulmont.cli.core {
     requires kotlin.stdlib.jdk8;
     requires kotlin.stdlib.jdk7;
     requires kotlin.stdlib;
@@ -39,15 +39,15 @@ module com.haulmont.cuba.cli.core {
     requires practicalxml;
     requires java.xml;
 
-    uses com.haulmont.cuba.cli.core.CliPlugin;
+    uses com.haulmont.cli.core.CliPlugin;
 
-    opens com.haulmont.cuba.cli.core.commands;
-    opens com.haulmont.cuba.cli.core;
+    opens com.haulmont.cli.core.commands;
+    opens com.haulmont.cli.core;
 
-    exports com.haulmont.cuba.cli.core;
-    exports com.haulmont.cuba.cli.core.event;
-    exports com.haulmont.cuba.cli.core.commands;
-    exports com.haulmont.cuba.cli.core.prompting;
+    exports com.haulmont.cli.core;
+    exports com.haulmont.cli.core.event;
+    exports com.haulmont.cli.core.commands;
+    exports com.haulmont.cli.core.prompting;
 
 //    for debug
     requires jdk.jdwp.agent;

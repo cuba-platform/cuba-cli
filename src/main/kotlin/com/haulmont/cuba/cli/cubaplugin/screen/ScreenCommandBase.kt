@@ -21,8 +21,8 @@ import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
-import com.haulmont.cuba.cli.core.kodein
-import com.haulmont.cuba.cli.core.prompting.ValidationHelper
+import com.haulmont.cli.core.kodein
+import com.haulmont.cli.core.prompting.ValidationHelper
 import com.haulmont.cuba.cli.registration.ScreenRegistrationHelper
 import org.kodein.di.generic.instance
 import java.nio.file.Path

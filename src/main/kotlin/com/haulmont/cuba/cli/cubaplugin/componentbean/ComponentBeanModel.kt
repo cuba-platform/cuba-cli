@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.componentbean
 
-import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.Answers
 
 class ComponentBeanModel(answers: Answers) {
     val name: String by answers

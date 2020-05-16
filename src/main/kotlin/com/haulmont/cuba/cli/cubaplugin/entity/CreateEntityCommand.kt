@@ -17,11 +17,11 @@
 package com.haulmont.cuba.cli.cubaplugin.entity
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.core.*
+import com.haulmont.cli.core.*
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.core.commands.NonInteractiveInfo
+import com.haulmont.cli.core.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
@@ -29,8 +29,8 @@ import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
-import com.haulmont.cuba.cli.core.prompting.Answers
-import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.QuestionsList
 import com.haulmont.cuba.cli.getTemplate
 import com.haulmont.cuba.cli.registration.EntityRegistrationHelper
 import org.kodein.di.Kodein

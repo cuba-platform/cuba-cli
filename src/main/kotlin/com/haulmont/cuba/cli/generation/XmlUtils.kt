@@ -16,8 +16,8 @@
 
 package com.haulmont.cuba.cli.generation
 
-import com.haulmont.cuba.cli.core.PrintHelper
-import com.haulmont.cuba.cli.core.kodein
+import com.haulmont.cli.core.PrintHelper
+import com.haulmont.cli.core.kodein
 import net.sf.practicalxml.DomUtil
 import net.sf.practicalxml.XmlException
 import net.sf.practicalxml.xpath.XPathWrapper

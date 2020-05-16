@@ -16,12 +16,12 @@
 
 package com.haulmont.cuba.cli.cubaplugin.statictemplate
 
-import com.haulmont.cuba.cli.core.commands.CommandExecutionException
+import com.haulmont.cli.core.commands.CommandExecutionException
 import com.haulmont.cuba.cli.generation.findFirstChild
 import com.haulmont.cuba.cli.generation.get
 import com.haulmont.cuba.cli.generation.getChildElements
 import com.haulmont.cuba.cli.generation.parse
-import com.haulmont.cuba.cli.core.kodein
+import com.haulmont.cli.core.kodein
 import net.sf.practicalxml.DomUtil
 import org.kodein.di.generic.instance
 import org.w3c.dom.Element

@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.screen.screenextension
 
-import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cli.core.prompting.Answers
 
 class ScreenExtensionModel(answers: Answers) {
     internal val screen: ExtendDefaultScreenCommand.ScreenToExtend by answers

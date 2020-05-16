@@ -16,13 +16,13 @@
 
 package com.haulmont.cuba.cli.cubaplugin.entitylistener
 
-import com.haulmont.cuba.cli.core.CliPlugin
+import com.haulmont.cli.core.CliPlugin
 import com.haulmont.cuba.cli.command.CommandTestBase
-import com.haulmont.cuba.cli.core.commands.CommandExecutionException
+import com.haulmont.cli.core.commands.CommandExecutionException
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.entity.CreateEntityCommand
-import com.haulmont.cuba.cli.core.prompting.ValidationException
+import com.haulmont.cli.core.prompting.ValidationException
 import org.junit.Test
 import org.kodein.di.Kodein
 import org.kodein.di.generic.bind

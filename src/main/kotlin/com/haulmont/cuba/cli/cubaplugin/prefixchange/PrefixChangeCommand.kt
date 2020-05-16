@@ -19,7 +19,7 @@ package com.haulmont.cuba.cli.cubaplugin.prefixchange
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.commands.AbstractCubaCommand
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
-import com.haulmont.cuba.cli.core.prompting.Prompts
+import com.haulmont.cli.core.prompting.Prompts
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
