@@ -17,18 +17,19 @@
 package com.haulmont.cuba.cli.cubaplugin.front.react
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.Messages
-import com.haulmont.cuba.cli.PrintHelper
-import com.haulmont.cuba.cli.Resources
-import com.haulmont.cuba.cli.Resources.Companion.fromMyPlugin
+import com.haulmont.cuba.cli.core.Messages
+import com.haulmont.cuba.cli.core.PrintHelper
+import com.haulmont.cuba.cli.core.Resources
+import com.haulmont.cuba.cli.core.Resources.Companion.fromMyPlugin
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.front.CreateFrontCommand
 import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.prompting.Answers
-import com.haulmont.cuba.cli.prompting.QuestionsList
-import com.haulmont.cuba.cli.walk
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.walk
+import com.haulmont.cuba.cli.getTemplate
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
@@ -42,13 +43,13 @@ class CreateReactModuleCommand(override val kodein: Kodein = cubaKodein) : Gener
 
     private val resources: Resources by fromMyPlugin()
 
-    private val writer: PrintWriter by kodein.instance()
+    private val writer: PrintWriter by kodein.instance<PrintWriter>()
 
     private val snippets: Snippets by lazy {
         Snippets(resources, "react", projectModel.platformVersion)
     }
 
-    private val printHelper: PrintHelper by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance<PrintHelper>()
 
     override fun getModelName(): String = "react"
 

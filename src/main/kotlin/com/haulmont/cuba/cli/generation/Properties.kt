@@ -16,9 +16,9 @@
 
 package com.haulmont.cuba.cli.generation
 
-import com.haulmont.cuba.cli.PrintHelper
+import com.haulmont.cuba.cli.core.PrintHelper
 import com.haulmont.cuba.cli.generation.properties.MessagesWriter
-import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.core.kodein
 import org.apache.commons.configuration.PropertiesConfiguration
 import org.kodein.di.generic.instance
 import java.io.Writer
@@ -49,7 +49,7 @@ class Properties private constructor(private val propertiesConfiguration: Proper
     }
 
     companion object {
-        private val printHelper: PrintHelper by kodein.instance()
+        private val printHelper: PrintHelper by kodein.instance<PrintHelper>()
 
         operator fun invoke(path: Path): Properties {
             val properties = PropertiesConfiguration().apply {

@@ -18,17 +18,17 @@ package com.haulmont.cuba.cli.command
 
 import com.google.common.eventbus.EventBus
 import com.google.common.eventbus.Subscribe
-import com.haulmont.cuba.cli.CliContext
-import com.haulmont.cuba.cli.CliPlugin
-import com.haulmont.cuba.cli.WorkingDirectoryManager
-import com.haulmont.cuba.cli.commands.CliCommand
+import com.haulmont.cuba.cli.core.CliContext
+import com.haulmont.cuba.cli.core.CliPlugin
+import com.haulmont.cuba.cli.core.WorkingDirectoryManager
+import com.haulmont.cuba.cli.core.commands.CliCommand
 import com.haulmont.cuba.cli.cubaplugin.VersionUtils
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitModel
-import com.haulmont.cuba.cli.event.AfterCommandExecutionEvent
-import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
-import com.haulmont.cuba.cli.event.ErrorEvent
+import com.haulmont.cuba.cli.core.event.AfterCommandExecutionEvent
+import com.haulmont.cuba.cli.core.event.BeforeCommandExecutionEvent
+import com.haulmont.cuba.cli.core.event.ErrorEvent
 import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
 import org.junit.After
@@ -77,7 +77,7 @@ open class CommandTestBase {
             manageDependencies()
         }
 
-        val bus: EventBus by kodein.instance()
+        val bus: EventBus by kodein.instance<EventBus>()
         context = kodein.direct.instance()
 
         for (plugin in plugins) {
@@ -86,7 +86,7 @@ open class CommandTestBase {
             bus.register(this)
         }
 
-        val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
+        val workingDirectoryManager: WorkingDirectoryManager by kodein.instance<WorkingDirectoryManager>()
 
         workingDirectoryManager.workingDirectory = workingDirectoryManager.workingDirectory.resolve("build/test-run")
         testDir = workingDirectoryManager.workingDirectory
@@ -98,7 +98,7 @@ open class CommandTestBase {
 
     @After
     fun tearDown() {
-        val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
+        val workingDirectoryManager: WorkingDirectoryManager by kodein.instance<WorkingDirectoryManager>()
         workingDirectoryManager.workingDirectory = testDir.parent
 
         context.clearModels()
@@ -138,7 +138,7 @@ open class CommandTestBase {
     }
 
     fun executeCommand(command: CliCommand) {
-        val bus: EventBus by kodein.instance()
+        val bus: EventBus by kodein.instance<EventBus>()
 
         bus.post(BeforeCommandExecutionEvent(command))
         try {

@@ -17,9 +17,9 @@
 package com.haulmont.cuba.cli.cubaplugin.model
 
 import com.google.gson.Gson
-import com.haulmont.cuba.cli.commands.LaunchOptions
-import com.haulmont.cuba.cli.localMessages
-import com.haulmont.cuba.cli.thisClassLogger
+import com.haulmont.cuba.cli.core.commands.LaunchOptions
+import com.haulmont.cuba.cli.core.localMessages
+import com.haulmont.cuba.cli.core.thisClassLogger
 import java.net.URL
 import java.util.logging.Level
 import kotlin.concurrent.thread

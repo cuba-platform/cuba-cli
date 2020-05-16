@@ -21,23 +21,23 @@ import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
-import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.prompting.ValidationHelper
+import com.haulmont.cuba.cli.core.kodein
+import com.haulmont.cuba.cli.core.prompting.ValidationHelper
 import com.haulmont.cuba.cli.registration.ScreenRegistrationHelper
 import org.kodein.di.generic.instance
 import java.nio.file.Path
 
 abstract class ScreenCommandBase<out Model : Any> : GeneratorCommand<Model>() {
-    protected val entitySearch: EntitySearch by cubaKodein.instance()
+    protected val entitySearch: EntitySearch by cubaKodein.instance<EntitySearch>()
 
-    protected val namesUtils: NamesUtils by kodein.instance()
+    protected val namesUtils: NamesUtils by kodein.instance<NamesUtils>()
 
     protected val screensXml: Path by lazy {
         val webModule = projectStructure.getModule(ModuleStructure.WEB_MODULE)
         webModule.screensXml
     }
 
-    protected val screenRegistrationHelper: ScreenRegistrationHelper by cubaKodein.instance()
+    protected val screenRegistrationHelper: ScreenRegistrationHelper by cubaKodein.instance<ScreenRegistrationHelper>()
 
     protected fun addToMenu(screenId: String, caption: String) {
         screenRegistrationHelper.addToMenu(screenId, caption)

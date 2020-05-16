@@ -18,16 +18,16 @@ package com.haulmont.cuba.cli.cubaplugin.gradle
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.commands.AbstractCommand
+import com.haulmont.cuba.cli.commands.AbstractCubaCommand
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
 @Parameters(commandDescription = "Launches gradle command")
-class GradleCommand : AbstractCommand() {
-    private val gradleRunner: GradleRunner by cubaKodein.instance()
+class GradleCommand : AbstractCubaCommand() {
+    private val gradleRunner: GradleRunner by cubaKodein.instance<GradleRunner>()
 
-    private val printWriter: PrintWriter by cubaKodein.instance()
+    private val printWriter: PrintWriter by cubaKodein.instance<PrintWriter>()
 
     @Parameter(description = "Gradle command string", variableArity = true)
     var command: List<String> = mutableListOf()

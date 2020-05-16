@@ -19,14 +19,14 @@ package com.haulmont.cuba.cli.cubaplugin.model
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.generation.getChildElements
 import com.haulmont.cuba.cli.generation.parse
-import com.haulmont.cuba.cli.readText
+import com.haulmont.cuba.cli.core.readText
 import net.sf.practicalxml.DomUtil
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import java.nio.file.Files
 
-class EntitySearch(val kodein: Kodein = com.haulmont.cuba.cli.kodein) {
-    private val namesUtils: NamesUtils by kodein.instance()
+class EntitySearch(val kodein: Kodein = com.haulmont.cuba.cli.core.kodein) {
+    private val namesUtils: NamesUtils by kodein.instance<NamesUtils>()
 
     fun getAllEntities(): List<Entity> {
         val globalModule = ProjectStructure().getModule(ModuleStructure.GLOBAL_MODULE)

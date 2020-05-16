@@ -17,15 +17,16 @@
 package com.haulmont.cuba.cli.cubaplugin.screen.screenextension
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.Resources
+import com.haulmont.cuba.cli.core.Resources
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.screen.ScreenCommandBase
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.prompting.Answers
-import com.haulmont.cuba.cli.prompting.Option
-import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.Option
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cuba.cli.getTemplate
 
 @Parameters(commandDescription = "Extends login and main screens")
 class ExtendDefaultScreenCommand : ScreenCommandBase<ScreenExtensionModel>() {

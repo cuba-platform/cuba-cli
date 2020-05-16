@@ -16,9 +16,9 @@
 
 package com.haulmont.cuba.cli.cubaplugin.project
 
-import com.haulmont.cuba.cli.CliPlugin
+import com.haulmont.cuba.cli.core.CliPlugin
 import com.haulmont.cuba.cli.command.CommandTestBase
-import com.haulmont.cuba.cli.commands.CommandExecutionException
+import com.haulmont.cuba.cli.core.commands.CommandExecutionException
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.*

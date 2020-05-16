@@ -18,12 +18,12 @@ package com.haulmont.cuba.cli.cubaplugin.updatescript
 
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
-import com.haulmont.cuba.cli.PrintHelper
+import com.haulmont.cuba.cli.core.PrintHelper
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.prompting.Answers
-import com.haulmont.cuba.cli.prompting.QuestionsList
-import com.haulmont.cuba.cli.resolve
+import com.haulmont.cuba.cli.core.kodein
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.resolve
 import org.kodein.di.generic.instance
 import java.nio.file.Files
 import java.util.*
@@ -33,7 +33,7 @@ class UpdateScriptCommand : GeneratorCommand<String>() {
 
     private val calendar = Calendar.getInstance()
 
-    private val printHelper: PrintHelper by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance<PrintHelper>()
 
     override fun getModelName(): String = "updateScriptName"
 

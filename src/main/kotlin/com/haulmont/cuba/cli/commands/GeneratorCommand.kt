@@ -16,9 +16,11 @@
 
 package com.haulmont.cuba.cli.commands
 
-import com.haulmont.cuba.cli.prompting.Answers
-import com.haulmont.cuba.cli.prompting.Prompts
-import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.commands.CommandExecutionException
+import com.haulmont.cuba.cli.core.commands.CommonParameters
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.Prompts
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
 
 /**
  * Base command for all commands, that generate any artifact.
@@ -33,7 +35,7 @@ import com.haulmont.cuba.cli.prompting.QuestionsList
  *
  * At generation phase, the command gets all available models as ```Map<String, Any>``` and generates artifact.
  */
-abstract class GeneratorCommand<out Model : Any> : AbstractCommand() {
+abstract class GeneratorCommand<out Model : Any> : AbstractCubaCommand() {
     /**
      * Returns current model if it already generated. Otherwise, it will raise an exception,
      * so don't call it before [createModel] method.

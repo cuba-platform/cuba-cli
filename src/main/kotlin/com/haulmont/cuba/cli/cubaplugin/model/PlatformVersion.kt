@@ -16,8 +16,8 @@
 
 package com.haulmont.cuba.cli.cubaplugin.model
 
-import com.haulmont.cuba.cli.CliContext
-import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.core.CliContext
+import com.haulmont.cuba.cli.core.kodein
 import org.kodein.di.direct
 import org.kodein.di.generic.instance
 import java.nio.file.Files

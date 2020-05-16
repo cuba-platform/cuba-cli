@@ -17,16 +17,16 @@
 package com.haulmont.cuba.cli.cubaplugin.prefixchange
 
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
-import com.haulmont.cuba.cli.PrintHelper
+import com.haulmont.cuba.cli.core.PrintHelper
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import com.haulmont.cuba.cli.generation.Properties
-import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.core.kodein
 import org.kodein.di.generic.instance
 import java.nio.file.Path
 
 class PrefixChanger {
 
-    private val printHelper: PrintHelper by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance<PrintHelper>()
 
     fun changePrefix(prefix: String) {
         val projectStructure = ProjectStructure()

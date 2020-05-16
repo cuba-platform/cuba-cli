@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.gradle
 
-import com.haulmont.cuba.cli.WorkingDirectoryManager
+import com.haulmont.cuba.cli.core.WorkingDirectoryManager
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import org.jline.reader.EndOfFileException
 import org.jline.reader.LineReader
@@ -30,10 +30,10 @@ import java.nio.file.Paths
 import kotlin.concurrent.thread
 
 class GradleRunner {
-    private val workingDirectoryManager: WorkingDirectoryManager by cubaKodein.instance()
+    private val workingDirectoryManager: WorkingDirectoryManager by cubaKodein.instance<WorkingDirectoryManager>()
 
     private val reader: LineReader by cubaKodein.instance(arg = NullCompleter())
-    private val terminal: Terminal by cubaKodein.instance()
+    private val terminal: Terminal by cubaKodein.instance<Terminal>()
 
     /**
      * Searches for gradle wrapper end execute [commands].

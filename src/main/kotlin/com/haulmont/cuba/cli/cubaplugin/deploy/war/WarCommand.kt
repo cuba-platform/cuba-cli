@@ -17,13 +17,14 @@
 package com.haulmont.cuba.cli.cubaplugin.deploy.war
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.*
+import com.haulmont.cuba.cli.core.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.deploy.ContextXmlParams
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.prompting.Answers
-import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cuba.cli.getTemplate
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.nio.file.Files
@@ -34,9 +35,9 @@ class WarCommand : GeneratorCommand<WarModel>() {
 
     private val resources: Resources by Resources.fromMyPlugin()
 
-    private val printWriter: PrintWriter by cubaKodein.instance()
+    private val printWriter: PrintWriter by cubaKodein.instance<PrintWriter>()
 
-    private val printHelper: PrintHelper by cubaKodein.instance()
+    private val printHelper: PrintHelper by cubaKodein.instance<PrintHelper>()
 
     override fun preExecute() {
         checkProjectExistence()

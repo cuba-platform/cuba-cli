@@ -17,30 +17,31 @@
 package com.haulmont.cuba.cli.cubaplugin.entitylistener
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.PrintHelper
-import com.haulmont.cuba.cli.Resources
+import com.haulmont.cuba.cli.core.PrintHelper
+import com.haulmont.cuba.cli.core.Resources
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.prompting.Answers
-import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.kodein
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cuba.cli.getTemplate
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
 @Parameters(commandDescription = "Creates new entity listener")
 class CreateEntityListenerCommand(override val kodein: Kodein = cubaKodein) : GeneratorCommand<EntityListenerModel>() {
-    private val printHelper: PrintHelper by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance<PrintHelper>()
 
     private val resources by Resources.fromMyPlugin()
 
-    private val entitySearch: EntitySearch by cubaKodein.instance()
+    private val entitySearch: EntitySearch by cubaKodein.instance<EntitySearch>()
 
-    private val printWriter: PrintWriter by cubaKodein.instance()
+    private val printWriter: PrintWriter by cubaKodein.instance<PrintWriter>()
 
     override fun getModelName(): String = EntityListenerModel.MODEL_NAME
 

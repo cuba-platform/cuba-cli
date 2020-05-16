@@ -17,24 +17,24 @@
 package com.haulmont.cuba.cli.cubaplugin.front
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.commands.AbstractCommand
-import com.haulmont.cuba.cli.commands.CliCommand
+import com.haulmont.cuba.cli.commands.AbstractCubaCommand
+import com.haulmont.cuba.cli.core.commands.CliCommand
 import com.haulmont.cuba.cli.cubaplugin.ProjectService
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.front.polymer.CreatePolymerModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.front.react.CreateReactModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
-import com.haulmont.cuba.cli.localMessages
-import com.haulmont.cuba.cli.prompting.Option
-import com.haulmont.cuba.cli.prompting.Prompts
+import com.haulmont.cuba.cli.core.localMessages
+import com.haulmont.cuba.cli.core.prompting.Option
+import com.haulmont.cuba.cli.core.prompting.Prompts
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 
 @Parameters(commandDescription = "Create new CUBA frontend module")
-class CreateFrontCommand(override val kodein: Kodein = cubaKodein) : AbstractCommand() {
+class CreateFrontCommand(override val kodein: Kodein = cubaKodein) : AbstractCubaCommand() {
     private val messages by localMessages()
 
-    private val projectService: ProjectService by kodein.instance()
+    private val projectService: ProjectService by kodein.instance<ProjectService>()
 
     override fun run() {
         val commands = mutableListOf(

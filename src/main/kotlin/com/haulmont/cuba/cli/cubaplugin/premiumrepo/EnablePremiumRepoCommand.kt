@@ -17,13 +17,13 @@
 package com.haulmont.cuba.cli.cubaplugin.premiumrepo
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.PrintHelper
-import com.haulmont.cuba.cli.Resources
-import com.haulmont.cuba.cli.commands.AbstractCommand
+import com.haulmont.cuba.cli.core.PrintHelper
+import com.haulmont.cuba.cli.core.Resources
+import com.haulmont.cuba.cli.commands.AbstractCubaCommand
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.Snippets
-import com.haulmont.cuba.cli.localMessages
-import com.haulmont.cuba.cli.prompting.Prompts
+import com.haulmont.cuba.cli.core.localMessages
+import com.haulmont.cuba.cli.core.prompting.Prompts
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.nio.file.Files
@@ -31,11 +31,11 @@ import java.nio.file.Paths
 
 
 @Parameters(commandDescription = "Adds premium CUBA repository to projects build script")
-class EnablePremiumRepoCommand : AbstractCommand() {
+class EnablePremiumRepoCommand : AbstractCubaCommand() {
     private val gradlePropertiesPath = Paths.get(System.getProperty("user.home"), ".gradle", "gradle.properties")
 
-    private val printHelper: PrintHelper by kodein.instance()
-    private val printWriter: PrintWriter by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance<PrintHelper>()
+    private val printWriter: PrintWriter by kodein.instance<PrintWriter>()
     private val messages by localMessages()
 
     private val resources by Resources.fromMyPlugin()

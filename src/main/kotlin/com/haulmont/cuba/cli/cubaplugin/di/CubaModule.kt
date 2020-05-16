@@ -21,7 +21,9 @@ import com.haulmont.cuba.cli.cubaplugin.ProjectServiceImpl
 import com.haulmont.cuba.cli.cubaplugin.gradle.GradleRunner
 import com.haulmont.cuba.cli.cubaplugin.model.EntitySearch
 import com.haulmont.cuba.cli.cubaplugin.prefixchange.PrefixChanger
-import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.core.kodein
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManagerImpl
 import com.haulmont.cuba.cli.registration.EntityRegistrationHelper
 import com.haulmont.cuba.cli.registration.ScreenRegistrationHelper
 import com.haulmont.cuba.cli.registration.ServiceRegistrationHelper
@@ -56,6 +58,10 @@ private val cubaModule = Kodein.Module {
 
     bind<ProjectService>() with singleton {
         ProjectServiceImpl()
+    }
+
+    bind<PlatformVersionsManager>() with singleton {
+        PlatformVersionsManagerImpl()
     }
 }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import com.haulmont.cuba.cli.CliPlugin;
+import com.haulmont.cuba.cli.core.CliPlugin;
 import com.haulmont.cuba.cli.JansiSupportWorkAround;
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin;
 import org.jline.terminal.spi.JansiSupport;
@@ -46,7 +46,7 @@ module com.haulmont.cuba.cli {
 
     provides CliPlugin with CubaPlugin;
 
-    uses com.haulmont.cuba.cli.CliPlugin;
+    uses com.haulmont.cuba.cli.core.CliPlugin;
 
     opens com.haulmont.cuba.cli.cubaplugin;
     opens com.haulmont.cuba.cli.commands;
@@ -84,7 +84,6 @@ module com.haulmont.cuba.cli {
     exports com.haulmont.cuba.cli;
     exports com.haulmont.cuba.cli.event;
     exports com.haulmont.cuba.cli.commands;
-    exports com.haulmont.cuba.cli.prompting;
     exports com.haulmont.cuba.cli.generation;
     exports com.haulmont.cuba.cli.registration;
     exports com.haulmont.cuba.cli.cubaplugin.model;
@@ -99,6 +98,7 @@ module com.haulmont.cuba.cli {
     requires java.desktop;
     requires java.management;
     requires java.naming;
+    requires com.haulmont.cuba.cli.core;
 
 //    jansi support workaround
     provides JansiSupport with JansiSupportWorkAround;

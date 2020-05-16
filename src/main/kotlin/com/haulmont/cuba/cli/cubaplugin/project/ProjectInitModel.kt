@@ -16,10 +16,10 @@
 
 package com.haulmont.cuba.cli.cubaplugin.project
 
-import com.haulmont.cuba.cli.commands.CommandExecutionException
-import com.haulmont.cuba.cli.commands.CommonParameters
-import com.haulmont.cuba.cli.localMessages
-import com.haulmont.cuba.cli.prompting.Answers
+import com.haulmont.cuba.cli.core.commands.CommandExecutionException
+import com.haulmont.cuba.cli.core.commands.CommonParameters
+import com.haulmont.cuba.cli.core.localMessages
+import com.haulmont.cuba.cli.core.prompting.Answers
 
 class ProjectInitModel(answers: Answers) {
     val projectName: String by answers

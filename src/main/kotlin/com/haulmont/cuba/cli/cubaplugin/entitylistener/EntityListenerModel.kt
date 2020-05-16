@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.entitylistener
 
-import com.haulmont.cuba.cli.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.Answers
 
 class EntityListenerModel(answers: Answers) {
     val className: String by answers

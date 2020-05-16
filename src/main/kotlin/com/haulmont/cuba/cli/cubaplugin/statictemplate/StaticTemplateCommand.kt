@@ -19,14 +19,14 @@ package com.haulmont.cuba.cli.cubaplugin.statictemplate
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.haulmont.cuba.cli.cubaplugin.model.LatestVersion
-import com.haulmont.cuba.cli.WorkingDirectoryManager
+import com.haulmont.cuba.cli.core.WorkingDirectoryManager
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.generation.VelocityHelper
-import com.haulmont.cuba.cli.kodein
-import com.haulmont.cuba.cli.prompting.Answers
-import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.kodein
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
 import com.haulmont.cuba.cli.registration.EntityRegistrationHelper
 import com.haulmont.cuba.cli.registration.ScreenRegistrationHelper
 import com.haulmont.cuba.cli.registration.ServiceRegistrationHelper
@@ -38,13 +38,13 @@ import java.util.stream.Collectors
 @Parameters(commandDescription = "Generates artifacts from custom template")
 class StaticTemplateCommand : GeneratorCommand<Answers>() {
 
-    private val writer: PrintWriter by kodein.instance()
+    private val writer: PrintWriter by kodein.instance<PrintWriter>()
 
-    private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
+    private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance<WorkingDirectoryManager>()
 
-    private val screenRegistrationHelper: ScreenRegistrationHelper by cubaKodein.instance()
-    private val serviceRegistrationHelper: ServiceRegistrationHelper by cubaKodein.instance()
-    private val entityRegistrationHelper: EntityRegistrationHelper by cubaKodein.instance()
+    private val screenRegistrationHelper: ScreenRegistrationHelper by cubaKodein.instance<ScreenRegistrationHelper>()
+    private val serviceRegistrationHelper: ServiceRegistrationHelper by cubaKodein.instance<ServiceRegistrationHelper>()
+    private val entityRegistrationHelper: EntityRegistrationHelper by cubaKodein.instance<EntityRegistrationHelper>()
 
     private val velocityHelper = VelocityHelper()
 

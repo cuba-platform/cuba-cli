@@ -17,14 +17,15 @@
 package com.haulmont.cuba.cli.cubaplugin.front.polymer
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.*
+import com.haulmont.cuba.cli.core.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.front.CreateFrontCommand
 import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.prompting.Answers
-import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cuba.cli.getTemplate
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
@@ -33,7 +34,7 @@ import java.io.PrintWriter
 class CreatePolymerModuleCommand(override val kodein: Kodein = cubaKodein) : GeneratorCommand<PolymerModel>() {
     private val messages = Messages(CreateFrontCommand::class.java)
 
-    private val writer: PrintWriter by kodein.instance()
+    private val writer: PrintWriter by kodein.instance<PrintWriter>()
 
     private val resources by Resources.fromMyPlugin()
 
@@ -41,7 +42,7 @@ class CreatePolymerModuleCommand(override val kodein: Kodein = cubaKodein) : Gen
         Snippets(resources, "polymer", projectModel.platformVersion)
     }
 
-    private val printHelper: PrintHelper by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance<PrintHelper>()
 
     override fun getModelName(): String = "polymer"
 

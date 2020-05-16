@@ -16,8 +16,11 @@
 
 package com.haulmont.cuba.cli.prompting
 
-import com.haulmont.cuba.cli.ColoredWriter
-import com.haulmont.cuba.cli.PrintHelper
+import com.haulmont.cuba.cli.core.ColoredWriter
+import com.haulmont.cuba.cli.core.PrintHelper
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.Prompts
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
 import org.jline.reader.Completer
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
@@ -72,7 +75,9 @@ open class QuestionsTestBase {
     fun appendInputLine(str: String) = "$str\n".toByteArray().let(outputStream::write)
 
     fun interactivePrompts(setup: QuestionsList.() -> Unit): Answers =
-            Prompts(QuestionsList("test", setup), kodein = kodein).askInteractive()
+            Prompts.create(kodein) {
+                QuestionsList("test", setup)
+            }.askInteractive()
 
     private fun createTerminal(): Terminal {
         outputStream = PipedOutputStream()

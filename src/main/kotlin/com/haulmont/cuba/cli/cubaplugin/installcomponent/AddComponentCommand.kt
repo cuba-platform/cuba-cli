@@ -21,9 +21,9 @@ import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.ProjectService
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
-import com.haulmont.cuba.cli.localMessages
-import com.haulmont.cuba.cli.prompting.Answers
-import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.localMessages
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 
@@ -32,7 +32,7 @@ class AddComponentCommand(override val kodein: Kodein = cubaKodein) : GeneratorC
 
     private val messages by localMessages()
 
-    private val projectService: ProjectService by kodein.instance()
+    private val projectService: ProjectService by kodein.instance<ProjectService>()
 
     override fun getModelName(): String = ComponentModel.MODEL_NAME
 

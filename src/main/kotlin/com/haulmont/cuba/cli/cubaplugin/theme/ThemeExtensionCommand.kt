@@ -17,15 +17,16 @@
 package com.haulmont.cuba.cli.cubaplugin.theme
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.*
+import com.haulmont.cuba.cli.core.*
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.WEB_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.generation.Snippets
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.cubaplugin.model.SpecificVersion
-import com.haulmont.cuba.cli.prompting.Answers
-import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cuba.cli.getTemplate
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 import java.nio.file.Files
@@ -41,9 +42,9 @@ class ThemeExtensionCommand : GeneratorCommand<ThemeExtensionModel>() {
         Snippets(resources, "theme")
     }
 
-    private val writer: PrintWriter by kodein.instance()
+    private val writer: PrintWriter by kodein.instance<PrintWriter>()
 
-    private val printHelper: PrintHelper by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance<PrintHelper>()
 
     private val themesToExtend: List<String> by lazy {
         val themesDirectory = projectStructure.getModule(WEB_MODULE).path.resolve("themes")

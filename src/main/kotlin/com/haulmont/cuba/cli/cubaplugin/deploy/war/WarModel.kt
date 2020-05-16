@@ -18,7 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.deploy.war
 
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 import com.haulmont.cuba.cli.cubaplugin.deploy.ContextXmlParams
-import com.haulmont.cuba.cli.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.Answers
 
 class WarModel(answers: Answers, projectModel: ProjectModel) {
     val appHome: String by answers

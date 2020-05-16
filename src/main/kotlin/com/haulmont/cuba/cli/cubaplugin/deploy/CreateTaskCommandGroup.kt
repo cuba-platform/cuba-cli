@@ -17,15 +17,14 @@
 package com.haulmont.cuba.cli.cubaplugin.deploy
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.commands.AbstractCommand
-import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.commands.AbstractCubaCommand
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
 @Parameters(commandDescription = "Gradle tasks creation commands")
-object CreateTaskCommandGroup : AbstractCommand() {
+object CreateTaskCommandGroup : AbstractCubaCommand() {
 
-    private val printWriter: PrintWriter by kodein.instance()
+    private val printWriter: PrintWriter by kodein.instance<PrintWriter>()
 
     override fun run() {
         printWriter.println("Use 'war' or 'uberjar' subcommands.")

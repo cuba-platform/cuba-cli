@@ -2,6 +2,7 @@ buildscript {
     ext.kotlin_version = '1.2.71'
 
     repositories {
+        mavenLocal()
         if (rootProject.hasProperty('haulmontRepoUrl')) {
             maven {
                 url rootProject['haulmontRepoUrl']
@@ -53,6 +54,7 @@ sourceCompatibility = 11
 targetCompatibility = 11
 
 repositories {
+    mavenLocal()
     if (rootProject.hasProperty('haulmontRepoUrl')) {
         maven {
             url rootProject['haulmontRepoUrl']
@@ -80,6 +82,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
+    implementation "com.haulmont.cuba.cli.core:cuba-cli-core:2.1-SNAPSHOT"
     implementation "com.beust:jcommander:$jCommanderVersion"
     implementation "org.jline:jline:$jlineVersion"
     implementation "org.fusesource.jansi:jansi:$jansiVersion"
@@ -188,19 +191,20 @@ task generatePom(group: 'distribution', description: 'Generates POM file for upl
 
 assemble.dependsOn(generatePom)
 
-mainClassName = "com.haulmont.cuba.cli.EntryPointKt"
+mainClassName = "com.haulmont.cuba.cli.core.EntryPointKt"
+def mainClassModuleName = "com.haulmont.cuba.cli.core"
 
 startScripts {
     doLast {
         unixScript.text = unixScript.text
                 .replace(
-                "eval set -- \$DEFAULT_JVM_OPTS \$JAVA_OPTS \$CUBA_CLI_OPTS -classpath \"\\\"\$CLASSPATH\\\"\" $mainClassName \"\$APP_ARGS\"",
-                "eval set -- \$DEFAULT_JVM_OPTS \$JAVA_OPTS \$CUBA_CLI_OPTS -p \"\\\"\$CLASSPATH\\\"\" -m $moduleName/$mainClassName \"\$APP_ARGS\"")
+                        "eval set -- \$DEFAULT_JVM_OPTS \$JAVA_OPTS \$CUBA_CLI_OPTS -classpath \"\\\"\$CLASSPATH\\\"\" $mainClassName \"\$APP_ARGS\"",
+                        "eval set -- \$DEFAULT_JVM_OPTS \$JAVA_OPTS \$CUBA_CLI_OPTS -p \"\\\"\$CLASSPATH\\\"\" -m $mainClassModuleName/$mainClassName \"\$APP_ARGS\"")
 
         windowsScript.text = windowsScript.text
                 .replace(
-                "\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %CUBA_CLI_OPTS%  -classpath \"%CLASSPATH%\" $mainClassName %CMD_LINE_ARGS%",
-                "\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %CUBA_CLI_OPTS%  -p \"%CLASSPATH%\" -m $moduleName/$mainClassName %CMD_LINE_ARGS%")
+                        "\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %CUBA_CLI_OPTS%  -classpath \"%CLASSPATH%\" $mainClassName %CMD_LINE_ARGS%",
+                        "\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %CUBA_CLI_OPTS%  -p \"%CLASSPATH%\" -m $mainClassModuleName/$mainClassName %CMD_LINE_ARGS%")
 
     }
 }
@@ -214,6 +218,7 @@ def installedLibsDir = file("${buildDir}/install/cuba-cli/lib")
 def patchLibsDir = file("${buildDir}/jar-patch")
 
 def modulesConfig = [
+        'com.haulmont.cuba.cli.core': "cuba-cli-core-2.1-SNAPSHOT.jar",
         'commons.lang'              : "commons-lang-2.4-cuba.0.jar",
         'commons.collections'       : "commons-collections-3.2.2.jar",
         'commons.configuration'     : "commons-configuration-1.10.jar",
@@ -256,7 +261,7 @@ task jarPatch(dependsOn: installDist, group: 'build',
             into patchLibsDir
         }
 
-        def javaHome = System.getenv('JAVA_HOME')
+        def javaHome = System.getenv('JAVA11_HOME')
         if (javaHome == null
                 || javaHome.isEmpty()) {
             throw new GradleException('JAVA_HOME is not set')
@@ -321,7 +326,7 @@ task bundle(dependsOn: jarPatch, group: 'distribution', description: 'Builds bun
 
         logger.info("Linking")
 
-        def javaHome = System.getenv('JAVA_HOME')
+        def javaHome = System.getenv('JAVA11_HOME')
         if (javaHome == null
                 || javaHome.isEmpty()) {
             throw new GradleException('JAVA_HOME is not set')
@@ -329,7 +334,7 @@ task bundle(dependsOn: jarPatch, group: 'distribution', description: 'Builds bun
 
         def targetOsJavaHome = project.hasProperty('targetOsJavaHome') ? project.property('targetOsJavaHome') : null
         if (targetOsJavaHome == null
-            || targetOsJavaHome.isEmpty()) {
+                || targetOsJavaHome.isEmpty()) {
             targetOsJavaHome = javaHome
         }
 
@@ -344,7 +349,7 @@ task bundle(dependsOn: jarPatch, group: 'distribution', description: 'Builds bun
                     '--module-path', (["${targetOsJavaHome}/jmods"] + ext.appModulePaths).grep().join(File.pathSeparator),
                     '--add-modules', moduleName,
                     '--output', bundleOutput,
-                    '--launcher', "cuba-cli=$moduleName/$mainClassName",
+                    '--launcher', "cuba-cli=$mainClassModuleName/$mainClassName",
                     '--compress=2',
                     '--no-header-files',
                     '--no-man-pages'

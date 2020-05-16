@@ -18,12 +18,11 @@ package com.haulmont.cuba.cli.cubaplugin.idea
 
 import com.beust.jcommander.Parameters
 import com.google.common.io.CharStreams
-import com.haulmont.cuba.cli.commands.AbstractCommand
+import com.haulmont.cuba.cli.commands.AbstractCubaCommand
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.gradle.GradleRunner
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
-import com.haulmont.cuba.cli.green
-import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.core.green
 import org.kodein.di.generic.instance
 import java.io.IOException
 import java.io.InputStreamReader
@@ -34,11 +33,11 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 @Parameters(commandDescription = "Opens project in IntelliJ IDEA")
-class IdeaOpenCommand : AbstractCommand() {
+class IdeaOpenCommand : AbstractCubaCommand() {
 
-    private val writer: PrintWriter by kodein.instance()
+    private val writer: PrintWriter by kodein.instance<PrintWriter>()
 
-    private val gradleRunner: GradleRunner by cubaKodein.instance()
+    private val gradleRunner: GradleRunner by cubaKodein.instance<GradleRunner>()
 
     override fun preExecute() = checkProjectExistence()
 

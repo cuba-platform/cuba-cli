@@ -16,13 +16,13 @@
 
 package com.haulmont.cuba.cli.cubaplugin.screen.entityscreen
 
-import com.haulmont.cuba.cli.Resources
-import com.haulmont.cuba.cli.commands.NonInteractiveInfo
+import com.haulmont.cuba.cli.core.Resources
+import com.haulmont.cuba.cli.core.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.Entity
 import com.haulmont.cuba.cli.cubaplugin.screen.ScreenCommandBase
-import com.haulmont.cuba.cli.prompting.Option
-import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.prompting.Option
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
@@ -30,7 +30,7 @@ abstract class EntityScreenCommandBase<out T : EntityScreenModel> : ScreenComman
 
     protected val resources by Resources.fromMyPlugin()
 
-    protected val printWriter: PrintWriter by cubaKodein.instance()
+    protected val printWriter: PrintWriter by cubaKodein.instance<PrintWriter>()
 
     override fun getNonInteractiveParameters(): Map<String, String> = mapOf(
             "entityName" to "Fully qualified entity name",

@@ -17,15 +17,15 @@
 package com.haulmont.cuba.cli.cubaplugin.gradle
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.commands.AbstractCommand
+import com.haulmont.cuba.cli.commands.AbstractCubaCommand
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
 @Parameters(commandDescription = "Executes assemble gradle task")
-class BuildCommand : AbstractCommand() {
-    private val gradleRunner: GradleRunner by cubaKodein.instance()
-    private val printWriter: PrintWriter by cubaKodein.instance()
+class BuildCommand : AbstractCubaCommand() {
+    private val gradleRunner: GradleRunner by cubaKodein.instance<GradleRunner>()
+    private val printWriter: PrintWriter by cubaKodein.instance<PrintWriter>()
 
     override fun run() {
         try {

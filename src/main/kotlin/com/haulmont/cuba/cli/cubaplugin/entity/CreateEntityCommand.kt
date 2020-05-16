@@ -17,11 +17,11 @@
 package com.haulmont.cuba.cli.cubaplugin.entity
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.*
+import com.haulmont.cuba.cli.core.*
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.GLOBAL_MODULE
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.commands.NonInteractiveInfo
+import com.haulmont.cuba.cli.core.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.commands.from
 import com.haulmont.cuba.cli.cubaplugin.NamesUtils
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
@@ -29,8 +29,9 @@ import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.generation.*
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
-import com.haulmont.cuba.cli.prompting.Answers
-import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cuba.cli.getTemplate
 import com.haulmont.cuba.cli.registration.EntityRegistrationHelper
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
@@ -41,9 +42,9 @@ import java.util.*
 class CreateEntityCommand(override val kodein: Kodein = cubaKodein) : GeneratorCommand<EntityModel>(), NonInteractiveInfo {
     private val entityTypes = listOf("Persistent", "Persistent embedded", "Not persistent")
 
-    private val namesUtils: NamesUtils by kodein.instance()
+    private val namesUtils: NamesUtils by kodein.instance<NamesUtils>()
 
-    private val printHelper: PrintHelper by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance<PrintHelper>()
 
     private val resources by Resources.fromMyPlugin()
 
@@ -51,7 +52,7 @@ class CreateEntityCommand(override val kodein: Kodein = cubaKodein) : GeneratorC
         Snippets(resources, "entity")
     }
 
-    private val entityRegistrationHelper: EntityRegistrationHelper by cubaKodein.instance()
+    private val entityRegistrationHelper: EntityRegistrationHelper by cubaKodein.instance<EntityRegistrationHelper>()
 
     private val calendar = Calendar.getInstance()
 

@@ -16,8 +16,8 @@
 
 package com.haulmont.cuba.cli.generation
 
-import com.haulmont.cuba.cli.PrintHelper
-import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.core.PrintHelper
+import com.haulmont.cuba.cli.core.kodein
 import net.sf.practicalxml.DomUtil
 import net.sf.practicalxml.XmlException
 import net.sf.practicalxml.xpath.XPathWrapper
@@ -34,8 +34,8 @@ import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
 
-private val writer: PrintWriter by kodein.instance()
-private val printHelper: PrintHelper by kodein.instance()
+private val writer: PrintWriter by kodein.instance<PrintWriter>()
+private val printHelper: PrintHelper by kodein.instance<PrintHelper>()
 
 fun parse(path: Path): Document = Files.newInputStream(path).let(::InputSource).let {
     createDocumentBuilder().parse(it)

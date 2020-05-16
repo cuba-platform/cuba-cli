@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.cli.prompting
 
+import com.haulmont.cuba.cli.core.prompting.Answers
 import org.junit.Assert.assertTrue
 import org.junit.Test
 

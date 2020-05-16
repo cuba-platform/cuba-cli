@@ -16,12 +16,12 @@
 
 package com.haulmont.cuba.cli.cubaplugin.statictemplate
 
-import com.haulmont.cuba.cli.commands.CommandExecutionException
+import com.haulmont.cuba.cli.core.commands.CommandExecutionException
 import com.haulmont.cuba.cli.generation.findFirstChild
 import com.haulmont.cuba.cli.generation.get
 import com.haulmont.cuba.cli.generation.getChildElements
 import com.haulmont.cuba.cli.generation.parse
-import com.haulmont.cuba.cli.kodein
+import com.haulmont.cuba.cli.core.kodein
 import net.sf.practicalxml.DomUtil
 import org.kodein.di.generic.instance
 import org.w3c.dom.Element
@@ -43,7 +43,7 @@ sealed class TemplateQuestion(val name: String, val caption: String)
 class PlainQuestion(name: String, caption: String) : TemplateQuestion(name, caption)
 class OptionsQuestion(name: String, caption: String, val options: List<String>) : TemplateQuestion(name, caption)
 
-private val printWriter: PrintWriter by kodein.instance()
+private val printWriter: PrintWriter by kodein.instance<PrintWriter>()
 
 fun parseTemplate(templateName: String): StaticTemplate {
     val templateBasePath = findTemplate(templateName)

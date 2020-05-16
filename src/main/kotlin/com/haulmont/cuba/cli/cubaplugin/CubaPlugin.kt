@@ -17,8 +17,8 @@
 package com.haulmont.cuba.cli.cubaplugin
 
 import com.google.common.eventbus.Subscribe
-import com.haulmont.cuba.cli.*
-import com.haulmont.cuba.cli.commands.CdCommand
+import com.haulmont.cuba.cli.core.*
+import com.haulmont.cuba.cli.core.commands.CdCommand
 import com.haulmont.cuba.cli.cubaplugin.appcomponentxml.AppComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.componentbean.CreateComponentBeanCommand
 import com.haulmont.cuba.cli.cubaplugin.config.ConfigCommand
@@ -45,31 +45,45 @@ import com.haulmont.cuba.cli.cubaplugin.service.CreateServiceCommand
 import com.haulmont.cuba.cli.cubaplugin.statictemplate.StaticTemplateCommand
 import com.haulmont.cuba.cli.cubaplugin.theme.ThemeExtensionCommand
 import com.haulmont.cuba.cli.cubaplugin.updatescript.UpdateScriptCommand
-import com.haulmont.cuba.cli.event.BeforeCommandExecutionEvent
-import com.haulmont.cuba.cli.event.InitPluginEvent
+import com.haulmont.cuba.cli.core.event.BeforeCommandExecutionEvent
+import com.haulmont.cuba.cli.core.event.InitPluginEvent
+import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
+import org.jline.terminal.Terminal
+import org.jline.terminal.impl.DumbTerminal
+import org.kodein.di.direct
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
 @Suppress("UNUSED_PARAMETER")
+@MainPlugin(prompt = "cuba>", priority = 900)
 class CubaPlugin : CliPlugin {
     override val apiVersion: Int = API_VERSION
 
     override val resources: ResourcesPath = HasResources(RESOURCES_PATH)
 
-    private val context: CliContext by kodein.instance()
+    private val context: CliContext by kodein.instance<CliContext>()
 
-    private val writer: PrintWriter by kodein.instance()
+    private val writer: PrintWriter by kodein.instance<PrintWriter>()
 
-    private val namesUtils: NamesUtils by kodein.instance()
+    private val namesUtils: NamesUtils by kodein.instance<NamesUtils>()
 
-    private val printHelper: PrintHelper by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance<PrintHelper>()
 
     private val messages by localMessages()
+
+    private val terminal: Terminal by kodein.instance<Terminal>()
 
     private val versionUtils: VersionUtils = VersionUtils()
 
     @Subscribe
     fun onInit(event: InitPluginEvent) {
+
+        loadVersions()
+        if (CliMode.SHELL == event.cliMode) {
+            printWelcome()
+        }
+
         event.commandsRegistry {
             command("create-app", ProjectInitCommand())
             command("create-entity", CreateEntityCommand())
@@ -98,6 +112,11 @@ class CubaPlugin : CliPlugin {
         }
     }
 
+    private fun loadVersions() {
+        val versionManager: PlatformVersionsManager by cubaKodein.instance<PlatformVersionsManager>()
+        versionManager.load()
+    }
+
     @Subscribe
     fun beforeCommand(event: BeforeCommandExecutionEvent) {
         when (event.command) {
@@ -124,5 +143,13 @@ class CubaPlugin : CliPlugin {
 
     companion object {
         const val RESOURCES_PATH = "/com/haulmont/cuba/cli/cubaplugin/"
+    }
+
+    private fun printWelcome() {
+        if (terminal !is DumbTerminal) {
+            writer.println(messages["welcomeMessage"].trimMargin())
+        } else {
+            writer.println(messages["welcomeMessageDumb"].trimMargin())
+        }
     }
 }

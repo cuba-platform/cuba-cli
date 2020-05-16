@@ -16,9 +16,9 @@
 
 package com.haulmont.cuba.cli.cubaplugin.front
 
-import com.haulmont.cuba.cli.CliPlugin
+import com.haulmont.cuba.cli.core.CliPlugin
 import com.haulmont.cuba.cli.command.CommandTestBase
-import com.haulmont.cuba.cli.commands.CommandExecutionException
+import com.haulmont.cuba.cli.core.commands.CommandExecutionException
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin
 import com.haulmont.cuba.cli.cubaplugin.ProjectService
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
@@ -27,7 +27,7 @@ import com.haulmont.cuba.cli.cubaplugin.front.react.CreateReactModuleCommand
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
-import com.haulmont.cuba.cli.prompting.ReadException
+import com.haulmont.cuba.cli.core.prompting.ReadException
 import org.junit.Assert
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -153,7 +153,7 @@ class CreateFrontModuleCommandTest : CommandTestBase() {
     fun testNotAskForRestComponentAsItIsAlreadyAdded() {
         createProject(version = PlatformVersion.v7_1)
 
-        val projectService: ProjectService by kodein.instance()
+        val projectService: ProjectService by kodein.instance<ProjectService>()
 
         projectService.registerAppComponent("com.haulmont.addon.restapi:restapi-global:0.1-SNAPSHOT")
 

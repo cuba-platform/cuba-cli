@@ -16,8 +16,8 @@
 
 package com.haulmont.cuba.cli.generation
 
-import com.haulmont.cuba.cli.*
-import com.haulmont.cuba.cli.commands.CommandExecutionException
+import com.haulmont.cuba.cli.core.*
+import com.haulmont.cuba.cli.core.commands.CommandExecutionException
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
@@ -49,7 +49,7 @@ import kotlin.reflect.full.memberProperties
  */
 class TemplateProcessor(templateBasePath: Path, private val bindings: Map<String, Any>, version: PlatformVersion = PlatformVersion.findVersion()) {
 
-    private val printHelper: PrintHelper by kodein.instance()
+    private val printHelper: PrintHelper by kodein.instance<PrintHelper>()
 
     private val pathExpressionPattern: Regex = Regex("\\$\\{[a-zA-Z][0-9a-zA-Z]*(\\.[a-zA-Z][0-9a-zA-Z]*)*}")
     private val packageExpressionPattern: Regex = Regex("\\$\\[[a-zA-Z][0-9a-zA-Z]*(\\.[a-zA-Z][0-9a-zA-Z]*)*]")
@@ -199,7 +199,7 @@ class TemplateProcessor(templateBasePath: Path, private val bindings: Map<String
     }
 
     companion object {
-        private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
+        private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance<WorkingDirectoryManager>()
 
         val projectRoot: Path
             get() = workingDirectoryManager.workingDirectory.toAbsolutePath()

@@ -16,17 +16,13 @@
 
 package com.haulmont.cuba.cli.commands
 
-import com.haulmont.cuba.cli.CliContext
+import com.haulmont.cuba.cli.core.commands.AbstractCommand
+import com.haulmont.cuba.cli.core.commands.CommandExecutionException
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
 import org.kodein.di.Kodein
-import org.kodein.di.generic.instance
-import java.nio.file.Files
-import java.nio.file.Path
 
-abstract class AbstractCommand(kodein: Kodein = com.haulmont.cuba.cli.kodein) : CliCommand {
-    @Suppress("CanBePrimaryConstructorProperty")
-    protected open val kodein: Kodein = kodein
+abstract class AbstractCubaCommand(kodein: Kodein = com.haulmont.cuba.cli.core.kodein) : AbstractCommand(kodein) {
 
     protected val projectStructure: ProjectStructure by lazy { ProjectStructure() }
 
@@ -42,34 +38,6 @@ abstract class AbstractCommand(kodein: Kodein = com.haulmont.cuba.cli.kodein) : 
         }
 
     /**
-     * Is used to generation model saving and retrieving.
-     */
-    val context: CliContext by kodein.instance()
-
-    final override fun execute() {
-        preExecute()
-
-        run()
-
-        postExecute()
-    }
-
-    /**
-     * Main command logic.
-     */
-    protected abstract fun run()
-
-    /**
-     * Invokes before [run].
-     */
-    protected open fun preExecute() {}
-
-    /**
-     * Invokes after [run].
-     */
-    protected open fun postExecute() {}
-
-    /**
      * It is implied, that method invokes in [preExecute] to fail fast, if command is started outside of CUBA Platform project.
      *
      * @throws CommandExecutionException - if command is started outside of CUBA Platform project.
@@ -79,29 +47,5 @@ abstract class AbstractCommand(kodein: Kodein = com.haulmont.cuba.cli.kodein) : 
         if (!context.hasModel("project")) {
             fail("Command should be started in project directory")
         }
-    }
-
-    /**
-     * Throws CommandExecutionException with [cause] message.
-     * If [silent] user will not see the error.
-     */
-    @Throws(CommandExecutionException::class)
-    protected fun fail(cause: String, silent: Boolean = false): Nothing =
-            throw CommandExecutionException(cause, silent = silent)
-
-    /**
-     * Silently stops command execution
-     */
-    @Throws(CommandExecutionException::class)
-    protected fun abort(): Nothing = fail("Aborted", silent = true)
-
-    /**
-     * If [file] exists throws CommandExecutionException with [cause] message.
-     * If [silent] user will not see the error.
-     */
-    @Throws(CommandExecutionException::class)
-    protected fun ensureFileAbsence(file: Path, cause: String, silent: Boolean = false) {
-        if (Files.exists(file))
-            fail(cause, silent)
     }
 }

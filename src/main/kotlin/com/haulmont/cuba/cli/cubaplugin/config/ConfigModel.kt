@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.config
 
-import com.haulmont.cuba.cli.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.Answers
 
 class ConfigModel(answers: Answers) {
 

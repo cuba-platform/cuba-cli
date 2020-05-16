@@ -17,19 +17,19 @@
 package com.haulmont.cuba.cli.cubaplugin.prefixchange
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.commands.AbstractCommand
+import com.haulmont.cuba.cli.commands.AbstractCubaCommand
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
-import com.haulmont.cuba.cli.prompting.Prompts
+import com.haulmont.cuba.cli.core.prompting.Prompts
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
 
 
 @Parameters(commandDescription = "Changes modules prefix")
-class PrefixChangeCommand : AbstractCommand() {
+class PrefixChangeCommand : AbstractCubaCommand() {
 
-    private val printWriter: PrintWriter by cubaKodein.instance()
+    private val printWriter: PrintWriter by cubaKodein.instance<PrintWriter>()
 
-    private val prefixChanger: PrefixChanger by cubaKodein.instance()
+    private val prefixChanger: PrefixChanger by cubaKodein.instance<PrefixChanger>()
 
     override fun preExecute() {
         checkProjectExistence()

@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin.screen.blankscreen
 
-import com.haulmont.cuba.cli.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.Answers
 
 class ScreenModel(answers: Answers) {
     val screenId: String by answers

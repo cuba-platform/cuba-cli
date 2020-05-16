@@ -21,7 +21,8 @@ import com.haulmont.cuba.cli.cubaplugin.model.Entity
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
 import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.generation.TemplateProcessor
-import com.haulmont.cuba.cli.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.getTemplate
 
 @Parameters(commandDescription = "Creates new master-detail screen")
 class MasterDetailScreenCommand : EntityScreenCommandBase<EntityScreenModel>() {

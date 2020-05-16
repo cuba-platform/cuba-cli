@@ -17,17 +17,18 @@
 package com.haulmont.cuba.cli.cubaplugin.project
 
 import com.beust.jcommander.Parameters
-import com.haulmont.cuba.cli.*
+import com.haulmont.cuba.cli.core.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
-import com.haulmont.cuba.cli.commands.NonInteractiveInfo
+import com.haulmont.cuba.cli.core.commands.NonInteractiveInfo
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionParseException
 import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManagerImpl
-import com.haulmont.cuba.cli.prompting.Answers
-import com.haulmont.cuba.cli.prompting.QuestionsList
+import com.haulmont.cuba.cli.core.prompting.Answers
+import com.haulmont.cuba.cli.core.prompting.QuestionsList
+import com.haulmont.cuba.cli.getTemplate
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
@@ -45,9 +46,9 @@ class ProjectInitCommand(override val kodein: Kodein = cubaKodein) : GeneratorCo
 
     private val resources by Resources.fromMyPlugin()
 
-    private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
+    private val workingDirectoryManager: WorkingDirectoryManager by kodein.instance<WorkingDirectoryManager>()
 
-    private val platformVersionsManager: PlatformVersionsManager by kodein.instance()
+    private val platformVersionsManager: PlatformVersionsManager by kodein.instance<PlatformVersionsManager>()
 
     private val databases by lazy {
         messages["databases"].split(',')
@@ -57,7 +58,7 @@ class ProjectInitCommand(override val kodein: Kodein = cubaKodein) : GeneratorCo
         messages["databaseAliases"].split(',')
     }
 
-    private val writer: PrintWriter by kodein.instance()
+    private val writer: PrintWriter by kodein.instance<PrintWriter>()
 
     override fun getNonInteractiveParameters(): Map<String, String> = mapOf(
             "projectName" to "Project name",

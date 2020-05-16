@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.cli.commands
+package com.haulmont.cuba.cli.event
 
-import com.beust.jcommander.Parameters
+import com.haulmont.cuba.cli.core.event.CliEvent
 
-@Parameters(commandDescription = "")
-open class PlaceholderCommand : AbstractCommand() {
-    final override fun run() {
-        fail("Command usage without arguments does not permit. Read help for more information.")
-    }
-}
+interface CubaCliEvent: CliEvent
+
+class ModelRegisteredEvent(val modelName: String) : CubaCliEvent

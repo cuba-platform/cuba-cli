@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.cli.cubaplugin
 
-import com.haulmont.cuba.cli.PrintHelper
+import com.haulmont.cuba.cli.core.PrintHelper
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
@@ -28,7 +28,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 class ProjectServiceImpl : ProjectService {
-    private val printHelper: PrintHelper by cubaKodein.instance()
+    private val printHelper: PrintHelper by cubaKodein.instance<PrintHelper>()
 
     override fun registerAppComponent(coordinates: String) {
         val projectStructure = ProjectStructure()
