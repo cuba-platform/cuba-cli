@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import com.haulmont.cuba.cli.CliPlugin;
-import com.haulmont.cuba.cli.JansiSupportWorkAround;
+import com.haulmont.cuba.cli.core.JansiSupportWorkAround;
 import org.jline.terminal.spi.JansiSupport;
 
-module com.haulmont.cuba.cli {
+module com.haulmont.cuba.cli.core {
     requires kotlin.stdlib.jdk8;
     requires kotlin.stdlib.jdk7;
     requires kotlin.stdlib;
@@ -43,15 +42,15 @@ module com.haulmont.cuba.cli {
     requires practicalxml;
     requires java.xml;
 
-    uses com.haulmont.cuba.cli.CliPlugin;
+    uses com.haulmont.cuba.cli.core.CliPlugin;
 
-    opens com.haulmont.cuba.cli.commands;
-    opens com.haulmont.cuba.cli;
+    opens com.haulmont.cuba.cli.core.commands;
+    opens com.haulmont.cuba.cli.core;
 
-    exports com.haulmont.cuba.cli;
-    exports com.haulmont.cuba.cli.event;
-    exports com.haulmont.cuba.cli.commands;
-    exports com.haulmont.cuba.cli.prompting;
+    exports com.haulmont.cuba.cli.core;
+    exports com.haulmont.cuba.cli.core.event;
+    exports com.haulmont.cuba.cli.core.commands;
+    exports com.haulmont.cuba.cli.core.prompting;
 
 //    for debug
     requires jdk.jdwp.agent;

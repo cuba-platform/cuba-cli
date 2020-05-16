@@ -31,12 +31,12 @@ buildscript {
     }
 }
 
-group 'com.haulmont.cuba.cli'
+group 'com.haulmont.cuba.cli.core'
 version rootProject.hasProperty('buildVersion') ? rootProject['buildVersion'] : '2.1-SNAPSHOT'
 
 def apiVersion = 5
 
-def moduleName = "com.haulmont.cuba.cli"
+def moduleName = "com.haulmont.cuba.cli.core"
 
 def velocityVersion = "1.7"
 def jCommanderVersion = "1.72"
@@ -80,7 +80,6 @@ repositories {
 }
 
 dependencies {
-//    implementation "com.haulmont.cuba.cli:cuba-cli-core:2.1-SNAPSHOT"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
@@ -131,7 +130,7 @@ configurations {
 }
 
 processResources.doLast {
-    def buildProperties = new File(project.buildDir, 'resources/main/com/haulmont/cuba/cli/application.properties')
+    def buildProperties = new File(project.buildDir, 'resources/main/com/haulmont/cuba/cli/core/application.properties')
     buildProperties.text = buildProperties.text.replace('version = DEVELOPMENT', 'version = ' + project.version)
 }
 
@@ -140,7 +139,7 @@ compileJava {
 
     options.compilerArgs = [
             '--module-path', classpath.asPath,
-            '--patch-module', 'com.haulmont.cuba.cli=' + compileKotlin.destinationDir
+            '--patch-module', 'com.haulmont.cuba.cli.core=' + compileKotlin.destinationDir
     ]
 }
 
@@ -192,7 +191,7 @@ task generatePom(group: 'distribution', description: 'Generates POM file for upl
 
 assemble.dependsOn(generatePom)
 
-mainClassName = "com.haulmont.cuba.cli.EntryPointKt"
+mainClassName = "com.haulmont.cuba.cli.core.EntryPointKt"
 
 startScripts {
     doLast {
