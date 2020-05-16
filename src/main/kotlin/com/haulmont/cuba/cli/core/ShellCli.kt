@@ -32,6 +32,7 @@ import org.jline.reader.LineReader
 import org.jline.reader.UserInterruptException
 import org.jline.reader.impl.LineReaderImpl
 import org.kodein.di.generic.instance
+import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
 import java.util.*
 
@@ -40,6 +41,10 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
     private val commandParser: CommandParser
 
     private val cliContext: CliContext by kodein.instance()
+
+    private val writer: PrintWriter by kodein.instance<PrintWriter>()
+
+    private val messages by localMessages()
 
     private val printHelper: PrintHelper by kodein.instance()
 
@@ -77,7 +82,7 @@ class ShellCli(private val commandsRegistry: CommandsRegistry) : Cli {
     private val lineReader: LineReader by kodein.instance(arg = createCommandsCompleter(commandsRegistry))
 
     override fun run() {
-
+        writer.println(messages["interactiveModeHint"])
         while (true) {
             CommonParameters.reset()
             commandParser.reset()
