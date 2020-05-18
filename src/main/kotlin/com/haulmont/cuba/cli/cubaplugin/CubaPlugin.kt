@@ -80,7 +80,7 @@ class CubaPlugin : CliPlugin {
     fun onInit(event: InitPluginEvent) {
 
         loadVersions()
-        if (CliMode.SHELL == event.cliMode) {
+        if (CliMode.SHELL == event.cliMode && context.mainPlugin() == this) {
             printWelcome()
         }
 
