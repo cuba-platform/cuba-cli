@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import com.haulmont.cli.core.CliPlugin;
+import com.haulmont.cli.core.MainCliPlugin;
 import com.haulmont.cuba.cli.JansiSupportWorkAround;
 import com.haulmont.cuba.cli.cubaplugin.CubaPlugin;
 import org.jline.terminal.spi.JansiSupport;
@@ -44,7 +44,7 @@ module com.haulmont.cuba.cli {
     requires practicalxml;
     requires java.xml;
 
-    provides CliPlugin with CubaPlugin;
+    provides MainCliPlugin with CubaPlugin;
 
     uses com.haulmont.cli.core.CliPlugin;
 

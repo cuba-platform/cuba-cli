@@ -25,8 +25,6 @@ import com.haulmont.cuba.cli.cubaplugin.entity.CreateEntityCommand
 import com.haulmont.cli.core.prompting.ValidationException
 import org.junit.Test
 import org.kodein.di.Kodein
-import org.kodein.di.generic.bind
-import org.kodein.di.generic.instance
 
 class CreateEntityListenerCommandTest : CommandTestBase() {
     override val plugins: List<CliPlugin> = listOf(CubaPlugin())

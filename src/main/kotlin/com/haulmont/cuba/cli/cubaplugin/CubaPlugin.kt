@@ -19,12 +19,15 @@ package com.haulmont.cuba.cli.cubaplugin
 import com.google.common.eventbus.Subscribe
 import com.haulmont.cli.core.*
 import com.haulmont.cli.core.commands.CdCommand
+import com.haulmont.cli.core.event.BeforeCommandExecutionEvent
+import com.haulmont.cli.core.event.InitPluginEvent
 import com.haulmont.cuba.cli.cubaplugin.appcomponentxml.AppComponentCommand
 import com.haulmont.cuba.cli.cubaplugin.componentbean.CreateComponentBeanCommand
 import com.haulmont.cuba.cli.cubaplugin.config.ConfigCommand
 import com.haulmont.cuba.cli.cubaplugin.deploy.CreateTaskCommandGroup
 import com.haulmont.cuba.cli.cubaplugin.deploy.uberjar.UberJarCommand
 import com.haulmont.cuba.cli.cubaplugin.deploy.war.WarCommand
+import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
 import com.haulmont.cuba.cli.cubaplugin.entity.CreateEntityCommand
 import com.haulmont.cuba.cli.cubaplugin.entitylistener.CreateEntityListenerCommand
 import com.haulmont.cuba.cli.cubaplugin.enumeration.CreateEnumerationCommand
@@ -34,33 +37,38 @@ import com.haulmont.cuba.cli.cubaplugin.gradle.GradleCommand
 import com.haulmont.cuba.cli.cubaplugin.gradle.RunCommand
 import com.haulmont.cuba.cli.cubaplugin.idea.IdeaOpenCommand
 import com.haulmont.cuba.cli.cubaplugin.installcomponent.AddComponentCommand
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectModel
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectScanException
 import com.haulmont.cuba.cli.cubaplugin.model.ProjectStructure
-import com.haulmont.cuba.cli.cubaplugin.premiumrepo.EnablePremiumRepoCommand
 import com.haulmont.cuba.cli.cubaplugin.prefixchange.PrefixChangeCommand
+import com.haulmont.cuba.cli.cubaplugin.premiumrepo.EnablePremiumRepoCommand
 import com.haulmont.cuba.cli.cubaplugin.project.ProjectInitCommand
 import com.haulmont.cuba.cli.cubaplugin.screen.ScreenCommandsGroup
 import com.haulmont.cuba.cli.cubaplugin.service.CreateServiceCommand
 import com.haulmont.cuba.cli.cubaplugin.statictemplate.StaticTemplateCommand
 import com.haulmont.cuba.cli.cubaplugin.theme.ThemeExtensionCommand
 import com.haulmont.cuba.cli.cubaplugin.updatescript.UpdateScriptCommand
-import com.haulmont.cli.core.event.BeforeCommandExecutionEvent
-import com.haulmont.cli.core.event.InitPluginEvent
-import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
-import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersionsManager
 import org.jline.terminal.Terminal
 import org.jline.terminal.impl.DumbTerminal
-import org.kodein.di.direct
 import org.kodein.di.generic.instance
 import java.io.PrintWriter
+import java.nio.file.Path
+import java.nio.file.Paths
 
 @Suppress("UNUSED_PARAMETER")
-@MainPlugin(prompt = "cuba>", priority = 900)
-class CubaPlugin : CliPlugin {
+class CubaPlugin : MainCliPlugin {
+
+    override val pluginsDir: Path? = Paths.get(System.getProperty("user.home"), ".haulmont", "cli", "plugins")
+    override val priority: Int = 900
+    override val prompt: String = "cuba>"
     override val apiVersion: Int = API_VERSION
 
     override val resources: ResourcesPath = HasResources(RESOURCES_PATH)
+
+    override fun welcome() {
+        printWelcome()
+    }
 
     private val context: CliContext by kodein.instance<CliContext>()
 
@@ -80,9 +88,6 @@ class CubaPlugin : CliPlugin {
     fun onInit(event: InitPluginEvent) {
 
         loadVersions()
-        if (CliMode.SHELL == event.cliMode && context.mainPlugin() == this) {
-            printWelcome()
-        }
 
         event.commandsRegistry {
             command("create-app", ProjectInitCommand())

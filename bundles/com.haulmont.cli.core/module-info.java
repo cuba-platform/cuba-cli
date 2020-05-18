@@ -24,8 +24,6 @@ module com.haulmont.cli.core {
     requires jansi;
     requires jline;
 
-    requires velocity;
-
     requires com.google.common;
     requires gson;
 
@@ -36,10 +34,10 @@ module com.haulmont.cli.core {
     requires kodein.di.core.jvm;
     requires kodein.di.generic.jvm;
 
-    requires practicalxml;
     requires java.xml;
 
     uses com.haulmont.cli.core.CliPlugin;
+    uses com.haulmont.cli.core.MainCliPlugin;
 
     opens com.haulmont.cli.core.commands;
     opens com.haulmont.cli.core;
