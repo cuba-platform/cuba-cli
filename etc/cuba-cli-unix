@@ -37,4 +37,4 @@ elif [[ "$unamestr" == 'Darwin' ]]; then
    platform='macos'
 fi
 
-"$DIR/../native-$platform/bin/java" $JLINK_VM_OPTIONS -m com.haulmont.cuba.cli.core/com.haulmont.cuba.cli.core.EntryPointKt $@
+"$DIR/../native-$platform/bin/java" $JLINK_VM_OPTIONS -m com.haulmont.cli.core/com.haulmont.cli.core.EntryPointKt $@
