@@ -32,13 +32,11 @@ buildscript {
 }
 
 group 'com.haulmont.cli.core'
-version rootProject.hasProperty('buildVersion') ? rootProject['buildVersion'] : '2.1-SNAPSHOT'
-
-def apiVersion = 5
+version rootProject.hasProperty('buildVersion') ? rootProject['buildVersion'] : '1.0-SNAPSHOT'
+def isSnapshot = version.endsWith('-SNAPSHOT')
 
 def moduleName = "com.haulmont.cli.core"
 
-def velocityVersion = "1.7"
 def jCommanderVersion = "1.72"
 def jansiVersion = "1.17"
 def guavaVersion = "26.0-jre"
@@ -87,10 +85,6 @@ dependencies {
     implementation "org.jline:jline:$jlineVersion"
     implementation "org.fusesource.jansi:jansi:$jansiVersion"
 
-    implementation("org.apache.velocity:velocity:$velocityVersion") {
-        // jlink: org.apache.commons.lang.enum: Invalid package name: 'enum' is not a Java identifier
-        exclude(group: 'commons-lang', module: 'commons-lang')
-    }
     // Using custom JAR without 'enum' package
     implementation("commons-lang:commons-lang:2.4-cuba.0")
     implementation("commons-collections:commons-collections:3.2.2")
@@ -102,10 +96,6 @@ dependencies {
     implementation("org.kodein.di:kodein-di-generic-jvm:$kodeinVersion") {
         // jlink: org.apache.commons.lang.enum: Invalid package name: 'enum' is not a Java identifier
         exclude(group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib')
-    }
-
-    implementation("net.sf.practicalxml:practicalxml:$practicalxmlVersion") {
-        exclude(group: "junit", module: "junit")
     }
 
     implementation("com.google.code.gson:gson:$gsonVersion")
@@ -120,6 +110,7 @@ dependencies {
 }
 
 configurations {
+    deployerJars
     compile {
         exclude(group: 'org.jetbrains', module: 'annotations')
     }
@@ -191,261 +182,26 @@ task generatePom(group: 'distribution', description: 'Generates POM file for upl
 
 assemble.dependsOn(generatePom)
 
-mainClassName = "com.haulmont.cli.core.EntryPointKt"
-
-startScripts {
-    doLast {
-        unixScript.text = unixScript.text
-                .replace(
-                "eval set -- \$DEFAULT_JVM_OPTS \$JAVA_OPTS \$CUBA_CLI_OPTS -classpath \"\\\"\$CLASSPATH\\\"\" $mainClassName \"\$APP_ARGS\"",
-                "eval set -- \$DEFAULT_JVM_OPTS \$JAVA_OPTS \$CUBA_CLI_OPTS -p \"\\\"\$CLASSPATH\\\"\" -m $moduleName/$mainClassName \"\$APP_ARGS\"")
-
-        windowsScript.text = windowsScript.text
-                .replace(
-                "\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %CUBA_CLI_OPTS%  -classpath \"%CLASSPATH%\" $mainClassName %CMD_LINE_ARGS%",
-                "\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %CUBA_CLI_OPTS%  -p \"%CLASSPATH%\" -m $moduleName/$mainClassName %CMD_LINE_ARGS%")
-
+def uploadUrl = project.hasProperty('uploadUrl') ? project.uploadUrl : null
+def haulmontUploadRepo = System.getenv('HAULMONT_REPOSITORY_UPLOAD_URL')
+if (uploadUrl == null && haulmontUploadRepo) {
+    if (!haulmontUploadRepo.endsWith('/')) {
+        haulmontUploadRepo += '/'
     }
+    uploadUrl = haulmontUploadRepo + "${isSnapshot ? 'snapshots' : 'releases'}"
 }
 
-def bundlePlatform = project.hasProperty('targetOsPlatform') ? '-' + project.property('targetOsPlatform') : '';
+def uploadUser = project.hasProperty('uploadUser') ? project.uploadUser :
+        System.getenv('HAULMONT_REPOSITORY_USER')
+def uploadPassword = project.hasProperty('uploadPassword') ? project.uploadPassword :
+        System.getenv('HAULMONT_REPOSITORY_PASSWORD')
 
-def bundlesDir = file("bundles")
-def modulesDir = file("${project.buildDir}/modules")
-def bundleOutput = file("${buildDir}/bundle" + bundlePlatform)
-def installedLibsDir = file("${buildDir}/install/cuba-cli/lib")
-def patchLibsDir = file("${buildDir}/jar-patch")
-
-def modulesConfig = [
-        'commons.lang'              : "commons-lang-2.4-cuba.0.jar",
-        'commons.collections'       : "commons-collections-3.2.2.jar",
-        'commons.configuration'     : "commons-configuration-1.10.jar",
-        'commons.logging'           : "commons-logging-1.1.1.jar",
-        'velocity'                  : "velocity-${velocityVersion}.jar",
-        'checker.qual'              : "checker-qual-2.5.2.jar",
-        'error.prone.annotations'   : "error_prone_annotations-2.1.3.jar",
-        'j2objc.annotations'        : "j2objc-annotations-1.1.jar",
-        'animal.sniffer.annotations': "animal-sniffer-annotations-1.14.jar",
-        'com.google.common'         : "guava-${guavaVersion}.jar",
-        'practicalxml'              : "practicalxml-${practicalxmlVersion}.jar",
-        'jansi'                     : "jansi-${jansiVersion}.jar",
-        'jline'                     : "jline-${jlineVersion}.jar",
-        'jcommander'                : "jcommander-${jCommanderVersion}.jar",
-        'kotlin.stdlib'             : "kotlin-stdlib-${kotlin_version}.jar",
-        'kotlin.reflect'            : "kotlin-reflect-${kotlin_version}.jar",
-        'kotlin.stdlib.jdk7'        : "kotlin-stdlib-jdk7-${kotlin_version}.jar",
-        'kotlin.stdlib.jdk8'        : "kotlin-stdlib-jdk8-${kotlin_version}.jar",
-        'kodein.di.core.jvm'        : "kodein-di-core-jvm-${kodeinVersion}.jar",
-        'kodein.di.generic.jvm'     : "kodein-di-generic-jvm-${kodeinVersion}.jar",
-        'gson'                      : "gson-${gsonVersion}.jar"
-]
-
-task jarPatch(dependsOn: installDist, group: 'build',
-        description: 'Patch dependencies with module information') {
-    inputs.dir bundlesDir
-    outputs.dir patchLibsDir
-
-    inputs.files installDist.outputs.files
-
-    doLast {
-        delete patchLibsDir
-        delete modulesDir
-
-        modulesDir.mkdirs()
-
-        // Compile module definitions
-        copy {
-            from installedLibsDir
-            into patchLibsDir
-        }
-
-        def javaHome = System.getenv('JAVA_HOME')
-        if (javaHome == null
-                || javaHome.isEmpty()) {
-            throw new GradleException('JAVA_HOME is not set')
-        }
-
-        for (moduleItem in modulesConfig) {
-            def moduleItemName = moduleItem.key
-            def moduleItemJar = moduleItem.value
-
-            def jarFile = new File(patchLibsDir, moduleItemJar)
-
-            logger.info("Modularize ${moduleItemJar}")
-
-            logger.info("Compile module-info.class")
-
-            def compiledModuleDir = new File(modulesDir, moduleItemName)
-
-            exec {
-                workingDir modulesDir
-
-                commandLine(
-                        "${javaHome}/bin/javac",
-                        '-p', patchLibsDir.absolutePath,
-                        '-d', compiledModuleDir.absolutePath,
-                        '--patch-module', "${moduleItemName}=${jarFile.absolutePath}",
-                        new File(project.file("bundles"), "${moduleItemName}/module-info.java").absolutePath
-                )
-
-                standardOutput = System.out
-                errorOutput = System.out
-            }
-
-            logger.info("Update JAR")
-
-            exec {
-                workingDir patchLibsDir
-
-                commandLine(
-                        "${javaHome}/bin/jar",
-                        'uf',
-                        jarFile.absolutePath,
-                        '-C',
-                        compiledModuleDir.absolutePath,
-                        'module-info.class'
-                )
-
-                standardOutput = System.out
-                errorOutput = System.out
-            }
-        }
-    }
-}
-
-task bundle(dependsOn: jarPatch, group: 'distribution', description: 'Builds bundle with custom JRE') {
-    outputs.dir bundleOutput
-    inputs.dir patchLibsDir
-
-    ext.appModulePaths = [patchLibsDir]
-
-    doLast {
-        delete bundleOutput
-
-        logger.info("Linking")
-
-        def javaHome = System.getenv('JAVA_HOME')
-        if (javaHome == null
-                || javaHome.isEmpty()) {
-            throw new GradleException('JAVA_HOME is not set')
-        }
-
-        def targetOsJavaHome = project.hasProperty('targetOsJavaHome') ? project.property('targetOsJavaHome') : null
-        if (targetOsJavaHome == null
-            || targetOsJavaHome.isEmpty()) {
-            targetOsJavaHome = javaHome
-        }
-
-        logger.info('Target JAVA_HOME ' + targetOsJavaHome)
-
-        // Call jlink
-        exec {
-            workingDir buildDir
-
-            commandLine(
-                    "${javaHome}/bin/jlink",
-                    '--module-path', (["${targetOsJavaHome}/jmods"] + ext.appModulePaths).grep().join(File.pathSeparator),
-                    '--add-modules', moduleName,
-                    '--output', bundleOutput,
-                    '--launcher', "cuba-cli=$moduleName/$mainClassName",
-                    '--compress=2',
-                    '--no-header-files',
-                    '--no-man-pages'
-            )
-
-            standardOutput = System.out
-            errorOutput = System.out
-
-            logger.info commandLine.join(' ')
-        }
-
-        logger.info("Remove standard launcher script")
-
-        def cubacliFile = new File(bundleOutput, "bin/cuba-cli")
-        def cubacliBatFile = new File(bundleOutput, "bin/cuba-cli.bat")
-
-        if (cubacliFile.exists()) {
-            cubacliFile.delete()
-        }
-        if (cubacliBatFile.exists()) {
-            cubacliBatFile.delete()
-        }
-
-        logger.info("Fix permissions")
-
-        // fix non-writable files in 'legal/'
-        def osName = System.getProperty("os.name").toLowerCase()
-        if (osName.contains('nux')
-                || osName.contains('mac')) {
-            exec {
-                executable 'chmod'
-                args = ['u+w', '-R', bundleOutput]
-            }
-        }
-
-        def targetOsPlatform = 'linux'
-        if (osName.contains('mac')) {
-            targetOsPlatform = 'macos'
-        } else if (osName.contains('Win')) {
-            targetOsPlatform = 'windows'
-        }
-        if (project.hasProperty('targetOsPlatform')) {
-            targetOsPlatform = project['targetOsPlatform']
-        }
-
-        // create nested folder
-
-        def nativeBundle = new File(bundleOutput, 'native-' + targetOsPlatform)
-        nativeBundle.mkdir()
-        bundleOutput.eachFile { file ->
-            if (file.name != nativeBundle.name) {
-                file.renameTo(new File(nativeBundle, file.name))
-            }
-        }
-
-        // create custom launcher script
-
-        def binFolder = new File(bundleOutput, 'bin')
-        binFolder.mkdir()
-
-        if (targetOsPlatform == 'linux' || targetOsPlatform == 'macos') {
-            def cubaCliScript = new File(binFolder, 'cuba-cli')
-            cubaCliScript.text = project.file('etc/cuba-cli-unix').text
-        } else if (targetOsPlatform == 'windows') {
-            def cubaCliScript = new File(binFolder, 'cuba-cli.bat')
-            cubaCliScript.text = project.file('etc/cuba-cli-windows.bat').text
-        }
-
-        // set executable flag
-
-        if (osName.contains('nux')
-                || osName.contains('mac')) {
-            exec {
-                executable 'chmod'
-                args = ['a+x', '-R', binFolder]
-            }
-        }
-    }
-}
-
-task buildWinSetup(dependsOn: bundle, group: 'distribution', description: 'Builds Windows installer') {
-    doLast {
-        if (project.hasProperty('targetOsPlatform') && project['targetOsPlatform'] == 'windows') {
-            def setupScriptDir = "${rootProject.projectDir}"
-            def setupScriptFile = "${setupScriptDir}/win-setup.iss"
-
-            def cliBuildBundleDir = "${project.buildDir}/bundle-windows"
-            def cliBuildDistributionsDir = "${project.buildDir}/distributions"
-
-            exec {
-                commandLine "cmd", "/c", "iscc",
-                        "${setupScriptFile}",
-                        "/DAppVersion=${version}",
-                        "/DAppSrc=${cliBuildBundleDir}",
-                        "/O${cliBuildDistributionsDir}"
-            }
-        } else {
-            throw new GradleException('Only for Windows targetOsPlatform')
+uploadArchives.configure {
+    repositories.mavenDeployer {
+        name = 'httpDeployer'
+        configuration = configurations.deployerJars
+        repository(url: uploadUrl) {
+            authentication(userName: uploadUser, password: uploadPassword)
         }
     }
 }

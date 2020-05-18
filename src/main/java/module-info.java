@@ -27,8 +27,6 @@ module com.haulmont.cli.core {
     requires jansi;
     requires jline;
 
-    requires velocity;
-
     requires com.google.common;
     requires gson;
 
