@@ -6,7 +6,7 @@
 </p>
 
 <p>
-The CLI Core makes it easy to create an command line application that already works, right out of the box.
+The CLI Core makes it easy to create a command line application that already works, right out of the box.
 </p>
 <h3 align="center">
 <img src="https://github.com/cuba-platform/cuba-cli/blob/master/img/cuba-cli-shell.gif" align="center">
