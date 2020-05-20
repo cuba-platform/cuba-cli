@@ -1,2 +1,0 @@
-
-You can read about Polymer User Interface on official CUBA Platform documentation https://doc.cuba-platform.com/manual-6.8/polymer_ui.html.

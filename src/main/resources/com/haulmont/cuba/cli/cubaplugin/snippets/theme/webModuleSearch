@@ -1,1 +1,0 @@
-def webModule = project(":${modulePrefix}-web")

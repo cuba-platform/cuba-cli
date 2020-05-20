@@ -1,2 +1,0 @@
-
-You can read about React User Interface on official CUBA Platform documentation https://doc.cuba-platform.com/manual-7.0/react_ui.html.

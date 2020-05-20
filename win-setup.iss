@@ -5,7 +5,7 @@
 ; #define AppSrc - specify this value through iscc.exe "/D" parameter
 #define AppPublisher "Haulmont"
 #define AppURL "https://www.cuba-platform.com"
-#define AppExeName "cuba-cli.bat"
+#define AppExeName "sample-cli.bat"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -23,7 +23,7 @@ DefaultDirName={pf}\{#AppName} {#AppVersion}
 
 LicenseFile=.\LICENSE.txt
 
-OutputBaseFilename=cuba-cli-{#AppVersion}
+OutputBaseFilename=sample-cli-{#AppVersion}
 ; OutputDir - specify this value through iscc.exe "/O" parameter
 
 Compression=lzma
@@ -46,7 +46,7 @@ Type: filesandordirs; Name: "{app}\lib"
 Type: filesandordirs; Name: "{app}\native-windows"
 
 [Messages]
-FinishedLabelNoIcons=Setup has finished installing [name] on your computer. Open a terminal and run the cuba-cli command to start.
+FinishedLabelNoIcons=Setup has finished installing [name] on your computer. Open a terminal and run the sample-cli command to start.
 
 [Code]
 const EnvironmentKey = 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment';

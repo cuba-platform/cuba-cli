@@ -1,2 +1,0 @@
-def webModule = project(":${modulePrefix}-web")
-def frontModule = project(":${modulePrefix}-front")

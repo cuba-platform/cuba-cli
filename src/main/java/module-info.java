@@ -15,21 +15,22 @@
  */
 
 import com.haulmont.cli.core.CliPlugin;
-import com.haulmont.cuba.cli.JansiSupportWorkAround;
-import com.haulmont.cuba.cli.cubaplugin.CubaPlugin;
+import com.haulmont.cli.core.MainCliPlugin;
+import com.haulmont.cli.sample.JansiSupportWorkAround;
+import com.haulmont.cli.sample.SamplePlugin;
 import org.jline.terminal.spi.JansiSupport;
 
-module com.haulmont.cuba.cli {
+module com.haulmont.cli.sample {
     requires kotlin.stdlib.jdk8;
     requires kotlin.stdlib.jdk7;
     requires kotlin.stdlib;
     requires kotlin.reflect;
 
+    requires com.haulmont.cli.core;
+
     requires jcommander;
     requires jansi;
     requires jline;
-
-    requires velocity;
 
     requires com.google.common;
     requires gson;
@@ -41,52 +42,16 @@ module com.haulmont.cuba.cli {
     requires kodein.di.core.jvm;
     requires kodein.di.generic.jvm;
 
-    requires practicalxml;
     requires java.xml;
 
-    provides CliPlugin with CubaPlugin;
+    provides MainCliPlugin with SamplePlugin;
 
-    uses com.haulmont.cli.core.CliPlugin;
+    uses com.haulmont.cli.sample.SamplePlugin;
 
-    opens com.haulmont.cuba.cli.cubaplugin;
-    opens com.haulmont.cuba.cli.commands;
-    opens com.haulmont.cuba.cli;
+    opens com.haulmont.cli.sample.commands;
 
-    opens com.haulmont.cuba.cli.cubaplugin.model;
-
-    opens com.haulmont.cuba.cli.cubaplugin.appcomponentxml;
-    opens com.haulmont.cuba.cli.cubaplugin.componentbean;
-    opens com.haulmont.cuba.cli.cubaplugin.entity;
-    opens com.haulmont.cuba.cli.cubaplugin.entitylistener;
-    opens com.haulmont.cuba.cli.cubaplugin.enumeration;
-    opens com.haulmont.cuba.cli.cubaplugin.project;
-    opens com.haulmont.cuba.cli.cubaplugin.screen;
-    opens com.haulmont.cuba.cli.cubaplugin.screen.blankscreen;
-    opens com.haulmont.cuba.cli.cubaplugin.screen.screenextension;
-    opens com.haulmont.cuba.cli.cubaplugin.screen.entityscreen;
-    opens com.haulmont.cuba.cli.cubaplugin.service;
-    opens com.haulmont.cuba.cli.cubaplugin.statictemplate;
-    opens com.haulmont.cuba.cli.cubaplugin.theme;
-    opens com.haulmont.cuba.cli.cubaplugin.installcomponent;
-    opens com.haulmont.cuba.cli.cubaplugin.front;
-    opens com.haulmont.cuba.cli.cubaplugin.front.polymer;
-    opens com.haulmont.cuba.cli.cubaplugin.front.react;
-    opens com.haulmont.cuba.cli.cubaplugin.config;
-    opens com.haulmont.cuba.cli.cubaplugin.updatescript;
-    opens com.haulmont.cuba.cli.cubaplugin.premiumrepo;
-    opens com.haulmont.cuba.cli.cubaplugin.prefixchange;
-    opens com.haulmont.cuba.cli.cubaplugin.deploy;
-    opens com.haulmont.cuba.cli.cubaplugin.deploy.war;
-    opens com.haulmont.cuba.cli.cubaplugin.deploy.uberjar;
-    opens com.haulmont.cuba.cli.cubaplugin.gradle;
-    opens com.haulmont.cuba.cli.cubaplugin.idea;
-
-    exports com.haulmont.cuba.cli;
-    exports com.haulmont.cuba.cli.event;
-    exports com.haulmont.cuba.cli.commands;
-    exports com.haulmont.cuba.cli.generation;
-    exports com.haulmont.cuba.cli.registration;
-    exports com.haulmont.cuba.cli.cubaplugin.model;
+    exports com.haulmont.cli.sample;
+    exports com.haulmont.cli.sample.commands;
 
 //    for debug
     requires jdk.jdwp.agent;
@@ -98,8 +63,6 @@ module com.haulmont.cuba.cli {
     requires java.desktop;
     requires java.management;
     requires java.naming;
-    requires com.haulmont.cli.core;
 
-//    jansi support workaround
     provides JansiSupport with JansiSupportWorkAround;
 }

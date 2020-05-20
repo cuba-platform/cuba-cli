@@ -1,6 +1,0 @@
-
-@|white Project has been generated in %s directory.
-The project's CUBA Platform version requires Java 8.
-To build project, go to the project directory and execute `gradlew assemble`.
-To import project into IDE, execute `gradlew ide` and open generated *.ipr file.
-|@
