@@ -1,0 +1,243 @@
+#set( $bintray = $project.repo.contains("bintray"))
+buildscript {
+    ext.cubaVersion = '${project.platformVersion}'
+#if ( $project.kotlinSupport )
+    ext.kotlinVersion = '${project.kotlinVersion}'
+#end
+    repositories {
+
+        maven {
+            url '${project.repo}'
+#if( !$bintray )
+            credentials {
+                username(rootProject.hasProperty('repoUser') ? rootProject['repoUser'] : 'cuba')
+                password(rootProject.hasProperty('repoPass') ? rootProject['repoPass'] : 'cuba123')
+            }
+#end
+        }
+#if( $bintray )
+        jcenter()
+#end
+
+    }
+    dependencies {
+        classpath "com.haulmont.gradle:cuba-plugin:$cubaVersion"
+#if ( $project.kotlinSupport )
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+#end
+    }
+}
+
+def modulePrefix = 'app'
+
+def globalModule = project(":${modulePrefix}-global")
+def coreModule = project(":${modulePrefix}-core")
+def webModule = project(":${modulePrefix}-web")
+
+def servletApi = 'javax.servlet:javax.servlet-api:3.1.0'
+
+
+apply(plugin: 'idea')
+apply(plugin: 'cuba')
+#if ( $project.kotlinSupport )
+apply(plugin: 'org.jetbrains.kotlin.jvm')
+#end
+
+cuba {
+    artifact {
+        group = '${project.rootPackage}'
+        version = '0.1'
+        isSnapshot = true
+    }
+    tomcat {
+        dir = "$project.rootDir/deploy/tomcat"
+    }
+}
+
+dependencies {
+    appComponent("com.haulmont.cuba:cuba-global:$cubaVersion")
+
+}
+
+def ${project.database.driverDependencyName} = ${project.database.driverDependency}
+
+configure([globalModule, coreModule, webModule]) {
+    apply(plugin: 'java')
+    apply(plugin: 'maven')
+    apply(plugin: 'idea')
+    apply(plugin: 'cuba')
+#if ( $project.kotlinSupport )
+    apply(plugin: 'org.jetbrains.kotlin.jvm')
+#end
+
+    dependencies {
+        testCompile('junit:junit:4.12')
+#if ( $project.kotlinSupport )
+        compile ("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
+#end
+    }
+
+    task sourceJar(type: Jar) {
+        from file('src')
+        classifier = 'sources'
+    }
+
+    artifacts {
+        archives sourceJar
+    }
+}
+
+configure(globalModule) {
+    dependencies {
+        if (!JavaVersion.current().isJava8()) {
+            runtime('javax.xml.bind:jaxb-api:2.3.1')
+            runtime('org.glassfish.jaxb:jaxb-runtime:2.3.1')
+        }
+    }
+    
+    entitiesEnhancing {
+        main {
+            enabled = true
+        }
+    }
+
+
+}
+
+#if( ${project.database.database} == "Microsoft SQL Server" || ${project.database.database} == "Microsoft SQL Server 2012+" )
+#set( $jdbcExclude = " { exclude(group: 'com.microsoft.azure', module: 'azure-keyvault') }" )
+#else
+#set( $jdbcExclude = "" )
+#end
+configure(coreModule) {
+
+    configurations {
+        jdbc
+        dbscripts
+    }
+
+    dependencies {
+        compile(globalModule)
+        compileOnly(servletApi)
+        jdbc(${project.database.driverDependencyName})$jdbcExclude
+        testRuntime(${project.database.driverDependencyName})$jdbcExclude
+
+    }
+
+    task cleanConf(description: 'Cleans up conf directory') {
+        doLast {
+            def dir = new File(cuba.tomcat.dir, "/conf/${modulePrefix}-core")
+            if (dir.isDirectory()) {
+                ant.delete(includeemptydirs: true) {
+                    fileset(dir: dir, includes: '**/*', excludes: 'local.app.properties')
+                }
+            }
+        }
+    }
+
+    task deploy(dependsOn: [assemble, cleanConf], type: CubaDeployment) {
+        appName = "${modulePrefix}-core"
+        appJars(modulePrefix + '-global', modulePrefix + '-core')
+    }
+
+    task createDb(dependsOn: assembleDbScripts, description: 'Creates local database', type: CubaDbCreation) {
+#if (${project.database.connectionParams} != "")
+        connectionParams = '${project.database.connectionParams}'
+#end
+        dbms = '${project.database.driverDependencyName}'
+        host = 'localhost'
+        dbName = '${project.namespace}'
+        dbUser = '${project.database.username}'
+        dbPassword = '${project.database.password}'
+    }
+
+    task updateDb(dependsOn: assembleDbScripts, description: 'Updates local database', type: CubaDbUpdate) {
+#if (${project.database.connectionParams} != "")
+        connectionParams = '${project.database.connectionParams}'
+#end
+        dbms = '${project.database.driverDependencyName}'
+        host = 'localhost'
+        dbName = '${project.namespace}'
+        dbUser = '${project.database.username}'
+        dbPassword = '${project.database.password}'
+    }
+#if (${project.database.driverDependencyName} == "hsql")
+
+    task startDb(description: 'Starts local HSQLDB server', type: CubaHsqlStart) {
+        dbPort = 9001
+        dbName = '${project.namespace}'
+    }
+
+    task stopDb(description: 'Stops local HSQLDB server', type: CubaHsqlStop)  {
+        dbPort = 9001
+        dbName = '${project.namespace}'
+    }
+#end
+}
+
+configure(webModule) {
+    configurations {
+        webcontent
+    }
+
+    dependencies {
+        compileOnly(servletApi)
+        compile(globalModule)
+
+    }
+
+    task webArchive(type: Zip) {
+        from file("$buildDir/web")
+        from file('web')
+        classifier = 'web'
+    }
+
+    artifacts {
+        archives webArchive
+    }
+
+    task deployConf(type: Copy) {
+        from file('src')
+        include "${project.rootPackageDirectory}/**"
+        into "$cuba.tomcat.dir/conf/${modulePrefix}"
+    }
+
+    task clearMessagesCache(type: CubaClearMessagesCache) {
+        appName = "${modulePrefix}"
+    }
+    deployConf.dependsOn clearMessagesCache
+
+    task cleanConf(description: 'Cleans up conf directory') {
+        doLast {
+            def dir = new File(cuba.tomcat.dir, "/conf/${modulePrefix}")
+            if (dir.isDirectory()) {
+                ant.delete(includeemptydirs: true) {
+                    fileset(dir: dir, includes: '**/*', excludes: 'local.app.properties')
+                }
+            }
+        }
+    }
+
+    task deploy(dependsOn: [assemble, cleanConf], type: CubaDeployment) {
+        appName = "${modulePrefix}"
+        appJars(modulePrefix + '-global', modulePrefix + '-web')
+    }
+}
+
+task undeploy(type: Delete, dependsOn: ":${modulePrefix}-web:cleanConf") {
+    delete("$cuba.tomcat.dir/shared")
+    delete("$cuba.tomcat.dir/webapps/${modulePrefix}-core")
+    delete("$cuba.tomcat.dir/webapps/${modulePrefix}")
+}
+
+task restart(dependsOn: ['stop', ":${modulePrefix}-core:deploy", ":${modulePrefix}-web:deploy"], description: 'Redeploys applications and restarts local Tomcat') {
+    doLast {
+        ant.waitfor(maxwait: 6, maxwaitunit: 'second', checkevery: 2, checkeveryunit: 'second') {
+            not {
+                socket(server: 'localhost', port: '8787')
+            }
+        }
+    }
+}
+restart.finalizedBy start

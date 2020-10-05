@@ -1,0 +1,87 @@
+#set( $v7_1_plus = ${versions.compareVersions($project.platformVersion, "7.1")} >= 0 )
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+
+    <!-- Application properties config files -->
+    <context-param>
+        <param-name>appPropertiesConfig</param-name>
+        <param-value>
+            
+            classpath:${project.rootPackageDirectory}/web-app.properties
+            /WEB-INF/local.app.properties
+            "file:${catalina.base}/conf/app/local.app.properties"
+        </param-value>
+    </context-param>
+    <!--Application components-->
+    <context-param>
+        <param-name>appComponents</param-name>
+        <param-value>com.haulmont.cuba</param-value>
+    </context-param>
+    <listener>
+        <listener-class>com.haulmont.cuba.web.sys.WebAppContextLoader</listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>app_servlet</servlet-name>
+        <servlet-class>com.haulmont.cuba.web.sys.CubaApplicationServlet</servlet-class>
+        
+        <async-supported>true</async-supported>
+    </servlet>
+    <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>com.haulmont.cuba.web.sys.CubaDispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+#if( !$v7_1_plus )
+    <servlet>
+        <servlet-name>rest_api</servlet-name>
+        <servlet-class>com.haulmont.restapi.sys.CubaRestApiServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+#end
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/dispatch/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>app_servlet</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+#if( !$v7_1_plus )
+    <servlet-mapping>
+        <servlet-name>rest_api</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+#end
+
+    <filter>
+        <filter-name>cuba_filter</filter-name>
+        <filter-class>com.haulmont.cuba.web.sys.CubaHttpFilter</filter-class>
+        <async-supported>true</async-supported>
+    </filter>
+    <filter-mapping>
+        <filter-name>cuba_filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+#if( !$v7_1_plus )
+    <filter>
+        <filter-name>restSpringSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>contextAttribute</param-name>
+            <param-value>org.springframework.web.servlet.FrameworkServlet.CONTEXT.rest_api</param-value>
+        </init-param>
+        <init-param>
+            <param-name>targetBeanName</param-name>
+            <param-value>springSecurityFilterChain</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>restSpringSecurityFilterChain</filter-name>
+        <url-pattern>/rest/*</url-pattern>
+    </filter-mapping>
+#end
+</web-app>
