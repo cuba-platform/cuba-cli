@@ -149,8 +149,9 @@ class ProjectInitCommand(override val kodein: Kodein = cubaKodein) : GeneratorCo
         }
 
         confirmation("kotlinSupport", "Support kotlin?") {
-            askIf {answers ->
-                PlatformVersion((answers[PLATFORM_VERSION] ?: answers[PREDEFINED_PLATFORM_VERSION]) as String) >= PlatformVersion.v7_2
+            askIf { answers ->
+                PlatformVersion((answers[PLATFORM_VERSION]
+                        ?: answers[PREDEFINED_PLATFORM_VERSION]) as String) >= PlatformVersion.v7_2
             }
         }
 
@@ -199,9 +200,17 @@ class ProjectInitCommand(override val kodein: Kodein = cubaKodein) : GeneratorCo
 
         Files.createDirectories(cwd)
 
+        val kotlinSupport = model.kotlinSupport
+
         val templateTips = TemplateProcessor(resources.getTemplate("project"), bindings, PlatformVersion(model.platformVersion)) {
-            listOf("modules", "build.gradle", "settings.gradle", "\${gitignore}").forEach {
-                transform(it)
+            listOf("modules", "build.gradle", "settings.gradle", "\${gitignore}").forEach { it ->
+                transform(it) { path ->
+                    return@transform if (kotlinSupport) {
+                        !path.fileName.toString().endsWith(".java")
+                    } else {
+                        !path.fileName.toString().endsWith(".kt")
+                    }
+                }
             }
 
             listOf("gradle", "gradlew", "gradlew.bat").forEach {
@@ -215,13 +224,6 @@ class ProjectInitCommand(override val kodein: Kodein = cubaKodein) : GeneratorCo
         }
 
         templateTips?.let { writer.println(it.format(cwd.toAbsolutePath().toString())) }
-
-        val dpTipsMessageName = when (model.database.database) {
-            databases[5] -> "oracleDbTips"
-            else -> return
-        }
-
-        writer.println(messages[dpTipsMessageName])
     }
 
     companion object {

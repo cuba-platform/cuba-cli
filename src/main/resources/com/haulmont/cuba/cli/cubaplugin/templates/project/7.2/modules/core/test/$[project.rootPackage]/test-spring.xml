@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans">
+
+    <!-- Override existing beans or define new bean definitions required for tests -->
+
+    <!-- <bean id="cuba_Emailer" class="com.haulmont.cuba.testsupport.TestEmailer"/> -->
+
+</beans>

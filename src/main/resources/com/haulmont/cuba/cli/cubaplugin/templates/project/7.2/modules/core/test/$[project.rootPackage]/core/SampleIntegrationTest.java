@@ -1,6 +1,6 @@
 package ${project.rootPackage}.core;
 
-import ${project.rootPackage}.AppTestContainer;
+import ${project.rootPackage}.${project.testContainerPrefix}TestContainer;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
@@ -9,33 +9,29 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.security.entity.User;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-
 public class SampleIntegrationTest {
 
-    @ClassRule
-    public static AppTestContainer cont = AppTestContainer.Common.INSTANCE;
+    @RegisterExtension
+    public static ${project.testContainerPrefix}TestContainer cont = ${project.testContainerPrefix}TestContainer.Common.INSTANCE;
 
-    private Metadata metadata;
-    private Persistence persistence;
-    private DataManager dataManager;
+    private static Metadata metadata;
+    private static Persistence persistence;
+    private static DataManager dataManager;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeAll
+    public static void beforeAll() throws Exception {
         metadata = cont.metadata();
         persistence = cont.persistence();
         dataManager = AppBeans.get(DataManager.class);
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterAll
+    public static void afterAll() throws Exception {
     }
 
     @Test
@@ -47,7 +43,7 @@ public class SampleIntegrationTest {
             query.setParameter("userLogin", "admin");
             List<User> users = query.getResultList();
             tx.commit();
-            assertEquals(1, users.size());
+            Assertions.assertEquals(1, users.size());
         }
     }
 }

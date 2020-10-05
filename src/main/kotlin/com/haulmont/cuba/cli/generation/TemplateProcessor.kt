@@ -67,7 +67,7 @@ class TemplateProcessor(templateBasePath: Path, private val bindings: Map<String
         }
     }
 
-    private fun process(from: Path, to: Path, withTransform: Boolean) {
+    private fun process(from: Path, to: Path, withTransform: Boolean, filter: PathFilter) {
         val targetAbsolutePath = to.toAbsolutePath()
 
         val baseTemplatePath = templatePath.toAbsolutePath().toString()
@@ -76,6 +76,7 @@ class TemplateProcessor(templateBasePath: Path, private val bindings: Map<String
         from.walk()
                 .filter { !isTemplateMetadata(it) }
                 .filter { Files.isRegularFile(it) }
+                .filter(filter)
                 .forEach { inputPath ->
                     val outputFile = inputPath.toAbsolutePath().toString()
                             .replace(baseTemplatePath, targetDirectoryPath)
@@ -151,20 +152,20 @@ class TemplateProcessor(templateBasePath: Path, private val bindings: Map<String
         return kClass.memberProperties.first { it.name == name }.getter.call(obj)!!
     }
 
-    fun copy(subPath: Path, to: Path = projectRoot) {
-        process(templatePath.resolve(subPath), to, false)
+    fun copy(subPath: Path, to: Path = projectRoot, filter: PathFilter = {true}) {
+        process(templatePath.resolve(subPath), to, false, filter)
     }
 
-    fun copy(subPath: String, to: Path = projectRoot) {
-        process(templatePath.resolve(subPath), to, false)
+    fun copy(subPath: String, to: Path = projectRoot, filter: PathFilter = {true}) {
+        process(templatePath.resolve(subPath), to, false, filter)
     }
 
-    fun transform(subPath: Path, to: Path = projectRoot) {
-        process(templatePath.resolve(subPath), to, true)
+    fun transform(subPath: Path, to: Path = projectRoot, filter: PathFilter = {true}) {
+        process(templatePath.resolve(subPath), to, true, filter)
     }
 
-    fun transform(subPath: String, to: Path = projectRoot) {
-        process(templatePath.resolve(subPath), to, true)
+    fun transform(subPath: String, to: Path = projectRoot, filter: PathFilter = {true}) {
+        process(templatePath.resolve(subPath), to, true, filter)
     }
 
     fun transform(subPath: String, to: OutputStream) {
@@ -229,3 +230,5 @@ class TemplateProcessor(templateBasePath: Path, private val bindings: Map<String
                         }
     }
 }
+
+typealias PathFilter = (Path) -> Boolean

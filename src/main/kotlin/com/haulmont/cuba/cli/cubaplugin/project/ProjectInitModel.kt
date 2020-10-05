@@ -18,6 +18,7 @@ package com.haulmont.cuba.cli.cubaplugin.project
 
 import com.haulmont.cuba.cli.commands.CommandExecutionException
 import com.haulmont.cuba.cli.commands.CommonParameters
+import com.haulmont.cuba.cli.cubaplugin.model.PlatformVersion
 import com.haulmont.cuba.cli.localMessages
 import com.haulmont.cuba.cli.prompting.Answers
 
@@ -36,6 +37,7 @@ class ProjectInitModel(answers: Answers) {
     val database: DatabaseModel = DatabaseModel(answers)
     val kotlinSupport: Boolean by answers.withDefault { false }
     val kotlinVersion: String by answers.withDefault { "1.3.41" }
+    val testContainerPrefix: String = namespace.capitalize()
 }
 
 class DatabaseModel(answers: Answers) {
@@ -62,6 +64,9 @@ class DatabaseModel(answers: Answers) {
     } else ""
 
     init {
+        val platformVersion = PlatformVersion(answers["platformVersion"] as? String
+                ?: answers["predefinedPlatformVersion"] as String)
+
         when (database) {
             databases[0] -> {
                 schema = "jdbc:hsqldb:hsql:"
@@ -74,15 +79,21 @@ class DatabaseModel(answers: Answers) {
             databases[1] -> {
                 schema = "jdbc:postgresql:"
                 driver = "org.postgresql.Driver"
-                driverDependency = "'org.postgresql:postgresql:9.4.1212'"
+                driverDependency = if (platformVersion >= PlatformVersion.v7_2)
+                    "'org.postgresql:postgresql:42.2.9'"
+                else
+                    "'org.postgresql:postgresql:9.4.1212'"
                 driverDependencyName = "postgres"
                 username = "cuba"
                 password = "cuba"
             }
-            databases[2] -> {
+            databases[2], databases[4] -> {
                 schema = "jdbc:sqlserver:"
                 driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-                driverDependency = "'com.microsoft.sqlserver:mssql-jdbc:6.4.0.jre8'"
+                driverDependency = if (platformVersion < PlatformVersion.v7_1)
+                    "'com.microsoft.sqlserver:mssql-jdbc:7.0.0.jre8'"
+                else
+                    "'com.microsoft.sqlserver:mssql-jdbc:7.2.2.jre8'"
                 driverDependencyName = "mssql"
                 username = "sa"
                 password = "saPass1"
@@ -95,18 +106,10 @@ class DatabaseModel(answers: Answers) {
                 username = "sa"
                 password = "saPass1"
             }
-            databases[4] -> {
-                schema = "jdbc:sqlserver:"
-                driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-                driverDependency = "'com.microsoft.sqlserver:mssql-jdbc:6.4.0.jre8'"
-                driverDependencyName = "mssql"
-                username = "sa"
-                password = "saPass1"
-            }
             databases[5] -> {
                 schema = "jdbc:oracle:thin:@"
                 driver = "oracle.jdbc.OracleDriver"
-                driverDependency = "files(\"\$cuba.tomcat.dir/lib/ojdbc6.jar\")"
+                driverDependency = "com.oracle.database.jdbc:ojdbc6:11.2.0.4"
                 driverDependencyName = "oracle"
                 username = (answers["projectName"] as String).replace('-', '_')
                 password = "cuba"

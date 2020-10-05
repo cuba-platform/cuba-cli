@@ -38,7 +38,6 @@ def webModule = project(":${modulePrefix}-web")
 def servletApi = 'javax.servlet:javax.servlet-api:3.1.0'
 
 
-apply(plugin: 'idea')
 apply(plugin: 'cuba')
 #if ( $project.kotlinSupport )
 apply(plugin: 'org.jetbrains.kotlin.jvm')
@@ -49,9 +48,6 @@ cuba {
         group = '${project.rootPackage}'
         version = '0.1'
         isSnapshot = true
-    }
-    tomcat {
-        dir = "$project.rootDir/deploy/tomcat"
     }
 }
 
@@ -65,7 +61,6 @@ def ${project.database.driverDependencyName} = ${project.database.driverDependen
 configure([globalModule, coreModule, webModule]) {
     apply(plugin: 'java')
     apply(plugin: 'maven')
-    apply(plugin: 'idea')
     apply(plugin: 'cuba')
 #if ( $project.kotlinSupport )
     apply(plugin: 'org.jetbrains.kotlin.jvm')
@@ -85,6 +80,9 @@ configure([globalModule, coreModule, webModule]) {
 
     artifacts {
         archives sourceJar
+    }
+    test {
+        useJUnitPlatform()
     }
 }
 
@@ -126,14 +124,7 @@ configure(coreModule) {
     }
 
     task cleanConf(description: 'Cleans up conf directory') {
-        doLast {
-            def dir = new File(cuba.tomcat.dir, "/conf/${modulePrefix}-core")
-            if (dir.isDirectory()) {
-                ant.delete(includeemptydirs: true) {
-                    fileset(dir: dir, includes: '**/*', excludes: 'local.app.properties')
-                }
-            }
-        }
+        delete "$cuba.appHome/${modulePrefix}-core/conf"
     }
 
     task deploy(dependsOn: [assemble, cleanConf], type: CubaDeployment) {
@@ -142,25 +133,9 @@ configure(coreModule) {
     }
 
     task createDb(dependsOn: assembleDbScripts, description: 'Creates local database', type: CubaDbCreation) {
-#if (${project.database.connectionParams} != "")
-        connectionParams = '${project.database.connectionParams}'
-#end
-        dbms = '${project.database.driverDependencyName}'
-        host = 'localhost'
-        dbName = '${project.namespace}'
-        dbUser = '${project.database.username}'
-        dbPassword = '${project.database.password}'
     }
 
     task updateDb(dependsOn: assembleDbScripts, description: 'Updates local database', type: CubaDbUpdate) {
-#if (${project.database.connectionParams} != "")
-        connectionParams = '${project.database.connectionParams}'
-#end
-        dbms = '${project.database.driverDependencyName}'
-        host = 'localhost'
-        dbName = '${project.namespace}'
-        dbUser = '${project.database.username}'
-        dbPassword = '${project.database.password}'
     }
 #if (${project.database.driverDependencyName} == "hsql")
 
@@ -184,7 +159,6 @@ configure(webModule) {
     dependencies {
         compileOnly(servletApi)
         compile(globalModule)
-
     }
 
     task webArchive(type: Zip) {
@@ -200,7 +174,7 @@ configure(webModule) {
     task deployConf(type: Copy) {
         from file('src')
         include "${project.rootPackageDirectory}/**"
-        into "$cuba.tomcat.dir/conf/${modulePrefix}"
+        into "$cuba.appHome/${modulePrefix}/conf"
     }
 
     task clearMessagesCache(type: CubaClearMessagesCache) {
@@ -209,14 +183,7 @@ configure(webModule) {
     deployConf.dependsOn clearMessagesCache
 
     task cleanConf(description: 'Cleans up conf directory') {
-        doLast {
-            def dir = new File(cuba.tomcat.dir, "/conf/${modulePrefix}")
-            if (dir.isDirectory()) {
-                ant.delete(includeemptydirs: true) {
-                    fileset(dir: dir, includes: '**/*', excludes: 'local.app.properties')
-                }
-            }
-        }
+        delete "$cuba.appHome/${modulePrefix}/conf"
     }
 
     task deploy(dependsOn: [assemble, cleanConf], type: CubaDeployment) {
