@@ -33,6 +33,7 @@ import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
 import org.junit.After
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.kodein.di.Kodein
 import org.kodein.di.direct
@@ -40,7 +41,6 @@ import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
 import java.io.*
 import java.nio.file.Files
-import java.nio.file.LinkOption
 import java.nio.file.Path
 import java.util.Comparator
 
@@ -179,7 +179,12 @@ open class CommandTestBase {
     fun appendInputLine(str: String) = "$str\n".toByteArray().let(outputStream::write)
 
     fun assertNoErrorEvents() {
-        assertTrue(errors.isEmpty())
+        if (errors.isNotEmpty()) {
+            val stackTraces = StringWriter().use { writer ->
+                errors.forEach { it.cause?.printStackTrace(PrintWriter(writer)) }
+            }.toString()
+            fail(stackTraces)
+        }
     }
 
     inline fun <reified T : Throwable> assertErrorEvent() {
