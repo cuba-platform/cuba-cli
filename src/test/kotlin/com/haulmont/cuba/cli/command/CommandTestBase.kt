@@ -180,10 +180,11 @@ open class CommandTestBase {
 
     fun assertNoErrorEvents() {
         if (errors.isNotEmpty()) {
-            val stackTraces = StringWriter().use { writer ->
-                errors.forEach { it.cause?.printStackTrace(PrintWriter(writer)) }
-            }.toString()
-            fail(stackTraces)
+            val stringWriter = StringWriter()
+            stringWriter.use { writer ->
+                errors.forEach { it.cause.printStackTrace(PrintWriter(writer)) }
+            }
+            fail(stringWriter.toString())
         }
     }
 
