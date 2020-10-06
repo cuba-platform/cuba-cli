@@ -21,6 +21,7 @@ import com.haulmont.cuba.cli.generation.parse
 import com.haulmont.cuba.cli.generation.xpath
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.CORE_MODULE
 import com.haulmont.cuba.cli.cubaplugin.model.ModuleStructure.Companion.GLOBAL_MODULE
+import com.haulmont.cuba.cli.generation.Properties
 import com.haulmont.cuba.cli.resolve
 import net.sf.practicalxml.DomUtil
 import org.w3c.dom.Element
@@ -91,7 +92,8 @@ class ProjectModel(projectStructure: ProjectStructure) {
 
             appComponentsStr = appComponents.joinToString(separator = " ")
 
-            database = parseDatabase(projectStructure)
+            database = parseJndiDatabase(projectStructure) ?: parseApplicationDatabase(projectStructure)
+                    ?: throw ProjectScanException("Unable to scan db properties")
         } catch (e: ProjectFileNotFoundException) {
             throw ProjectScanException(e.message!!, e)
         }
@@ -123,7 +125,7 @@ private fun parseNamespace(metadataXml: Path): String {
             ?.nodeValue ?: ""
 }
 
-private fun parseDatabase(projectStructure: ProjectStructure): Database {
+private fun parseJndiDatabase(projectStructure: ProjectStructure): Database? {
     val contextXml = projectStructure.getModule(CORE_MODULE)
             .path
             .resolve("web")
@@ -131,7 +133,7 @@ private fun parseDatabase(projectStructure: ProjectStructure): Database {
             .resolve("context.xml")
 
     val contextXmlRoot = parse(contextXml).documentElement
-    val resourceElement = contextXmlRoot.xpath("//Resource[@name=\"jdbc/CubaDS\"]").first() as Element
+    val resourceElement = contextXmlRoot.xpath("//Resource[@name=\"jdbc/CubaDS\"]").firstOrNull() as? Element ?: return null
 
     return Database(
             getDbTypeByDriver(resourceElement["driverClassName"]),
@@ -139,8 +141,55 @@ private fun parseDatabase(projectStructure: ProjectStructure): Database {
             resourceElement["driverClassName"],
             getPrefixUrl(resourceElement["driverClassName"]),
             resourceElement["username"],
-            resourceElement["password"]
+            resourceElement["password"],
+            DataSourceProvider.JNDI
     )
+}
+
+private fun parseApplicationDatabase(projectStructure: ProjectStructure): Database? {
+    val appPropertiesPath = projectStructure.getModule(CORE_MODULE)
+            .path
+            .resolve("src")
+            .resolve(projectStructure.rootPackageDirectory)
+            .resolve("app.properties")
+
+    val properties = Properties(appPropertiesPath)
+
+    val url = properties["cuba.dataSource.jdbcUrl"]
+
+    val driverClassName = properties["cuba.dataSource.driverClassName"] ?: ""
+    val dbType = getDbTypeByDriver(driverClassName)
+    val prefixUrl = getPrefixUrl(driverClassName)
+
+    val username = properties["cuba.dataSource.username"]!!
+    val password = properties["cuba.dataSource.password"] ?: ""
+
+    if (url == null) {
+        val host = properties["cuba.dataSource.host"]!!
+        val port = properties["cuba.dataSource.port"]?.let { ":$it" } ?: ""
+        val dbName = properties["cuba.dataSource.dbName"]!!
+        val connectionParams = properties["cuba.dataSource.connectionParams"]
+
+        return Database(
+                dbType,
+                getConnectionUrl(dbType, prefixUrl, host + port, connectionParams, dbName),
+                driverClassName,
+                prefixUrl,
+                username,
+                password,
+                DataSourceProvider.Application
+        )
+    } else {
+        return Database(
+                dbType,
+                url,
+                driverClassName,
+                prefixUrl,
+                username,
+                password,
+                DataSourceProvider.Application
+        )
+    }
 }
 
 private fun getDbTypeByDriver(driverClass: String): String = when {
@@ -161,9 +210,21 @@ fun getPrefixUrl(driverClass: String): String = when {
     else -> throw ProjectScanException("Unrecognized jdbc driver class $driverClass")
 }
 
+fun getConnectionUrl(dbType: String, prefix: String, host: String, connectionParams: String?, dbName: String) : String {
+    when(dbType) {
+        "hsql" -> prefix + host + "/" + dbName + (connectionParams?.let { ";$it" } ?: "")
+        "postgres", "mssql", "oracle", "mysql" -> prefix + host + "/" + dbName + (connectionParams?.let { "?$it" } ?: "")
+    }
+    throw ProjectScanException("Unable to construct jdbc url")
+}
+
 private fun Sequence<MatchResult>.getGroupValue(groupIndex: Int): String? =
         firstOrNull()?.groupValues?.get(groupIndex)
 
 class ProjectScanException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
-data class Database(val type: String, val connectionString: String, val driverClassName: String, val urlPrefix: String, val username: String, val password: String)
+enum class DataSourceProvider {
+    JNDI, Application
+}
+
+data class Database(val type: String, val connectionString: String, val driverClassName: String, val urlPrefix: String, val username: String, val password: String, val dataSourceProvider: DataSourceProvider)

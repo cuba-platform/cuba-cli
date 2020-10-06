@@ -71,7 +71,7 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
     }
 
     fun findMostSuitableVersionDirectory(baseDirectory: Path): Path {
-        Files.walk(baseDirectory, 1)
+        val directoriesByVersions = Files.walk(baseDirectory, 1)
                 .filter { Files.isDirectory(it) && it != baseDirectory }
                 .collect(Collectors.toList())
                 .associateBy {
@@ -82,15 +82,14 @@ sealed class PlatformVersion : Comparable<PlatformVersion> {
                         return baseDirectory
                     }
                 }.toSortedMap()
-                .onEach { (dirVersion, directory) ->
-                    if (dirVersion > this)
-                        return directory
-                }.let {
-                    if (it.isNotEmpty())
-                        return it[it.lastKey()]!!
-                }
 
-        return baseDirectory
+        if (directoriesByVersions.isEmpty())
+            return baseDirectory
+
+        return directoriesByVersions.entries
+                .lastOrNull { (version, _) -> version <= this }
+                ?.value
+                ?: directoriesByVersions.getValue(directoriesByVersions.firstKey())
     }
 
     companion object {
