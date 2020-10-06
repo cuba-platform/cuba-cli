@@ -37,8 +37,10 @@ import javax.xml.parsers.ParserConfigurationException
 private val writer: PrintWriter by kodein.instance()
 private val printHelper: PrintHelper by kodein.instance()
 
-fun parse(path: Path): Document = Files.newInputStream(path).let(::InputSource).let {
-    createDocumentBuilder().parse(it)
+fun parse(path: Path): Document = Files.newInputStream(path).use { stream ->
+    InputSource(stream).let {
+        createDocumentBuilder().parse(it)
+    }
 }
 
 fun parse(xml: String): Document = xml.let(::StringReader).let(::InputSource).let {

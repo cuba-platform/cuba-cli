@@ -26,7 +26,7 @@ class Snippets(private val snippetsPath: Path) {
 
     operator fun get(name: String): String {
         if (name !in snippets) {
-            snippets[name] = Files.newInputStream(snippetsPath.resolve(name)).reader().readText()
+            snippets[name] = Files.newInputStream(snippetsPath.resolve(name)).use { stream -> stream.reader().readText() }
         }
         return snippets[name]!!
     }

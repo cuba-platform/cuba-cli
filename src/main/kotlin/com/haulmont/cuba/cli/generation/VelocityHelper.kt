@@ -38,8 +38,9 @@ class VelocityHelper {
     }
 
     fun generate(inputPath: Path, vc: VelocityContext): String {
-        val templateText = Files.newInputStream(inputPath)
-                .bufferedReader().readText()
+        val templateText = Files.newInputStream(inputPath).use {
+            it.bufferedReader().readText()
+        }
         val templateName = generate(templateText, inputPath.fileName.toString(), vc)
 
         return generate(templateText, templateName, vc)

@@ -152,19 +152,19 @@ class TemplateProcessor(templateBasePath: Path, private val bindings: Map<String
         return kClass.memberProperties.first { it.name == name }.getter.call(obj)!!
     }
 
-    fun copy(subPath: Path, to: Path = projectRoot, filter: PathFilter = {true}) {
+    fun copy(subPath: Path, to: Path = projectRoot, filter: PathFilter = { true }) {
         process(templatePath.resolve(subPath), to, false, filter)
     }
 
-    fun copy(subPath: String, to: Path = projectRoot, filter: PathFilter = {true}) {
+    fun copy(subPath: String, to: Path = projectRoot, filter: PathFilter = { true }) {
         process(templatePath.resolve(subPath), to, false, filter)
     }
 
-    fun transform(subPath: Path, to: Path = projectRoot, filter: PathFilter = {true}) {
+    fun transform(subPath: Path, to: Path = projectRoot, filter: PathFilter = { true }) {
         process(templatePath.resolve(subPath), to, true, filter)
     }
 
-    fun transform(subPath: String, to: Path = projectRoot, filter: PathFilter = {true}) {
+    fun transform(subPath: String, to: Path = projectRoot, filter: PathFilter = { true }) {
         process(templatePath.resolve(subPath), to, true, filter)
     }
 
@@ -188,7 +188,9 @@ class TemplateProcessor(templateBasePath: Path, private val bindings: Map<String
 
         check(Files.isRegularFile(filePath)) { "Only file may be saved to output stream" }
 
-        Files.newInputStream(filePath).copyTo(to)
+        Files.newInputStream(filePath).use {
+            it.copyTo(to)
+        }
     }
 
     fun transformWhole(to: Path = projectRoot) {
@@ -225,8 +227,9 @@ class TemplateProcessor(templateBasePath: Path, private val bindings: Map<String
                         .takeIf { Files.exists(it) }
                         ?.let {
                             Files.newInputStream(it)
-                                    .bufferedReader()
-                                    .readText()
+                                    .use { stream ->
+                                        stream.bufferedReader().readText()
+                                    }
                         }
     }
 }
