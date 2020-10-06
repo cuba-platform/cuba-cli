@@ -42,6 +42,7 @@ import org.kodein.di.generic.instance
 import java.io.*
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.Comparator
 
 open class CommandTestBase {
@@ -88,7 +89,7 @@ open class CommandTestBase {
 
         val workingDirectoryManager: WorkingDirectoryManager by kodein.instance()
 
-        workingDirectoryManager.workingDirectory = workingDirectoryManager.workingDirectory.resolve("build/test-run")
+        workingDirectoryManager.workingDirectory = Paths.get(System.getProperty("user.dir")).resolve("build/test-run")
         testDir = workingDirectoryManager.workingDirectory
 
         Files.createDirectories(workingDirectoryManager.workingDirectory)
