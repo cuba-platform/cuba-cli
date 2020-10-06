@@ -21,6 +21,7 @@ import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.deploy.ContextXmlParams
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
+import com.haulmont.cuba.cli.cubaplugin.model.DataSourceProvider
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -60,8 +61,10 @@ class WarCommand : GeneratorCommand<WarModel>() {
 
         confirmation("includeTomcatContextXml", "Include Tomcat's context.xml?")
 
-        confirmation("generateContextXml", "Generate custom context.xml?") {
-            askIf("includeTomcatContextXml")
+        if(projectModel.database.dataSourceProvider == DataSourceProvider.JNDI) {
+            confirmation("generateContextXml", "Generate custom context.xml?") {
+                askIf("includeTomcatContextXml")
+            }
         }
 
         ContextXmlParams.run {

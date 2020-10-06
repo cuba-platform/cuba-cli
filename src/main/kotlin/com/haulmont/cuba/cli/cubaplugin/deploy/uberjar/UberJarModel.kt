@@ -25,7 +25,7 @@ class UberJarModel(answers: Answers, projectModel: ProjectModel) {
     val generateLogback: Boolean by answers
     val customLogback: String? by answers.withDefault { null }
 
-    val generateCustomJetty: Boolean by answers
+    val generateCustomJetty: Boolean by answers.withDefault { false }
     val jettyContextParams = answers["customJettyContextParams"]?.let { ContextXmlParams(it as Answers, projectModel) }
     val customJettyPath: String? by answers.withDefault { null }
 

@@ -21,6 +21,7 @@ import com.haulmont.cuba.cli.*
 import com.haulmont.cuba.cli.commands.GeneratorCommand
 import com.haulmont.cuba.cli.cubaplugin.deploy.ContextXmlParams
 import com.haulmont.cuba.cli.cubaplugin.di.cubaKodein
+import com.haulmont.cuba.cli.cubaplugin.model.DataSourceProvider
 import com.haulmont.cuba.cli.generation.TemplateProcessor
 import com.haulmont.cuba.cli.prompting.Answers
 import com.haulmont.cuba.cli.prompting.QuestionsList
@@ -63,7 +64,9 @@ class UberJarCommand : GeneratorCommand<UberJarModel>() {
             askIf("specifyLogback")
         }
 
-        confirmation("generateCustomJetty", "Generate custom Jetty environment file?")
+        if(projectModel.database.dataSourceProvider == DataSourceProvider.JNDI) {
+            confirmation("generateCustomJetty", "Generate custom Jetty environment file?")
+        }
 
         ContextXmlParams.run {
             askContextXmlParams(projectModel, questionName = "customJettyContextParams", askCondition = "generateCustomJetty")

@@ -61,7 +61,9 @@ private fun createDocumentBuilder(): DocumentBuilder {
 }
 
 fun save(document: Document, path: Path) = DOMSerializer(numIndentSpaces = 4).run {
-    serialize(document, Files.newOutputStream(path))
+    Files.newOutputStream(path).use { outputStream ->
+        serialize(document, outputStream)
+    }
 }
 
 fun updateXml(path: Path, block: Element.() -> Unit) {

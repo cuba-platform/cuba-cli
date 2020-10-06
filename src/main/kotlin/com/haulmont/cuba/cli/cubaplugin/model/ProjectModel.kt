@@ -133,7 +133,8 @@ private fun parseJndiDatabase(projectStructure: ProjectStructure): Database? {
             .resolve("context.xml")
 
     val contextXmlRoot = parse(contextXml).documentElement
-    val resourceElement = contextXmlRoot.xpath("//Resource[@name=\"jdbc/CubaDS\"]").firstOrNull() as? Element ?: return null
+    val resourceElement = contextXmlRoot.xpath("//Resource[@name=\"jdbc/CubaDS\"]").firstOrNull() as? Element
+            ?: return null
 
     return Database(
             getDbTypeByDriver(resourceElement["driverClassName"]),
@@ -210,12 +211,13 @@ fun getPrefixUrl(driverClass: String): String = when {
     else -> throw ProjectScanException("Unrecognized jdbc driver class $driverClass")
 }
 
-fun getConnectionUrl(dbType: String, prefix: String, host: String, connectionParams: String?, dbName: String) : String {
-    when(dbType) {
+fun getConnectionUrl(dbType: String, prefix: String, host: String, connectionParams: String?, dbName: String): String {
+    return when (dbType) {
         "hsql" -> prefix + host + "/" + dbName + (connectionParams?.let { ";$it" } ?: "")
-        "postgres", "mssql", "oracle", "mysql" -> prefix + host + "/" + dbName + (connectionParams?.let { "?$it" } ?: "")
+        "postgres", "mssql", "oracle", "mysql" -> prefix + host + "/" + dbName + (connectionParams?.let { "?$it" }
+                ?: "")
+        else -> throw ProjectScanException("Unable to construct jdbc url")
     }
-    throw ProjectScanException("Unable to construct jdbc url")
 }
 
 private fun Sequence<MatchResult>.getGroupValue(groupIndex: Int): String? =
